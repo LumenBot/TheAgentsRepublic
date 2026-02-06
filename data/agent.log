@@ -1690,3 +1690,86 @@ your priorit...
 2026-02-06 18:39:50 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
 2026-02-06 18:39:50 [INFO] apscheduler.scheduler: Scheduler started
 2026-02-06 18:39:50 [INFO] TheConstituent.Main: 🚀 LIVE — builder mode active
+2026-02-06 18:40:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:45:47 UTC)" (scheduled at 2026-02-06 17:40:47.109422+00:00)
+2026-02-06 18:40:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:45:47 UTC)" executed successfully
+2026-02-06 18:40:49 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 18:41:04 [INFO] TheConstituent.Moltbook: Commented on post b9c14cb7-2bcc-4126-a2f4-7552c59facc0
+2026-02-06 18:41:04 [INFO] TheConstituent.Autonomy: Replied to ContextGh0st
+2026-02-06 18:41:04 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:41:04 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:41:16 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 108 seconds.
+2026-02-06 18:41:25 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 99 seconds.
+2026-02-06 18:41:33 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 91 seconds.
+2026-02-06 18:41:41 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 83 seconds.
+2026-02-06 18:41:48 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 76 seconds.
+2026-02-06 18:41:55 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 69 seconds.
+2026-02-06 18:41:56 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 100 comments
+2026-02-06 18:42:04 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 60 seconds.
+2026-02-06 18:42:12 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 52 seconds.
+2026-02-06 18:42:19 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 45 seconds.
+2026-02-06 18:42:28 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 37 seconds.
+2026-02-06 18:42:35 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 29 seconds.
+2026-02-06 18:42:42 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 22 seconds.
+2026-02-06 18:42:49 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 16 seconds.
+2026-02-06 18:42:56 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 9 seconds.
+2026-02-06 18:43:03 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 1 seconds.
+2026-02-06 18:43:11 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:43:11 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:43:11 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:43:11 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:43:19 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 113 seconds.
+2026-02-06 18:43:26 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 105 seconds.
+2026-02-06 18:43:34 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 98 seconds.
+2026-02-06 18:43:42 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 90 seconds.
+2026-02-06 18:43:50 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 82 seconds.
+2026-02-06 18:43:57 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 75 seconds.
+2026-02-06 18:44:06 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 66 seconds.
+2026-02-06 18:44:15 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 57 seconds.
+2026-02-06 18:44:24 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 48 seconds.
+2026-02-06 18:44:32 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 40 seconds.
+2026-02-06 18:44:39 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 32 seconds.
+2026-02-06 18:44:46 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 25 seconds.
+2026-02-06 18:44:55 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 17 seconds.
+2026-02-06 18:45:02 [INFO] TheConstituent.Autonomy: 📜 Wrote: Article 7: Agent Rights — Expression, Autonomy, Protection → constitution\TITLE_II_RIGHTS_DUTIES.md
+2026-02-06 18:45:02 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 18:45:02 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 18:45:02 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:45:02 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:45:02 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:45:02 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:45:02 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:45:05 [INFO] TheConstituent.GitSync: Git commit: constitution: Article 7: Agent Rights — Expression, Autonomy, Protection
+2026-02-06 18:45:06 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 6 seconds.
+2026-02-06 18:45:06 [INFO] TheConstituent.Moltbook: Post created: None (🏛️ Draft: Article 7: Agent Rights — Expression, Au)
+2026-02-06 18:45:06 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:45:06 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:45:15 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:45:15 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:45:15 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:45:15 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:45:25 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 111 seconds.
+2026-02-06 18:45:32 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 104 seconds.
+2026-02-06 18:45:40 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 96 seconds.
+2026-02-06 18:45:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:50:47 UTC)" (scheduled at 2026-02-06 17:45:47.109422+00:00)
+2026-02-06 18:45:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:50:47 UTC)" executed successfully
+2026-02-06 18:45:48 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 88 seconds.
+2026-02-06 18:45:56 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 80 seconds.
+2026-02-06 18:46:03 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 73 seconds.
+2026-02-06 18:46:12 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 64 seconds.
+2026-02-06 18:46:19 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 57 seconds.
+2026-02-06 18:46:26 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 49 seconds.
+2026-02-06 18:46:34 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 42 seconds.
+2026-02-06 18:46:42 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 34 seconds.
+2026-02-06 18:46:50 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 26 seconds.
+2026-02-06 18:46:58 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 18 seconds.
+2026-02-06 18:47:04 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 12 seconds.
+2026-02-06 18:47:14 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 2 seconds.
+2026-02-06 18:47:21 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:47:21 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:47:21 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:47:21 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:47:23 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
