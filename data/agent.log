@@ -275,3 +275,16 @@ desc...
 2026-02-06 13:38:09 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
 2026-02-06 13:38:09 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:43:09 UTC)" executed successfully
 2026-02-06 13:39:49 [INFO] TheConstituent.TelegramBot: Message from 285623945: diagnostic : erreur 404 sur l'url de claim - probl...
+2026-02-06 13:42:10 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #1 (2026-02-06 12:42 UTC)
+2026-02-06 13:43:09 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:48:09 UTC)" (scheduled at 2026-02-06 12:43:09.211638+00:00)
+2026-02-06 13:43:09 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 13:43:09 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 13:43:09 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:48:09 UTC)" executed successfully
+2026-02-06 13:48:09 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:53:09 UTC)" (scheduled at 2026-02-06 12:48:09.211638+00:00)
+2026-02-06 13:48:09 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 13:48:09 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 13:48:09 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:53:09 UTC)" executed successfully
+2026-02-06 13:53:09 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:58:09 UTC)" (scheduled at 2026-02-06 12:53:09.211638+00:00)
+2026-02-06 13:53:09 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 13:53:09 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 13:53:09 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 12:58:09 UTC)" executed successfully
