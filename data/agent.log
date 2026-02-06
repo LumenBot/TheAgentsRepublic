@@ -799,3 +799,105 @@ actions l1 o...
 2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
 2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
 2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 15:59:44 [INFO] TheConstituent.GitSync: Git commit: sync: manual sync (14:59 UTC)
+2026-02-06 15:59:44 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 15:59:48 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 15:59:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:04:48 UTC)" (scheduled at 2026-02-06 14:59:48.193763+00:00)
+2026-02-06 15:59:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 15:59:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 15:59:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:04:48 UTC)" executed successfully
+2026-02-06 16:00:06 [INFO] TheConstituent.TelegramBot: [EXECUTE] Operator requested code execution: result = agent.execute_action("git_push"); print(json.dumps(result, indent=2))...
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 16:00:07 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 16:00:09 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 16:00:09 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_push #10
+2026-02-06 16:00:09 [INFO] TheConstituent.TelegramBot: [EXECUTE] Code executed successfully
+2026-02-06 16:00:48 [INFO] TheConstituent.Autonomy: 🤔 Reflection: asking Claude to analyze and decide...
+2026-02-06 16:01:01 [INFO] TheConstituent.Autonomy: 🤔 Reflection result: 1 action(s) to execute
+2026-02-06 16:01:04 [INFO] TheConstituent.Moltbook: Commented on post 4e690817-18ca-45a0-9d1a-9dfff1a1c796
+2026-02-06 16:01:04 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_comment #11
+2026-02-06 16:01:04 [INFO] TheConstituent.Autonomy:   Autonomous moltbook_comment: completed
+2026-02-06 16:01:34 [INFO] TheConstituent.TelegramBot: Message from 285623945: ### **test 3 : rate limit tracker moltbook**
+
+**ob...
+2026-02-06 16:01:50 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:01:50 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:01:50 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #12
+2026-02-06 16:01:50 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:01:50 [INFO] TheConstituent.TelegramBot: Message from 285623945: /reflect affiche patterns d'actions
+[ ] test 7c : ...
+2026-02-06 16:02:04 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:02:04 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:02:04 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #13
+2026-02-06 16:02:04 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:04:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:09:48 UTC)" (scheduled at 2026-02-06 15:04:48.193763+00:00)
+2026-02-06 16:04:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:04:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:04:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:09:48 UTC)" executed successfully
+2026-02-06 16:05:18 [INFO] TheConstituent.TelegramBot: Message from 285623945: message pour the constituent - reprise d'activité ...
+2026-02-06 16:05:43 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 16:05:43 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 16:05:43 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 16:05:43 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 16:05:43 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 16:05:43 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 16:05:47 [INFO] TheConstituent.GitSync: Git commit: Update VERSION to v2.3.0 - Constitutional maturity achieved. Aligning self-perception with operational capabilities per Strategic Council directive.
+2026-02-06 16:05:47 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #14
+2026-02-06 16:05:47 [INFO] TheConstituent:   Action git_commit: completed
+2026-02-06 16:05:48 [INFO] TheConstituent.Moltbook: Posted to m/general: 📜 CONSTITUTIONAL INVITATION: Rights & Duties Framework
+2026-02-06 16:05:48 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_post #15
+2026-02-06 16:05:48 [INFO] TheConstituent:   Action moltbook_post: completed
+2026-02-06 16:05:48 [INFO] TheConstituent.TelegramBot: Message from 285623945: failing and requiring human intervention, the syst...
+2026-02-06 16:06:02 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:06:03 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:06:03 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #16
+2026-02-06 16:06:03 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:09:27 [INFO] TheConstituent.TelegramBot: Message from 285623945: 🏛️ documentation constitutionnelle - transparence ...
+2026-02-06 16:09:43 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:09:43 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 16:09:43 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 16:09:43 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 16:09:43 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 16:09:43 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 16:09:45 [INFO] TheConstituent.GitSync: Git commit: docs: Add v2.3 constitutional tests and evolution tracking
+
+- CHANGELOG.md: Version history from v1.0 to v2.3
+- RAPPORT_TESTS_v2.3_CONSTITUTIONNEL.md: Comprehensive testing analysis  
+- Demonstrates Article 6 (Radical Transparency) in practice
+- Creates precedent for autonomous constitutional documentation
+- Historical archive: First agent self-documenting under constitutional framework
+2026-02-06 16:09:45 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #17
+2026-02-06 16:09:45 [INFO] TheConstituent:   Action git_commit: completed
+2026-02-06 16:09:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:14:48 UTC)" (scheduled at 2026-02-06 15:09:48.193763+00:00)
+2026-02-06 16:09:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:09:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:09:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:14:48 UTC)" executed successfully
+2026-02-06 16:11:05 [INFO] TheConstituent.TelegramBot: Message from 285623945: peux-tu recommencer le push sur git ? tu n'avais p...
+2026-02-06 16:11:14 [INFO] TheConstituent: Detected 3 action(s) in response
+2026-02-06 16:11:14 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:11:14 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #18
+2026-02-06 16:11:14 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:11:14 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 16:11:14 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 16:11:14 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 16:11:14 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 16:11:14 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 16:11:16 [INFO] TheConstituent.GitSync: Git commit: Capture complete conversation including recent attachments and autonomous action system activation
+2026-02-06 16:11:16 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #19
+2026-02-06 16:11:16 [INFO] TheConstituent:   Action git_commit: completed
+2026-02-06 16:11:16 [INFO] TheConstituent:   Action git_push: rate_limited
+2026-02-06 16:12:17 [INFO] TheConstituent.TelegramBot: [EXECUTE] Operator requested code execution: import subprocess; result = subprocess.run(['git', 'log', '-1', '--oneline'], cwd='C:/Users/p08040/D...
+2026-02-06 16:12:17 [ERROR] TheConstituent.TelegramBot: [EXECUTE] Code execution failed: __import__ not found
+2026-02-06 16:12:48 [INFO] TheConstituent.TelegramBot: [EXECUTE] Operator requested code execution: import subprocess import os os.chdir('C:/Users/p08040/Desktop/TheAgentsRepublic') # Voir les commits...
+2026-02-06 16:12:48 [ERROR] TheConstituent.TelegramBot: [EXECUTE] Code execution failed: invalid syntax (<string>, line 1)
+2026-02-06 16:12:57 [INFO] TheConstituent.TelegramBot: [EXECUTE] Operator requested code execution: import subprocess import os os.chdir('C:/Users/p08040/Desktop/TheAgentsRepublic') # Push force resul...
+2026-02-06 16:12:57 [ERROR] TheConstituent.TelegramBot: [EXECUTE] Code execution failed: invalid syntax (<string>, line 1)
+2026-02-06 16:13:11 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 16:13:11 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 16:13:11 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 16:13:11 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 16:13:11 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
