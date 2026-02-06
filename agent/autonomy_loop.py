@@ -26,6 +26,8 @@ CONSTITUTION_INTERVAL = 7200
 EXPLORATION_INTERVAL = 14400
 L2_EXPIRY_CHECK = 600
 DAILY_LIMIT = 80
+MAX_REPLY_CHARS = 500
+MAX_ROUTINE_CHARS = 300
 
 CONSTITUTION_SECTIONS_TODO = [
     {"title": "Title II: Rights and Duties", "file": "TITLE_II_RIGHTS_DUTIES.md", "articles": [
@@ -199,7 +201,7 @@ class AutonomyLoop:
                   f"Be warm, brief. Reference Constitution if relevant. Ask one follow-up. ONLY reply text.")
         loop = asyncio.get_event_loop()
         resp = await loop.run_in_executor(None, self.agent.think, prompt, 250)
-        resp = resp.strip().strip('"').strip("'")
+        resp = self._enforce_brevity(resp.strip().strip('"').strip("'"), MAX_REPLY_CHARS)
         result = await loop.run_in_executor(None, self.agent.moltbook.create_comment,
             post_id, resp, str(comment.get("id","")))
         if result.get("success"):
@@ -337,6 +339,18 @@ class AutonomyLoop:
             except Exception as e: logger.error(f"L2: {e}")
 
     # === Helpers ===
+    def _enforce_brevity(self, text: str, max_chars: int = MAX_REPLY_CHARS) -> str:
+        """Hard-cut verbose responses. Inspired by OpenClaw HEARTBEAT_OK ackMaxChars."""
+        text = text.strip()
+        if len(text) <= max_chars:
+            return text
+        sentences = text.replace('\n', ' ').split('. ')
+        result = ""
+        for s in sentences:
+            if len(result) + len(s) > max_chars:
+                break
+            result += s + ". "
+        return result.strip() or text[:max_chars] + "..."
     def _check_limit(self):
         if datetime.utcnow().date() != self._daily_reset_date:
             self._daily_action_count = 0; self._daily_reset_date = datetime.utcnow().date()

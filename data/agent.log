@@ -2299,3 +2299,15 @@ answer these 5 questions wit...
 2026-02-06 20:20:48 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
 2026-02-06 20:20:48 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
 2026-02-06 20:20:48 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 20:20:51 [INFO] TheConstituent.GitSync: Git commit: sync: manual sync (19:20 UTC)
+2026-02-06 20:20:51 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 20:20:54 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 20:20:57 [INFO] TheConstituent.Main: Signal 2, shutting down...
+2026-02-06 20:20:57 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 20:20:57 [INFO] TheConstituent.Autonomy: Autonomy stopped
+2026-02-06 20:20:57 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 20:20:57 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 20:21:00 [INFO] TheConstituent.GitSync: Git commit: shutdown: v4.0 state saved
+2026-02-06 20:21:00 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 20:21:03 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 20:21:03 [INFO] TheConstituent.Main: ✅ Shutdown complete
