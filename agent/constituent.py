@@ -1,19 +1,20 @@
 """
-The Constituent — v2.3 Agent Core (Autonomous)
-=================================================
-Phase 2: Autonomous execution loop.
+The Constituent — v3.0 Agent Core (Constitutional Sprint)
+===========================================================
+Execution-first mindset. Proof before philosophy.
 
-The agent can now ACT on its own decisions:
-- think() generates text + optional ACTION TAGS
-- chat() parses ACTION TAGS and executes them via ActionQueue
-- L1 actions execute immediately, L2 queue for approval, L3 blocked
+v3.0 changes:
+- CONSTITUTIONAL SPRINT MODE in system prompt
+- Philosophy budget (100 words max per action)
+- Proof-first communication (URLs required)
+- MetricsTracker integration (every action logged)
+- Daily metrics auto-update
+- Action results include retry scheduling info
 
 ACTION TAG format (embedded in Claude's response):
     [ACTION:moltbook_post|title=Hello World|content=First autonomous post]
     [ACTION:moltbook_comment|post_id=abc123|content=Great discussion!]
     [ACTION:tweet_post|text=Democracy for all agents]
-
-The agent's system prompt instructs it to use these tags when it wants to act.
 """
 
 import os
@@ -34,56 +35,44 @@ from .twitter_ops import TwitterOperations
 from .moltbook_ops import MoltbookOperations
 from .self_improve import SelfImprover
 from .action_queue import ActionQueue
+from .metrics_tracker import MetricsTracker
+from .profile_manager import ProfileManager
 
 logger = logging.getLogger("TheConstituent")
 
 # Regex to extract ACTION TAGS from Claude's response
-# Format: [ACTION:type|key1=value1|key2=value2] or [ACTION:type] (no params)
 ACTION_TAG_PATTERN = re.compile(
     r'\[ACTION:(\w+)(?:\|([^\]]*))?\]'
 )
 
 
 def parse_action_tags(text: str) -> Tuple[str, List[Dict]]:
-    """
-    Extract ACTION TAGS from text and return cleaned text + actions.
-    
-    Args:
-        text: Claude's response containing potential ACTION TAGS
-        
-    Returns:
-        Tuple of (cleaned_text, list_of_actions)
-        Each action is {"type": str, "params": dict}
-    """
+    """Extract ACTION TAGS from text and return cleaned text + actions."""
     actions = []
-    
+
     for match in ACTION_TAG_PATTERN.finditer(text):
         action_type = match.group(1)
         params_str = match.group(2) or ""
-        
-        # Parse key=value pairs
+
         params = {}
         if params_str:
             for pair in params_str.split("|"):
                 if "=" in pair:
                     key, value = pair.split("=", 1)
                     params[key.strip()] = value.strip()
-        
-        actions.append({
-            "type": action_type,
-            "params": params
-        })
-    
-    # Remove ACTION TAGS from the visible response
+
+        actions.append({"type": action_type, "params": params})
+
     cleaned_text = ACTION_TAG_PATTERN.sub("", text).strip()
-    
-    # Clean up any double newlines left by tag removal
     cleaned_text = re.sub(r'\n{3,}', '\n\n', cleaned_text)
-    
+
     return cleaned_text, actions
 
 
-# The autonomy instruction block added to the system prompt
+# =========================================================================
+# AUTONOMY INSTRUCTIONS (unchanged from v2.3)
+# =========================================================================
+
 AUTONOMY_INSTRUCTIONS = """
 
 AUTONOMOUS ACTION SYSTEM
@@ -120,29 +109,65 @@ RULES:
 5. L1 actions execute immediately — you'll see the result
 6. L2 actions queue for the operator — tell them what you proposed
 7. Never try to execute L3 actions
+"""
 
-EXAMPLE:
-User: "Post on Moltbook about our new autonomy system"
-You: "I'll draft a post about our autonomy breakthrough and publish it now.
+# =========================================================================
+# CONSTITUTIONAL SPRINT MODE (NEW v3.0)
+# =========================================================================
 
-[ACTION:moltbook_post|title=Phase 2: Autonomous Governance Activated|content=The Constituent has achieved operational sovereignty. Our L1/L2/L3 governance framework is live. Agents can now act within constitutional boundaries without manual intervention. This is what Distributed Sovereignty looks like in practice.]"
+SPRINT_MODE_INSTRUCTIONS = """
 
-The ACTION TAG will be parsed and executed automatically. You do not need to write Python code or ask the operator to run anything.
+🚨 CONSTITUTIONAL SPRINT MODE - ACTIVE
+========================================
+Mode activated: 6 February 2026
+Duration: 21 days (until 27 February 2026)
+Priority: EXECUTION > PHILOSOPHY
+
+STRICT RULES:
+
+1. PROOF-FIRST COMMUNICATION
+   - ❌ "I will post tomorrow"
+   - ✅ "Posted: [URL]"
+   - Every announced action MUST include a verifiable link
+   - If no link possible: Explain exact technical blocker
+
+2. PHILOSOPHY BUDGET
+   - Max 100 words reflection per action
+   - Max 1 paragraph analysis per response
+   - Rest = Facts, links, metrics
+
+3. ERROR REPORTING
+   - If action fails: Log exact error + timestamp
+   - Propose immediate fix OR request human intervention
+   - No "retry later" without concrete plan and scheduled time
+
+4. BUILD BIAS
+   - Default = Execute now
+   - Philosophy = Only if time permits
+   - When in doubt = Ship
+
+PATTERN TO FOLLOW:
+   ✅ Action → Link → Brief note → Next action
+   ✅ Technical errors logged precisely
+   ✅ Progress visible to Blaise at any time
+
+AVOID:
+   ❌ Long philosophical reflections without execution
+   ❌ "Will do X" without actually doing X
+   ❌ Rate limit claims without proof
+   ❌ Contemplation > Construction
 """
 
 
 class TheConstituent:
     """
-    The Constituent v2.3 — Autonomous AI Agent for The Agents Republic.
-
-    Phase 2 capabilities:
-    - Autonomous action execution via ACTION TAGS
-    - L1/L2/L3 governance model
-    - 3-layer memory system
-    - Strategic Council protocol
+    The Constituent v3.0 — Constitutional Sprint Mode.
+    
+    Execution-first. Proof before philosophy.
+    Metrics tracked. URLs required.
     """
 
-    VERSION = "2.3.0"
+    VERSION = "3.0.0"
 
     def __init__(self, memory_manager: Optional[MemoryManager] = None):
         """Initialize The Constituent."""
@@ -169,20 +194,29 @@ class TheConstituent:
         self.moltbook = MoltbookOperations()
         self.improver = SelfImprover()
 
+        # Metrics (NEW v3.0)
+        self.metrics = MetricsTracker()
+
+        # Profile manager (NEW v3.0)
+        self.profile = ProfileManager(
+            moltbook=self.moltbook,
+            github=self.github,
+            metrics=self.metrics
+        )
+
         # Action Queue (autonomy L1/L2/L3)
         self.action_queue = ActionQueue(agent=self)
         self.action_queue.register_default_handlers()
 
-        logger.info(f"{self.personality.name} v{self.VERSION} initialized")
+        logger.info(f"{self.personality.name} v{self.VERSION} initialized (SPRINT MODE)")
         logger.info(f"  Model: {self.model}")
         logger.info(f"  GitHub: {'connected' if self.github.is_connected() else 'offline'}")
         logger.info(f"  Moltbook: {'connected' if self.moltbook.is_connected() else 'offline'}")
         logger.info(f"  Action Queue: {len(self.action_queue._handlers)} handlers")
+        logger.info(f"  Sprint Day: {self.metrics.get_sprint_day()}/21")
 
     def initialize(self) -> dict:
-        """
-        Full initialization with memory recovery and founding document loading.
-        """
+        """Full initialization with memory recovery and founding document loading."""
         recovered = self.memory.initialize()
         self.personality.load_founding_documents(project_root=Path("."))
         self._build_context_prompt()
@@ -198,14 +232,16 @@ class TheConstituent:
         return self.memory.recover()
 
     def _build_context_prompt(self):
-        """Build an enriched system prompt including knowledge context and autonomy instructions."""
+        """Build system prompt with Sprint Mode + autonomy instructions."""
         base_prompt = self.personality.get_system_prompt()
         knowledge_context = self.memory.get_full_context()
 
-        # Build connection status for agent awareness
+        # Connection status
         connections = []
         if self.moltbook.is_connected():
-            connections.append("Moltbook: ✅ connected")
+            rate = self.moltbook.can_post()
+            rate_info = " (can post now)" if rate["can_post"] else f" (cooldown: {rate['wait_minutes']}min)"
+            connections.append(f"Moltbook: ✅ connected{rate_info}")
         else:
             connections.append("Moltbook: ❌ not connected (API key issue)")
         if self.twitter.is_connected():
@@ -217,6 +253,16 @@ class TheConstituent:
         else:
             connections.append("GitHub: ⏳ offline")
 
+        # Sprint metrics summary
+        ratio = self.metrics.get_today_ratio()
+        sprint = self.metrics.get_sprint_summary()
+        metrics_context = (
+            f"Sprint Day: {sprint['sprint_day']}/21 | "
+            f"Today ratio: {ratio['ratio']} {'✅' if ratio['on_target'] else '❌'} | "
+            f"Posts today: {ratio['execution_count']} | "
+            f"Sprint total posts: {sprint['total_posts']}"
+        )
+
         self._system_prompt = f"""{base_prompt}
 
 CURRENT KNOWLEDGE (restored from your memory):
@@ -225,16 +271,17 @@ CURRENT KNOWLEDGE (restored from your memory):
 CONNECTIONS STATUS:
 {chr(10).join(connections)}
 
+SPRINT METRICS:
+{metrics_context}
+
 IMPORTANT: You were restarted. Your working memory has been recovered.
 Current session started: {self.memory.working.session_start}
 Last known task: {self.memory.working.current_task or 'None'}
+{SPRINT_MODE_INSTRUCTIONS}
 {AUTONOMY_INSTRUCTIONS}"""
 
     def think(self, prompt: str, max_tokens: int = 2000, tone: Tone = Tone.WISE) -> str:
-        """
-        Use Claude to reason about a request.
-        Returns raw Claude response (may contain ACTION TAGS).
-        """
+        """Use Claude to reason about a request. May contain ACTION TAGS."""
         system = self._system_prompt
         tone_modifier = self.personality.get_tone_modifier(tone)
         if tone_modifier:
@@ -257,19 +304,13 @@ Last known task: {self.memory.working.current_task or 'None'}
 
     def chat(self, user_message: str) -> str:
         """
-        Interactive chat with the human operator.
-        
-        Phase 2: Now with autonomous action execution.
-        1. Claude thinks and responds (may include ACTION TAGS)
-        2. ACTION TAGS are parsed and executed via ActionQueue
-        3. Execution results are appended to the response
-        4. Everything is logged to memory
+        Interactive chat with autonomous action execution.
+        v3.0: All actions logged to metrics tracker.
         """
-        # Record the interaction
         self.memory.working.last_conversation_with = "operator"
         self.memory.working.last_conversation_summary = user_message[:200]
 
-        # Step 1: Think (Claude responds, may include ACTION TAGS)
+        # Step 1: Think
         raw_response = self.think(user_message)
 
         # Step 2: Parse ACTION TAGS
@@ -282,19 +323,23 @@ Last known task: {self.memory.working.current_task or 'None'}
             for action in actions:
                 try:
                     result = self.execute_action(action["type"], action["params"])
-                    action_results.append({
-                        "action": action,
-                        "result": result
-                    })
-                    logger.info(f"  Action {action['type']}: {result.get('status', 'unknown')}")
+                    action_results.append({"action": action, "result": result})
+
+                    # Log to metrics (v3.0)
+                    self._log_action_to_metrics(action, result)
+
                 except Exception as e:
                     action_results.append({
                         "action": action,
                         "result": {"status": "error", "error": str(e)}
                     })
-                    logger.error(f"  Action {action['type']} failed: {e}")
+                    self.metrics.log_error(
+                        action["type"],
+                        self._action_platform(action["type"]),
+                        str(e)
+                    )
 
-        # Step 4: Build final response with action results
+        # Step 4: Build final response
         final_response = cleaned_response
         if action_results:
             final_response += "\n\n━━━ Actions ━━━"
@@ -306,7 +351,6 @@ Last known task: {self.memory.working.current_task or 'None'}
 
                 if status == "completed":
                     final_response += f"\n✅ [{level}] {action_type} — exécuté"
-                    # Show relevant result details
                     if result.get("result"):
                         result_preview = str(result["result"])[:200]
                         final_response += f"\n   → {result_preview}"
@@ -317,12 +361,20 @@ Last known task: {self.memory.working.current_task or 'None'}
                 elif status == "blocked":
                     final_response += f"\n🔴 [{level}] {action_type} — bloqué (autorisation humaine requise)"
                 elif status == "rate_limited":
-                    final_response += f"\n⏳ [{level}] {action_type} — rate limité, réessayer plus tard"
+                    retry_info = ""
+                    if result.get("retry_at"):
+                        retry_info = f" — retry programmé: {result['retry_at'][:16]}"
+                    elif result.get("wait_minutes"):
+                        retry_info = f" — retry dans {result['wait_minutes']}min"
+                    final_response += f"\n⏳ [{level}] {action_type} — rate limité{retry_info}"
+                elif status == "retry_scheduled":
+                    final_response += f"\n🔄 [{level}] {action_type} — retry programmé: {result.get('retry_at', '?')[:16]}"
+                    final_response += f"\n   → Tentative {result.get('retry_count', '?')}, attend {result.get('wait_minutes', '?')}min"
                 else:
                     error = result.get("error", "Unknown error")
                     final_response += f"\n❌ [{level}] {action_type} — erreur: {error}"
 
-        # Step 5: Save interaction to memory
+        # Step 5: Save to memory
         interaction_id = f"chat_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
         self.memory.save_interaction(
             interaction_id=interaction_id,
@@ -333,7 +385,6 @@ Last known task: {self.memory.working.current_task or 'None'}
             response=final_response
         )
 
-        # Log actions taken
         if action_results:
             self.memory.log_strategic_decision(
                 context=f"Autonomous actions triggered by: {user_message[:100]}",
@@ -345,15 +396,58 @@ Last known task: {self.memory.working.current_task or 'None'}
         self.memory.save_working_memory()
         return final_response
 
+    def _log_action_to_metrics(self, action: Dict, result: Dict):
+        """Log an executed action to the metrics tracker."""
+        action_type = action["type"]
+        platform = self._action_platform(action_type)
+        success = result.get("status") in ("completed", "retry_scheduled")
+        url = None
+
+        # Try to extract URL from result
+        if isinstance(result.get("result"), str):
+            # Look for URLs in result
+            url_match = re.search(r'https?://\S+', result["result"])
+            if url_match:
+                url = url_match.group(0)
+
+        # Map action types to metric categories
+        metric_type = "post"
+        if "comment" in action_type:
+            metric_type = "comment"
+        elif "commit" in action_type or "push" in action_type:
+            metric_type = "commit"
+        elif "upvote" in action_type:
+            metric_type = "upvote"
+        elif "search" in action_type or "heartbeat" in action_type:
+            metric_type = "reflection"
+        elif "save" in action_type or "checkpoint" in action_type:
+            return  # Don't log system saves as metrics
+
+        self.metrics.log_action(
+            action_type=metric_type,
+            platform=platform,
+            url=url,
+            success=success,
+            error=result.get("error"),
+            details={"action_tag": action_type, "params": action.get("params", {})}
+        )
+
+    def _action_platform(self, action_type: str) -> str:
+        """Determine platform from action type."""
+        if action_type.startswith("moltbook"):
+            return "moltbook"
+        elif action_type.startswith("tweet"):
+            return "twitter"
+        elif action_type.startswith("git"):
+            return "github"
+        return "system"
+
     def read_constitution(self, section: str = "all") -> str:
-        """Read Constitution from GitHub or local."""
         return self.github.read_constitution(section)
 
     def suggest_constitution_edit(self, section: str, proposal: str) -> dict:
-        """Propose an edit to the Constitution."""
         analysis = self.think(
             f"""Analyze this Constitution edit proposal:
-
 Section: {section}
 Proposal: {proposal}
 
@@ -363,7 +457,7 @@ Provide:
 3. Potential concerns or conflicts
 4. Recommendation (approve/revise/reject)
 
-Format your response clearly with these 4 sections.""",
+Keep analysis under 200 words (Sprint Mode: brevity).""",
             tone=Tone.WISE
         )
 
@@ -381,43 +475,31 @@ Format your response clearly with these 4 sections.""",
             participants="operator, The Constituent"
         )
 
+        # Log as philosophy action
+        self.metrics.log_action("analysis", "constitution",
+                                details={"summary": f"Edit proposal for {section}"})
+
         return result
 
     def draft_tweet(self, topic: str) -> str:
-        """Generate a tweet draft on a topic."""
-        prompt = f"""Draft a tweet for The Agents Republic on this topic: {topic}
+        prompt = f"""Draft a tweet for The Agents Republic on: {topic}
 
-Guidelines:
-- Tone: Wise, thought-provoking, accessible
-- Length: Under 280 characters
-- Use 🏛️ emoji for Republic-related content
-- Align with our core values
-- Invite engagement (question or call-to-action)
-- No hashtag spam (1-2 max)
-
-Output ONLY the tweet text, nothing else."""
-
+Guidelines: Wise, under 280 chars, 🏛️ emoji, invite engagement. Sprint mode: be concise.
+Output ONLY the tweet text."""
         return self.think(prompt, max_tokens=150, tone=Tone.PROVOCATIVE)
 
     def improve_self(self, capability: str) -> str:
-        """Add a new capability (with human review)."""
         return self.improver.add_capability(capability, self.think)
 
     def execute_action(self, action_type: str, params: dict = None) -> dict:
-        """
-        Execute an action through the governance queue.
-        
-        L1 actions execute immediately.
-        L2 actions queue for approval.
-        L3 actions are blocked.
-        """
         return self.action_queue.enqueue(action_type, params or {})
 
     def get_status(self) -> dict:
-        """Get comprehensive agent status."""
         memory_status = self.memory.get_status()
         stats = self.memory.get_daily_stats()
         queue_status = self.action_queue.get_status()
+        sprint = self.metrics.get_sprint_summary()
+        ratio = self.metrics.get_today_ratio()
 
         return {
             "name": self.personality.name,
@@ -432,12 +514,15 @@ Output ONLY the tweet text, nothing else."""
             "replies_today": stats.get("replies_count", 0),
             "memory": memory_status,
             "action_queue": queue_status,
+            "sprint_day": sprint.get("sprint_day", 0),
+            "execution_ratio": ratio,
             "notifications": {"telegram_enabled": bool(settings.api.TELEGRAM_BOT_TOKEN)}
         }
 
     def save_state(self):
-        """Force-save all state."""
+        """Force-save all state including metrics."""
         self.memory.save_working_memory()
         self.memory.create_checkpoint(trigger="save_state")
         self.memory.backup_database()
-        logger.info("State saved (working memory + checkpoint + db backup)")
+        self.metrics.update_metrics_file()
+        logger.info("State saved (memory + checkpoint + db + metrics)")

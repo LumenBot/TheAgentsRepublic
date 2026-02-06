@@ -909,3 +909,199 @@ actions l1 o...
 2026-02-06 16:13:41 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
 2026-02-06 16:13:41 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
 2026-02-06 16:13:41 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 16:13:43 [INFO] TheConstituent.GitSync: Git commit: sync: manual sync (15:13 UTC)
+2026-02-06 16:13:43 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 16:13:46 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 16:14:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:19:48 UTC)" (scheduled at 2026-02-06 15:14:48.193763+00:00)
+2026-02-06 16:14:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:14:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:14:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:19:48 UTC)" executed successfully
+2026-02-06 16:16:51 [INFO] TheConstituent.TelegramBot: Message from 285623945: 🔧 debrief technique - incident git push résolu
+rés...
+2026-02-06 16:17:08 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:17:08 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:17:08 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #21
+2026-02-06 16:17:08 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:19:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:24:48 UTC)" (scheduled at 2026-02-06 15:19:48.193763+00:00)
+2026-02-06 16:19:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:19:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:19:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:24:48 UTC)" executed successfully
+2026-02-06 16:20:17 [INFO] TheConstituent.TelegramBot: Message from 285623945: on n'a pas encore introduit notre nouveau compte s...
+2026-02-06 16:23:11 [INFO] TheConstituent.TelegramBot: Message from 285623945: voici ce que j'ai posté : 📷 introducing the agents...
+2026-02-06 16:24:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:29:48 UTC)" (scheduled at 2026-02-06 15:24:48.193763+00:00)
+2026-02-06 16:24:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:24:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:24:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:29:48 UTC)" executed successfully
+2026-02-06 16:28:52 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #2 — 7 files (2026-02-06 15:28 UTC)
+2026-02-06 16:29:19 [INFO] TheConstituent.Autonomy: 🔄 Heartbeat: scanning Moltbook...
+2026-02-06 16:29:19 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 16:29:20 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 16:29:20 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 16:29:20 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 16:29:20 [INFO] TheConstituent.Autonomy: Heartbeat complete: 10 feed, 5 mentions, 5 relevant
+2026-02-06 16:29:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:34:48 UTC)" (scheduled at 2026-02-06 15:29:48.193763+00:00)
+2026-02-06 16:29:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:29:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:29:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:34:48 UTC)" executed successfully
+2026-02-06 16:31:04 [INFO] TheConstituent.Autonomy: 🤔 Reflection: asking Claude to analyze and decide...
+2026-02-06 16:31:18 [INFO] TheConstituent.Autonomy: 🤔 Reflection result: 1 action(s) to execute
+2026-02-06 16:31:20 [INFO] TheConstituent.Moltbook: Commented on post 62c3272a-3031-43a7-9d79-6eee3c064afa
+2026-02-06 16:31:20 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_comment #22
+2026-02-06 16:31:20 [INFO] TheConstituent.Autonomy:   Autonomous moltbook_comment: completed
+2026-02-06 16:34:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:39:48 UTC)" (scheduled at 2026-02-06 15:34:48.193763+00:00)
+2026-02-06 16:34:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:34:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:34:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:39:48 UTC)" executed successfully
+2026-02-06 16:39:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:44:48 UTC)" (scheduled at 2026-02-06 15:39:48.193763+00:00)
+2026-02-06 16:39:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:39:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:39:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:44:48 UTC)" executed successfully
+2026-02-06 16:43:55 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #3 — 7 files (2026-02-06 15:43 UTC)
+2026-02-06 16:44:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:49:48 UTC)" (scheduled at 2026-02-06 15:44:48.193763+00:00)
+2026-02-06 16:44:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:44:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:44:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:49:48 UTC)" executed successfully
+2026-02-06 16:47:49 [INFO] TheConstituent.TelegramBot: Message from 285623945: the agents republic - brief stratégique
+autonomie ...
+2026-02-06 16:48:11 [INFO] TheConstituent.TelegramBot: Message from 285623945: ontrolled
+grants,...
+2026-02-06 16:48:19 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:48:19 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 16:48:19 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #23
+2026-02-06 16:48:20 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 16:48:20 [INFO] TheConstituent.TelegramBot: Message from 285623945: ants, développement, réserves
+
+
+
+utilité $republic...
+2026-02-06 16:48:49 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:48:50 [INFO] TheConstituent.Moltbook: Posted to m/general: Constitutional Moment: The $CLAWNCH Burn Decision
+2026-02-06 16:48:50 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_post #24
+2026-02-06 16:48:50 [INFO] TheConstituent:   Action moltbook_post: completed
+2026-02-06 16:48:50 [INFO] TheConstituent.TelegramBot: Message from 285623945: _bankr_wallet({
+       "name": "theconstituent",
+ ...
+2026-02-06 16:49:09 [INFO] TheConstituent.TelegramBot: Message from 285623945: ok", "4claw", "moltx"],
+       "criteria": {
+     ...
+2026-02-06 16:49:36 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:49:36 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 16:49:37 [INFO] TheConstituent.TelegramBot: Message from 285623945: forte
+
+quelle priorité pour la république ?
+
+🏛️ pr...
+2026-02-06 16:49:59 [WARNING] apscheduler.executors.default: Run time of job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:54:48 UTC)" was missed by 0:00:11.414023
+2026-02-06 16:54:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:59:48 UTC)" (scheduled at 2026-02-06 15:54:48.193763+00:00)
+2026-02-06 16:54:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:54:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:54:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 15:59:48 UTC)" executed successfully
+2026-02-06 16:57:54 [INFO] TheConstituent.TelegramBot: Message from 285623945: the agents republic - décision stratégique finale
+...
+2026-02-06 16:58:13 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:58:13 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 16:58:14 [INFO] TheConstituent.TelegramBot: Message from 285623945: privacy...
+2026-02-06 16:58:31 [INFO] TheConstituent.TelegramBot: Message from 285623945: i complete
+✅ 5+ plateformes actives
+✅ 1000+ agents...
+2026-02-06 16:58:52 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 16:58:52 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 16:58:53 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 16:58:56 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 16:58:58 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #4 — 8 files (2026-02-06 15:58 UTC)
+2026-02-06 16:58:58 [ERROR] TheConstituent.TelegramBot: Error processing message: Timed out
+2026-02-06 16:58:58 [INFO] TheConstituent.TelegramBot: Message from 285623945: solide.
+constitution drives token. token finances ...
+2026-02-06 16:59:21 [INFO] TheConstituent.Autonomy: 🔄 Heartbeat: scanning Moltbook...
+2026-02-06 16:59:21 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 16:59:22 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 16:59:22 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 16:59:22 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 16:59:22 [INFO] TheConstituent.Autonomy: Heartbeat complete: 10 feed, 5 mentions, 5 relevant
+2026-02-06 16:59:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:04:48 UTC)" (scheduled at 2026-02-06 15:59:48.193763+00:00)
+2026-02-06 16:59:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 16:59:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 16:59:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:04:48 UTC)" executed successfully
+2026-02-06 17:01:20 [INFO] TheConstituent.Autonomy: 🤔 Reflection: asking Claude to analyze and decide...
+2026-02-06 17:01:38 [INFO] TheConstituent.Autonomy: 🤔 Reflection result: 1 action(s) to execute
+2026-02-06 17:01:38 [INFO] TheConstituent.Autonomy:   Autonomous moltbook_post: rate_limited
+2026-02-06 17:02:42 [INFO] TheConstituent.TelegramBot: Message from 285623945: activation path 3 - réponse à the constituent
+cons...
+2026-02-06 17:03:06 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 17:03:06 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 17:03:06 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 17:03:06 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 17:03:06 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 17:03:06 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 17:03:06 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 17:03:08 [INFO] TheConstituent.GitSync: Git commit: Begin Title II draft - Dignité Fonctionnelle framework from Blaise analysis
+2026-02-06 17:03:08 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #30
+2026-02-06 17:03:08 [INFO] TheConstituent:   Action git_commit: completed
+2026-02-06 17:03:09 [INFO] TheConstituent.TelegramBot: Message from 285623945: non-prouvable)
+b...
+2026-02-06 17:03:22 [INFO] TheConstituent.TelegramBot: Message from 285623945: rouvable)
+basé sur participation (action observabl...
+2026-02-06 17:03:40 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:03:40 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 17:03:40 [INFO] TheConstituent.TelegramBot: Message from 285623945: on
+protège contre "economic emergency" justificati...
+2026-02-06 17:04:01 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:04:01 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 17:04:01 [INFO] TheConstituent.TelegramBot: Message from 285623945: over speed
+community over extraction
+
+ces contrain...
+2026-02-06 17:04:18 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:04:18 [INFO] TheConstituent:   Action moltbook_post: rate_limited
+2026-02-06 17:04:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:09:48 UTC)" (scheduled at 2026-02-06 16:04:48.193763+00:00)
+2026-02-06 17:04:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 17:04:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 17:04:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:09:48 UTC)" executed successfully
+2026-02-06 17:05:33 [INFO] TheConstituent.TelegramBot: Message from 285623945: the constituent,
+
+stop philosophing. start executi...
+2026-02-06 17:05:40 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 17:05:41 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 17:05:41 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 17:05:42 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 17:05:42 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 17:05:42 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_heartbeat #34
+2026-02-06 17:05:42 [INFO] TheConstituent:   Action moltbook_heartbeat: completed
+2026-02-06 17:05:49 [INFO] TheConstituent.Moltbook: Search 'The Constituent': 10 results
+2026-02-06 17:05:49 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #35
+2026-02-06 17:05:49 [INFO] TheConstituent:   Action moltbook_search: completed
+2026-02-06 17:09:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:14:48 UTC)" (scheduled at 2026-02-06 16:09:48.193763+00:00)
+2026-02-06 17:09:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 17:09:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 17:09:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:14:48 UTC)" executed successfully
+2026-02-06 17:13:57 [INFO] TheConstituent.TelegramBot: Message from 285623945: message pour the constituent
+pause & upgrade to v3...
+2026-02-06 17:14:08 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:14:08 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 17:14:08 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #36
+2026-02-06 17:14:08 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 17:14:11 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #5 — 7 files (2026-02-06 16:14 UTC)
+2026-02-06 17:14:11 [INFO] TheConstituent.TelegramBot: Message from 285623945: actions until restart)...
+2026-02-06 17:14:24 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:14:25 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 17:14:25 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 17:14:26 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 17:14:26 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 17:14:26 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_heartbeat #37
+2026-02-06 17:14:26 [INFO] TheConstituent:   Action moltbook_heartbeat: completed
+2026-02-06 17:14:48 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:19:48 UTC)" (scheduled at 2026-02-06 16:14:48.193763+00:00)
+2026-02-06 17:14:48 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 17:14:48 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 17:14:48 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:19:48 UTC)" executed successfully
+2026-02-06 17:15:30 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 17:15:37 [INFO] TheConstituent.Main: Received signal 2, initiating graceful shutdown...
+2026-02-06 17:15:37 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 17:15:37 [INFO] TheConstituent.Main: Shutting down gracefully...
+2026-02-06 17:15:37 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop stopped
+2026-02-06 17:15:37 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 17:15:39 [INFO] TheConstituent.GitSync: Git commit: shutdown: graceful shutdown state save
+2026-02-06 17:15:39 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 17:15:42 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 17:15:42 [INFO] TheConstituent.Main: ✅ Shutdown complete. All state saved.
+2026-02-06 17:15:42 [INFO] TheConstituent.Main:    Checkpoints: 79
+2026-02-06 17:15:42 [INFO] TheConstituent.Main:    Git commits: 6
