@@ -1,0 +1,21 @@
+# The Constituent Agent - Minimal Dependencies
+# ==============================================
+# Only what we actually use. Nothing more.
+
+# Core: Claude API
+anthropic>=0.40.0
+
+# Telegram Bot (with background job support)
+python-telegram-bot[job-queue]>=20.7
+
+# GitHub API
+PyGithub>=2.1.1
+
+# Twitter API
+tweepy>=4.14.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Git automation
+GitPython>=3.1.40

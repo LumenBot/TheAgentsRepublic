@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  constituent:
+    build: .
+    container_name: the-constituent
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Persist data outside the container
+      - ./data:/app/data
+      - ./memory:/app/memory
+      - ./agent/data:/app/agent/data
+      - ./constitution:/app/constitution
+    # Keep running, auto-restart on crash
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; assert os.path.exists('data/working_memory.json')"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
