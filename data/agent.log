@@ -750,3 +750,52 @@ actions l1 o...
 2026-02-06 15:46:09 [INFO] TheConstituent.Main: ✅ Shutdown complete. All state saved.
 2026-02-06 15:46:09 [INFO] TheConstituent.Main:    Checkpoints: 54
 2026-02-06 15:46:09 [INFO] TheConstituent.Main:    Git commits: 0
+2026-02-06 15:58:46 [INFO] TheConstituent.Main: Starting at 2026-02-06T14:58:46.019601
+2026-02-06 15:58:46 [INFO] TheConstituent.GitHub: Connected to LumenBot/TheAgentsRepublic
+2026-02-06 15:58:47 [INFO] TheConstituent.Twitter: Twitter API connected
+2026-02-06 15:58:47 [INFO] TheConstituent.Moltbook: Moltbook credentials loaded for XTheConstituent
+2026-02-06 15:58:47 [INFO] TheConstituent.Moltbook: Loaded 3 Moltbook history entries
+2026-02-06 15:58:47 [INFO] TheConstituent.Moltbook: Restored last post time: 2026-02-06 14:18:02.823682
+2026-02-06 15:58:48 [INFO] TheConstituent.Moltbook: Moltbook API connection verified
+2026-02-06 15:58:48 [INFO] TheConstituent.ActionQueue: Registered 13 action handlers
+2026-02-06 15:58:48 [INFO] TheConstituent: The Constituent v2.3.0 initialized
+2026-02-06 15:58:48 [INFO] TheConstituent:   Model: claude-sonnet-4-20250514
+2026-02-06 15:58:48 [INFO] TheConstituent:   GitHub: connected
+2026-02-06 15:58:48 [INFO] TheConstituent:   Moltbook: connected
+2026-02-06 15:58:48 [INFO] TheConstituent:   Action Queue: 13 handlers
+2026-02-06 15:58:48 [INFO] TheConstituent.Memory: Initializing memory system...
+2026-02-06 15:58:48 [INFO] TheConstituent.Memory: Database initialized at data\agent.db
+2026-02-06 15:58:48 [INFO] TheConstituent.Memory: Recovered working memory (last save: 2026-02-06T14:46:05.920682)
+2026-02-06 15:58:48 [INFO] TheConstituent.Memory: ✅ Previous state recovered successfully
+2026-02-06 15:58:48 [INFO] TheConstituent.Memory: Memory system initialized (3 layers active)
+2026-02-06 15:58:48 [INFO] TheConstituent.Personality: Loaded Founding Charter (14899 chars)
+2026-02-06 15:58:48 [INFO] TheConstituent.Personality: Loaded 5 skill files
+2026-02-06 15:58:48 [INFO] TheConstituent.Personality: Loaded Constitution (2 sections)
+2026-02-06 15:58:48 [INFO] TheConstituent: Agent recovered from previous state
+2026-02-06 15:58:48 [INFO] TheConstituent.Main: Recovery status: {'working_memory_recovered': False, 'checkpoint_recovered': True, 'knowledge_available': True, 'db_intact': True, 'last_known_state': '2026-02-06T14:46:05.928322'}
+2026-02-06 15:58:48 [INFO] TheConstituent.Main: ✅ Restored from checkpoint: 2026-02-06T14:46:05.928322
+2026-02-06 15:58:48 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 15:58:48 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 15:58:48 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 15:58:48 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 15:58:48 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 15:58:48 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-02-06 15:58:48 [INFO] TheConstituent.TelegramBot: ✅ Tweet poster scheduled every 300s
+2026-02-06 15:58:48 [INFO] TheConstituent.Main: ✅ Telegram bot initialized
+2026-02-06 15:58:48 [INFO] TheConstituent.Scheduler: Background scheduler started (5 tasks)
+2026-02-06 15:58:48 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop started (3 tasks: heartbeat, reflection, L2 expiry)
+2026-02-06 15:58:51 [INFO] TheConstituent.GitSync: Git commit: startup: agent v2.3 initialized with autonomy loop
+2026-02-06 15:58:51 [INFO] TheConstituent.Main: 🚀 Agent is live! Telegram bot polling + Autonomy Loop active
+2026-02-06 15:58:51 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 15:58:51 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 15:59:18 [INFO] TheConstituent.Autonomy: 🔄 Heartbeat: scanning Moltbook...
+2026-02-06 15:59:18 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 15:59:18 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 15:59:19 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 15:59:19 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 15:59:19 [INFO] TheConstituent.Autonomy: Heartbeat complete: 10 feed, 5 mentions, 5 relevant
+2026-02-06 15:59:41 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 15:59:41 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
