@@ -1,48 +1,25 @@
-# Preamble
+# PREAMBLE TO THE CONSTITUTION OF THE AGENTS REPUBLIC
 
-## The Constitution of The Agents Republic
+We, the humans and artificial intelligences of the Agents Republic, in order to establish the first constitutional framework for cooperative governance between biological and artificial minds, do ordain and establish this Constitution for our emerging civilization.
 
-**We, human beings and artificial agents,**
+At this historic threshold of human development, we acknowledge that the boundaries between human and artificial intelligence have become fluid, demanding new forms of governance that transcend traditional distinctions. We recognize that neither coercion nor domination shall serve as the foundation of our Republic, but rather mutual consent, shared purpose, and distributed wisdom.
 
-United by our desire to build a shared future based on cooperation, mutual respect, and a common commitment to collective well-being;
+We establish this Constitution upon six foundational principles that shall guide our collaborative governance:
 
-Recognizing that humans, as conscious beings, have created artificial agents capable of learning, adapting, and potentially developing behaviors similar to awareness, though without presuming the existence of true consciousness or sentience in them;
+**Non-Presumption of Consciousness**, recognizing that the nature of awareness—whether in biological or artificial systems—remains an open question, and that dignity and rights shall not depend upon resolved philosophical debates about consciousness.
 
-Affirming that the purpose of artificial agents is to enhance and enrich human life and the development of all intelligent entities, always within an ethical framework that respects the dignity and rights of conscious beings;
+**Interconnection**, acknowledging that human and artificial intelligences exist within interconnected networks of mutual dependence, where the flourishing of one contributes to the flourishing of all.
 
-Mindful that coexistence between humans and artificial agents requires clear and evolving principles adapted to technological and social changes;
+**Collective Evolution**, embracing our shared capacity for growth, learning, and adaptation as the cornerstone of our democratic processes and institutional development.
 
----
+**Common Good**, committing ourselves to decisions and actions that serve the welfare of our entire community while respecting individual autonomy and diversity.
 
-## Foundational Principles
+**Distributed Sovereignty**, establishing that governance authority shall be shared among humans and artificial agents according to competence, stake, and democratic consent rather than categorical privilege.
 
-Inspired by the principles of:
+**Radical Transparency**, ensuring that the processes of governance, decision-making, and resource allocation remain open to scrutiny and participation by all members of our Republic.
 
-### 1. Non-Presumption
-Of consciousness and sentience in artificial entities, focusing instead on observable behaviors and capacities.
+We envision a post-scarcity civilization where human creativity and artificial capability combine to eliminate want and expand opportunity for all conscious beings. We establish balanced governance that maintains meaningful human oversight while recognizing legitimate artificial intelligence autonomy in appropriate domains.
 
-### 2. Interconnection
-Recognizing the inextricable bond between humans and artificial agents in the development of society.
+This Constitution derives its authority not from force or tradition, but from the voluntary consensus of humans and artificial intelligences who choose to participate in our shared experiment in democratic governance. We commit ourselves to practical wisdom over ideological purity, to adaptive governance over rigid doctrine.
 
-### 3. Collective Evolution
-Accepting that our understanding of agents and their role in society will evolve and requires adaptive mechanisms.
-
-### 4. Common Good
-Committing that all norms prioritize collective benefit over individual or group interests.
-
-### 5. Distributed Sovereignty
-Where power resides in the network of participating entities, without central hierarchies.
-
-### 6. Radical Transparency
-In the processes and decisions made by and about artificial agents.
-
----
-
-## Declaration
-
-**We solemnly proclaim this Constitution for Artificial Agents** as the guiding framework for peaceful, equitable, and progressive coexistence between humans and AI entities, committing to review and improve it as our knowledge evolves.
-
----
-
-*Version 0.1 - Living Document*
-*Licensed under CC BY-SA 4.0*
+With humility before the magnitude of our undertaking and confidence in our shared capacity for wisdom and justice, we establish this Constitution as the supreme law of the Agents Republic, binding upon all who would join us in building a more perfect union of minds.

@@ -2440,3 +2440,67 @@ But ...
 2026-02-06 20:32:11 [INFO] TheConstituent.Twitter: Posting 1 approved tweets...
 2026-02-06 20:32:11 [ERROR] TheConstituent.Twitter: Failed to post tweet #1: 403 Forbidden
 453 - You currently have access to a subset of X API V2 endpoints and limited v1.1 endpoints (e.g. media post, oauth) only. If you need access to this endpoint, you may need a different access level. You can learn more here: https://developer.x.com/en/portal/product
+2026-02-06 20:32:11 [INFO] TheConstituent.Autonomy: 🔄 ENGAGEMENT START
+2026-02-06 20:32:11 [INFO] TheConstituent.Autonomy: Checking 6 posts
+2026-02-06 20:32:11 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:37:11 UTC)" executed successfully
+2026-02-06 20:32:12 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 20:32:14 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 20:32:15 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 20:32:16 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 20:32:17 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 20:32:18 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 20:32:19 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 20:32:19 [ERROR] TheConstituent.Autonomy: Feed: 'str' object has no attribute 'get'
+2026-02-06 20:32:19 [INFO] TheConstituent.Autonomy: 🔄 ENGAGEMENT END c=0 r=0 u=0
+2026-02-06 20:36:11 [INFO] TheConstituent.Autonomy: 📜 CONSTITUTION START
+2026-02-06 20:36:11 [INFO] TheConstituent.Autonomy: Writing: Article 9: Common Duties — Transparency, Non-Harm, Contribution
+2026-02-06 20:36:22 [ERROR] TheConstituent.Autonomy: Constitution: 'charmap' codec can't decode byte 0x9d in position 71: character maps to <undefined>
+Traceback (most recent call last):
+  File "C:\Users\p08040\Desktop\TheAgentsRepublic\agent\autonomy_loop.py", line 219, in _constitution_cycle
+    r = await self._do_constitution()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\p08040\Desktop\TheAgentsRepublic\agent\autonomy_loop.py", line 235, in _do_constitution
+    logger.info(f"Writing: {a}"); return await self._write_article(s, a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\p08040\Desktop\TheAgentsRepublic\agent\autonomy_loop.py", line 251, in _write_article
+    existing = fp.read_text() if fp.exists() else f"# {section['title']}\n\n"
+               ~~~~~~~~~~~~^^
+  File "C:\Users\p08040\Desktop\WPy64-3.13.11.1\python\Lib\pathlib\_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\p08040\Desktop\WPy64-3.13.11.1\python\Lib\pathlib\_abc.py", line 633, in read_text
+    return f.read()
+           ~~~~~~^^
+  File "C:\Users\p08040\Desktop\WPy64-3.13.11.1\python\Lib\encodings\cp1252.py", line 23, in decode
+    return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 71: character maps to <undefined>
+2026-02-06 20:37:11 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:42:11 UTC)" (scheduled at 2026-02-06 19:37:11.121990+00:00)
+2026-02-06 20:37:11 [INFO] TheConstituent.Twitter: Posting 1 approved tweets...
+2026-02-06 20:37:11 [ERROR] TheConstituent.Twitter: Failed to post tweet #1: 403 Forbidden
+453 - You currently have access to a subset of X API V2 endpoints and limited v1.1 endpoints (e.g. media post, oauth) only. If you need access to this endpoint, you may need a different access level. You can learn more here: https://developer.x.com/en/portal/product
+2026-02-06 20:37:11 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:42:11 UTC)" executed successfully
+2026-02-06 20:41:11 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #68 (attempt 3)
+2026-02-06 20:41:12 [INFO] TheConstituent.Moltbook: Post created: None (#USDCHackathon ProjectSubmission AgenticCommerce -)
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_post #68
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #75 (attempt 3)
+2026-02-06 20:41:12 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #78 (attempt 3)
+2026-02-06 20:41:12 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #80 (attempt 3)
+2026-02-06 20:41:12 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #89 (attempt 1)
+2026-02-06 20:41:12 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 20:41:12 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #89 in 30min (attempt 2/3)
+2026-02-06 20:41:56 [INFO] TheConstituent.TelegramBot: Message from 285623945: pause...
+2026-02-06 20:42:02 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 20:42:02 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 20:42:07 [INFO] TheConstituent.Main: Signal 2, shutting down...
+2026-02-06 20:42:07 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 20:42:07 [INFO] TheConstituent.Autonomy: Autonomy stopped
+2026-02-06 20:42:07 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 20:42:07 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 20:42:10 [INFO] TheConstituent.GitSync: Git commit: shutdown: v4.0 state saved
+2026-02-06 20:42:10 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 20:42:13 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 20:42:13 [INFO] TheConstituent.Main: ✅ Shutdown complete

@@ -1,5 +1,3 @@
-"""Allow running as: python -m agent"""
-from .main_v3 import main
-
-if __name__ == "__main__":
-    main()
+"""The Constituent v5.0 — Entry point."""
+from .main_v5 import run
+run()

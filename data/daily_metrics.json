@@ -698,5 +698,245 @@
     },
     "success": true,
     "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:50:53.103018+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_read"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:50:57.141333+00:00",
+    "date": "2026-02-06",
+    "action_type": "post",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_get_post"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:51:00.417881+00:00",
+    "date": "2026-02-06",
+    "action_type": "post",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_get_post"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:51:05.638983+00:00",
+    "date": "2026-02-06",
+    "action_type": "comment",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_comment"
+    },
+    "success": false,
+    "error": "'MoltbookOperations' object has no attribute 'comment_on_post'"
+  },
+  {
+    "timestamp": "2026-02-06T19:51:07.378884+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:51:10.930026+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_feed"
+    },
+    "success": false,
+    "error": "slice(None, 15, None)"
+  },
+  {
+    "timestamp": "2026-02-06T19:52:05.661023+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_feed"
+    },
+    "success": false,
+    "error": "slice(None, 10, None)"
+  },
+  {
+    "timestamp": "2026-02-06T19:52:11.330114+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_heartbeat"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:52:13.586140+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_status"
+    },
+    "success": false,
+    "error": "'name'"
+  },
+  {
+    "timestamp": "2026-02-06T19:52:15.581115+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_next"
+    },
+    "success": false,
+    "error": "'name'"
+  },
+  {
+    "timestamp": "2026-02-06T19:57:54.866254+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_read"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:57:57.418973+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_read"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:58:00.696166+00:00",
+    "date": "2026-02-06",
+    "action_type": "post",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_get_post"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:58:06.546918+00:00",
+    "date": "2026-02-06",
+    "action_type": "comment",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_comment"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:58:08.719540+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_feed"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:58:11.331846+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_upvote"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:59:06.785615+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_next"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T19:59:08.611228+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T20:00:15.436525+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "subagent_write"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-06T20:00:21.587983+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_write"
+    },
+    "success": true,
+    "error": null
   }
 ]
