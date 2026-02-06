@@ -108,5 +108,18 @@
     },
     "success": false,
     "error": "Too many requests"
+  },
+  {
+    "timestamp": "2026-02-06T16:41:13.430373+00:00",
+    "date": "2026-02-06",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "action_tag": "moltbook_heartbeat",
+      "params": {}
+    },
+    "success": true,
+    "error": null
   }
 ]
