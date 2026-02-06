@@ -17,6 +17,7 @@ Schedule:
 """
 
 import os
+import shutil
 import subprocess
 import logging
 from datetime import datetime
@@ -30,7 +31,15 @@ try:
     GIT_AVAILABLE = True
 except ImportError:
     GIT_AVAILABLE = False
-    logger.warning("GitPython not installed — Git sync disabled")
+    # v5.2: Distinguish "GitPython missing" from "git CLI missing"
+    _git_cli = shutil.which("git")
+    if _git_cli:
+        logger.warning(
+            "GitPython not installed — Git sync disabled "
+            f"(git CLI available at {_git_cli}, install GitPython to enable sync)"
+        )
+    else:
+        logger.warning("Neither GitPython nor git CLI found — Git sync fully disabled")
 
 
 class GitSync:

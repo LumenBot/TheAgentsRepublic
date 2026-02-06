@@ -472,26 +472,25 @@ class Engine:
         ):
             return {"status": "skipped", "reason": "empty heartbeat"}
 
-        # Build heartbeat prompt — focused and concise
+        # Build heartbeat prompt — focused and concise, enforces builder mode
+        constraints = (
+            f"CONSTRAINTS (non-negotiable):\n"
+            f"- ONE action only. Call tools, get result, report in <50 words.\n"
+            f"- Max {self._max_tool_rounds} tool calls, {self._max_heartbeat_duration}s time limit.\n"
+            f"- NO philosophy. NO explanations. Just: Action → Result → Next.\n"
+            f"- If nothing to do, reply HEARTBEAT_OK (nothing else).\n"
+            f"- Priority: Constitution > Engagement > Research\n"
+        )
+
         if section:
             prompt = (
-                f"Execute ONLY the '{section}' section of your HEARTBEAT.md.\n\n"
-                f"{content}\n\n"
-                f"IMPORTANT: Do ONE action maximum for this section. "
-                f"Be efficient — you have a {self._max_heartbeat_duration}s time limit "
-                f"and {self._max_tool_rounds} tool calls max.\n"
-                f"If nothing to do, reply HEARTBEAT_OK."
+                f"Execute ONE action for '{section}':\n\n"
+                f"{content}\n\n{constraints}"
             )
         else:
             prompt = (
-                f"Read your HEARTBEAT.md and execute the MOST IMPORTANT due task:\n\n"
-                f"{content}\n\n"
-                f"IMPORTANT CONSTRAINTS:\n"
-                f"- Do ONE task only (the most urgent/important)\n"
-                f"- You have {self._max_tool_rounds} tool calls max\n"
-                f"- Time limit: {self._max_heartbeat_duration}s\n"
-                f"- Prioritize: Constitution > Engagement > Research\n"
-                f"If nothing needs attention, reply HEARTBEAT_OK."
+                f"Execute ONE due task from HEARTBEAT.md:\n\n"
+                f"{content}\n\n{constraints}"
             )
 
         # Run with tools — time-limited

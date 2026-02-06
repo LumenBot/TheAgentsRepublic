@@ -1,14 +1,13 @@
 """
-Telegram Bot Handler for The Constituent v3.0
+Telegram Bot Handler for The Constituent v5.2
 ===============================================
-Full interactive Telegram bot with Sprint Mode commands.
+Full interactive Telegram bot adapted to v5.1 Engine architecture.
 
-v3.0 new commands:
-- /metrics — Show today's metrics + execution/philosophy ratio
-- /profile — Show public profile
-- /ratio — Quick ratio check
-
-All v2.3 commands preserved.
+v5.2 fixes:
+- /execute: Fixed multi-line parsing (preserved newlines, full builtins)
+- /status: Reads from Engine.get_budget_status() instead of old autonomy_loop
+- /heartbeat: Triggers engine.run_heartbeat() directly
+- /autonomy: Shows heartbeat budget instead of dead autonomy_loop
 """
 
 import os
@@ -37,7 +36,7 @@ except ImportError:
 
 
 class TelegramBotHandler:
-    """Interactive Telegram bot for The Constituent v3.0."""
+    """Interactive Telegram bot for The Constituent v5.2."""
 
     TWEET_POST_INTERVAL = 300
 
@@ -102,23 +101,23 @@ class TelegramBotHandler:
             await update.message.reply_text("Unauthorized.")
             return
 
-        help_text = """🤖 **The Constituent v3.0 — Sprint Mode**
-
-📊 **Sprint Commands** (NEW)
-├ /metrics - Today's metrics + ratio
-├ /profile - Public profile summary
-└ /ratio - Quick execution/philosophy ratio
+        help_text = """🤖 **The Constituent v5.2**
 
 📋 **General**
 ├ /start - Welcome
-├ /status - Agent status
+├ /status - Agent status + budget
 └ /help - This message
+
+📊 **Metrics & Sprint**
+├ /metrics - Today's metrics + ratio
+├ /profile - Public profile summary
+└ /ratio - Execution/philosophy ratio
 
 🧠 **Memory & Sync**
 ├ /memory - Memory details
 ├ /save - Force save state
 ├ /sync - Git commit + push
-└ /migrate - Full backup for PC move
+└ /migrate - Full backup
 
 📜 **Constitution**
 ├ /constitution - Read Constitution
@@ -126,9 +125,7 @@ class TelegramBotHandler:
 
 🐦 **Twitter**
 ├ /tweet <topic> - Draft tweet
-├ /approve - Approve pending
-├ /reject - Discard pending
-└ /show - View pending
+├ /approve / /reject / /show
 
 🦞 **Moltbook**
 ├ /moltbook - Status
@@ -136,18 +133,13 @@ class TelegramBotHandler:
 ├ /mpost <title> | <content> - Post
 └ /mregister - Register
 
-⚙️ **Action Queue**
-├ /qpending - Pending L2 actions
-├ /qapprove <id> - Approve
-└ /qreject <id> [reason] - Reject
-
-🧠 **Autonomy Loop**
-├ /autonomy - Loop status
-├ /heartbeat - Trigger scan
-└ /reflect - Trigger reflection
+🧠 **Heartbeat Engine**
+├ /autonomy - Budget + heartbeat stats
+├ /heartbeat [section] - Trigger heartbeat
+└ /reflect - Agent self-reflection
 
 🔧 **System** (Operator)
-├ /execute <code> - Run Python
+├ /execute <code> - Run Python (multi-line OK)
 └ /improve <cap> - Self-improve
 
 💬 Just send a message to chat."""
@@ -162,38 +154,53 @@ class TelegramBotHandler:
             await update.message.reply_text("Agent not initialized.")
             return
 
+        # v5.2: Adapted to v5.1 Engine architecture
         status = self.agent.get_status()
         chat_id = update.effective_chat.id
 
-        anthropic_status = "✅" if status.get('model') else "❌"
-        github_status = "✅" if status.get('github_connected') else "⏳"
-        twitter_status = "✅" if status.get('twitter_connected') else "⏳"
-        moltbook_status = "✅" if status.get('moltbook_connected') else "⏳"
+        # Service status — check actual connection objects
+        claude_ok = "✅" if status.get('model') else "❌"
+        github_ok = "✅" if hasattr(self.agent, 'github') and self.agent.github.is_connected() else "⏳"
+        moltbook_ok = "✅" if hasattr(self.agent, 'moltbook') and self.agent.moltbook.is_connected() else "⏳"
 
-        mem = status.get('memory', {})
-        queue = status.get('action_queue', {})
-        ratio = status.get('execution_ratio', {})
+        twitter_icon = "⏳"
+        if hasattr(self.agent, 'twitter'):
+            if self.agent.twitter.has_write_access():
+                twitter_icon = "✅"
+            elif self.agent.twitter.is_connected():
+                twitter_icon = "⚠️"  # Connected but no write
 
-        autonomy_status = "❌ Off"
-        if self.autonomy_loop:
-            auto_st = self.autonomy_loop.get_status()
-            if auto_st.get("running"):
-                autonomy_status = f"✅ Active ({auto_st.get('daily_actions', 0)}/{auto_st.get('daily_limit', 50)})"
+        # Budget from v5.1 engine
+        budget = self.agent.get_budget_status() if hasattr(self.agent, 'get_budget_status') else {}
 
+        # Metrics
+        ratio = self.agent.metrics.get_today_ratio()
+        sprint = self.agent.metrics.get_sprint_summary()
+
+        # Constitution progress — count local files
+        const_count = 0
+        try:
+            from pathlib import Path
+            const_files = list(Path("constitution").glob("*.md"))
+            const_count = len(const_files)
+        except Exception:
+            pass
+
+        # Tweet counts
         tweet_counts = self.agent.twitter.get_all_counts()
         draft = self.agent.twitter.get_draft(chat_id)
 
         last_act = self.last_activity.strftime("%H:%M:%S") if self.last_activity else "—"
 
-        text = f"""🤖 **The Constituent v{status.get('version', '3.0.0')}**
-🚨 Sprint Day: {status.get('sprint_day', '?')}/21
+        text = f"""🤖 **The Constituent v{status.get('version', '5.1.0')}**
+🚨 Sprint Day: {sprint.get('sprint_day', '?')}/21
 
-🔗 Claude {anthropic_status} | GitHub {github_status} | Twitter {twitter_status} | Moltbook {moltbook_status}
+🔗 Claude {claude_ok} | GitHub {github_ok} | Moltbook {moltbook_ok} | Twitter {twitter_icon}
 
+📊 **Budget:** {budget.get('api_calls_this_hour', '?')}/{budget.get('max_per_hour', '?')} hourly, {budget.get('api_calls_today', '?')}/{budget.get('max_per_day', '?')} daily
 📊 **Ratio:** {ratio.get('ratio', 0)} {'✅' if ratio.get('on_target') else '❌'} (exec: {ratio.get('execution_count', 0)} / phil: {ratio.get('philosophy_count', 0)})
 
-⚙️ Queue: {queue.get('pending_l2', 0)} pending | Retry: {queue.get('retry_queue', 0)}
-🧠 Autonomy: {autonomy_status}
+📜 Constitution: {const_count}/27 articles
 🐦 Drafts: {1 if draft else 0} | Posted: {tweet_counts.get('posted', 0)}
 🕐 Last: {last_act}
 
@@ -495,23 +502,28 @@ Full profile: agent_profile.md"""
         if not operator_id or chat_id != int(operator_id):
             await update.message.reply_text("⚠️ Operator only.")
             return
-        if not context.args:
-            await update.message.reply_text("Usage: /execute <python code>")
+
+        # v5.2: Extract code preserving newlines (was: " ".join(context.args) which destroyed newlines)
+        raw_text = update.message.text or ""
+        if raw_text.startswith("/execute"):
+            code = raw_text[len("/execute"):]
+        else:
+            code = raw_text
+        code = code.strip()
+
+        if not code:
+            await update.message.reply_text("Usage: /execute <python code>\n\nMulti-line supported.")
             return
-        code = " ".join(context.args)
+
         logger.info(f"[EXECUTE] {code[:100]}...")
         await update.message.reply_text(f"⚙️ Executing:\n```python\n{code}\n```", parse_mode='Markdown')
         try:
+            import builtins as _builtins
             from io import StringIO
+
+            # v5.2: Use full builtins so import/from-import statements work
             exec_globals = {
-                '__builtins__': {
-                    'print': print, 'len': len, 'str': str, 'int': int, 'float': float,
-                    'bool': bool, 'dict': dict, 'list': list, 'tuple': tuple, 'set': set,
-                    'range': range, 'enumerate': enumerate, 'zip': zip, 'sorted': sorted,
-                    'sum': sum, 'min': min, 'max': max, 'abs': abs, 'round': round,
-                    'isinstance': isinstance, 'type': type, 'hasattr': hasattr,
-                    'getattr': getattr, 'dir': dir,
-                },
+                '__builtins__': _builtins,
                 'agent': self.agent, 'moltbook': self.agent.moltbook,
                 'twitter': self.agent.twitter, 'github': self.agent.github,
                 'memory': self.agent.memory, 'metrics': self.agent.metrics,
@@ -530,7 +542,7 @@ Full profile: agent_profile.md"""
                 await update.message.reply_text("✅ Done (no output)")
         except Exception as e:
             sys.stdout = sys.__stdout__
-            await update.message.reply_text(f"❌ Error:\n```\n{e}\n```", parse_mode='Markdown')
+            await update.message.reply_text(f"❌ Error:\n```\n{type(e).__name__}: {e}\n```", parse_mode='Markdown')
 
     # =========================================================================
     # Moltbook Commands
@@ -674,40 +686,53 @@ Full profile: agent_profile.md"""
     # =========================================================================
 
     async def autonomy_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v5.2: Shows heartbeat runner status (replaces old autonomy_loop)."""
         if not self._is_authorized(update.effective_chat.id):
             await update.message.reply_text("Unauthorized.")
             return
-        if not self.autonomy_loop:
-            await update.message.reply_text("⚠️ Autonomy loop not initialized.")
+        if not self.agent:
+            await update.message.reply_text("Agent not initialized.")
             return
-        s = self.autonomy_loop.get_status()
-        status_icon = "✅ Active" if s.get("running") else "❌ Stopped"
+
+        budget = self.agent.get_budget_status() if hasattr(self.agent, 'get_budget_status') else {}
         await update.message.reply_text(
-            f"🧠 **Autonomy:** {status_icon}\n"
-            f"├ Actions: {s.get('daily_actions', 0)}/{s.get('daily_limit', 50)}\n"
-            f"├ Observations: {'Yes' if s.get('has_observations') else 'No'}\n"
-            f"└ /heartbeat /reflect",
+            f"🧠 **Heartbeat Engine (v5.1)**\n"
+            f"├ API calls: {budget.get('api_calls_today', '?')}/{budget.get('max_per_day', '?')} daily\n"
+            f"├ Hourly: {budget.get('api_calls_this_hour', '?')}/{budget.get('max_per_hour', '?')}\n"
+            f"└ /heartbeat to trigger manually",
             parse_mode='Markdown'
         )
 
     async def heartbeat_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if not self._is_authorized(update.effective_chat.id) or not self.autonomy_loop:
-            await update.message.reply_text("Unauthorized or loop not init.")
+        """v5.2: Trigger heartbeat directly via engine."""
+        if not self._is_authorized(update.effective_chat.id) or not self.agent:
+            await update.message.reply_text("Unauthorized or not init.")
             return
-        await update.message.reply_text("🔄 Heartbeat...")
+        await update.message.reply_text("🔄 Running heartbeat...")
         try:
-            r = await self.autonomy_loop.trigger_heartbeat()
-            await update.message.reply_text(f"✅ {r}")
+            section = " ".join(context.args) if context.args else None
+            result = self.agent.run_heartbeat(section=section)
+            status = result.get("status", "?")
+            duration = result.get("duration_ms", "?")
+            response = result.get("response", "")
+            if len(response) > 1500:
+                response = response[:1500] + "..."
+            await update.message.reply_text(f"✅ Heartbeat: {status} ({duration}ms)\n\n{response}")
         except Exception as e:
             await update.message.reply_text(f"❌ {e}")
 
     async def reflect_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if not self._is_authorized(update.effective_chat.id) or not self.autonomy_loop:
-            await update.message.reply_text("Unauthorized or loop not init.")
+        """v5.2: Reflection via engine.think() instead of autonomy_loop."""
+        if not self._is_authorized(update.effective_chat.id) or not self.agent:
+            await update.message.reply_text("Unauthorized or not init.")
             return
         await update.message.reply_text("🤔 Reflecting...")
         try:
-            r = await self.autonomy_loop.trigger_reflection()
+            r = self.agent.think(
+                "Brief self-reflection: What have you accomplished today? "
+                "What's the most important next action? Under 100 words.",
+                max_tokens=300
+            )
             await update.message.reply_text(f"✅ {r}")
         except Exception as e:
             await update.message.reply_text(f"❌ {e}")
