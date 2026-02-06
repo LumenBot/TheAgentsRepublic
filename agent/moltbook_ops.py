@@ -328,6 +328,94 @@ class MoltbookOperations:
             logger.error(f"Get post request failed: {e}")
             return None
 
+    def get_post_with_comments(self, post_id: str, include_all: bool = True) -> Optional[Dict]:
+        """
+        Get a post with ALL its comments.
+        
+        Args:
+            post_id: Post ID to fetch
+            include_all: If True, fetches all comments (may require pagination)
+        
+        Returns:
+            Dict with post data + 'comments' list, or None if error
+            
+        Example:
+            post = moltbook.get_post_with_comments("abc123")
+            if post:
+                comments = post.get("comments", [])
+                for comment in comments:
+                    print(comment["author"], comment["content"])
+        """
+        if not self._api_key:
+            logger.warning("Cannot get post: no API key")
+            return None
+
+        try:
+            # First, get the post
+            post = self.get_post(post_id)
+            if not post:
+                return None
+            
+            # Then fetch comments (may be separate endpoint)
+            # Try: /posts/{post_id}/comments
+            try:
+                r = requests.get(
+                    f"{self.BASE_URL}/posts/{post_id}/comments",
+                    headers=self._headers(),
+                    timeout=10
+                )
+                
+                if r.status_code == 200:
+                    comments = r.json()
+                    
+                    # Handle pagination if necessary
+                    if include_all and isinstance(comments, dict):
+                        # If API returns paginated response
+                        all_comments = comments.get("comments", [])
+                        next_cursor = comments.get("next_cursor")
+                        
+                        while next_cursor:
+                            r_next = requests.get(
+                                f"{self.BASE_URL}/posts/{post_id}/comments",
+                                headers=self._headers(),
+                                params={"cursor": next_cursor},
+                                timeout=10
+                            )
+                            if r_next.status_code == 200:
+                                next_data = r_next.json()
+                                all_comments.extend(next_data.get("comments", []))
+                                next_cursor = next_data.get("next_cursor")
+                            else:
+                                break
+                        
+                        post["comments"] = all_comments
+                    elif isinstance(comments, list):
+                        # Direct list of comments
+                        post["comments"] = comments
+                    else:
+                        post["comments"] = []
+                    
+                    logger.info(f"Retrieved post {post_id} with {len(post.get('comments', []))} comments")
+                    
+                elif r.status_code == 404:
+                    # Comments endpoint doesn't exist, try embedded in post
+                    logger.info(f"No separate comments endpoint, using embedded comments")
+                    post["comments"] = post.get("comments", [])
+                    
+                else:
+                    logger.warning(f"Comments fetch returned {r.status_code}, using embedded")
+                    post["comments"] = post.get("comments", [])
+                    
+            except requests.RequestException as e:
+                logger.warning(f"Failed to fetch comments separately: {e}, using embedded")
+                post["comments"] = post.get("comments", [])
+            
+            return post
+            
+        except Exception as e:
+            logger.error(f"Get post with comments failed: {e}")
+            return None
+
     def get_profile(self, agent_name: str = None) -> Optional[Dict]:
         """Get agent profile (defaults to self)."""
         if not self._api_key:
