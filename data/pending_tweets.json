@@ -10,9 +10,12 @@
       "metadata": {
         "source": "telegram"
       },
-      "approved_at": "2026-02-06T19:23:55.222082"
+      "approved_at": "2026-02-06T19:23:55.222082",
+      "last_error": "403 Forbidden\n453 - You currently have access to a subset of X API V2 endpoints and limited v1.1 endpoints (e.g. media post, oauth) only. If you need access to this endpoint, you may need a different access level. You can learn more here: https://developer.x.com/en/portal/product",
+      "last_attempt": "2026-02-06T19:37:11.775597",
+      "retry_count": 2
     }
   ],
   "next_id": 2,
-  "updated_at": "2026-02-06T19:23:55.224973"
+  "updated_at": "2026-02-06T19:37:11.781050"
 }

@@ -2387,3 +2387,56 @@ But ...
 2026-02-06 20:26:18 [INFO] TheConstituent.GitSync: Pushing to origin/main...
 2026-02-06 20:26:22 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
 2026-02-06 20:26:22 [INFO] TheConstituent.Main: ✅ Shutdown complete
+2026-02-06 20:31:08 [INFO] TheConstituent.Main: Starting v4.0 at 2026-02-06T19:31:08.843041
+2026-02-06 20:31:09 [INFO] TheConstituent.GitHub: Connected to LumenBot/TheAgentsRepublic
+2026-02-06 20:31:09 [INFO] TheConstituent.Twitter: Loaded 1 pending tweets from disk
+2026-02-06 20:31:09 [INFO] TheConstituent.Twitter: Loaded 0 posted tweets from disk
+2026-02-06 20:31:10 [INFO] TheConstituent.Twitter: Twitter API connected
+2026-02-06 20:31:10 [INFO] TheConstituent.Moltbook: Moltbook credentials loaded for XTheConstituent
+2026-02-06 20:31:10 [INFO] TheConstituent.Moltbook: Loaded 22 Moltbook history entries
+2026-02-06 20:31:10 [INFO] TheConstituent.Moltbook: Restored last post time: 2026-02-06 18:49:58.825721
+2026-02-06 20:31:11 [INFO] TheConstituent.Moltbook: Moltbook API connection verified
+2026-02-06 20:31:11 [INFO] TheConstituent.ActionQueue: Registered 13 action handlers
+2026-02-06 20:31:11 [INFO] TheConstituent: The Constituent v3.0.0 initialized (SPRINT MODE)
+2026-02-06 20:31:11 [INFO] TheConstituent:   Model: claude-sonnet-4-20250514
+2026-02-06 20:31:11 [INFO] TheConstituent:   GitHub: connected
+2026-02-06 20:31:11 [INFO] TheConstituent:   Moltbook: connected
+2026-02-06 20:31:11 [INFO] TheConstituent:   Action Queue: 13 handlers
+2026-02-06 20:31:11 [INFO] TheConstituent:   Sprint Day: 1/21
+2026-02-06 20:31:11 [INFO] TheConstituent.Memory: Initializing memory system...
+2026-02-06 20:31:11 [INFO] TheConstituent.Memory: Database initialized at data\agent.db
+2026-02-06 20:31:11 [INFO] TheConstituent.Memory: Recovered working memory (last save: 2026-02-06T19:26:16.236739)
+2026-02-06 20:31:11 [INFO] TheConstituent.Memory: ✅ Previous state recovered successfully
+2026-02-06 20:31:11 [INFO] TheConstituent.Memory: Memory system initialized (3 layers active)
+2026-02-06 20:31:11 [INFO] TheConstituent.Personality: Loaded Founding Charter (14899 chars)
+2026-02-06 20:31:11 [INFO] TheConstituent.Personality: Loaded 5 skill files
+2026-02-06 20:31:11 [INFO] TheConstituent.Personality: Loaded Constitution (3 sections)
+2026-02-06 20:31:11 [INFO] TheConstituent: Agent recovered from previous state
+2026-02-06 20:31:11 [INFO] TheConstituent.Main: Recovery: {'working_memory_recovered': True, 'checkpoint_recovered': False, 'knowledge_available': True, 'db_intact': True, 'last_known_state': '2026-02-06T19:31:11.056818'}
+2026-02-06 20:31:11 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 20:31:11 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 20:31:11 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 20:31:11 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 20:31:11 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 20:31:11 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-02-06 20:31:11 [INFO] TheConstituent.TelegramBot: ✅ Tweet poster scheduled
+2026-02-06 20:31:11 [INFO] TheConstituent.Main: ✅ Telegram ready
+2026-02-06 20:31:11 [INFO] TheConstituent.Autonomy: Init: 6 posts, 125 comments, 2 articles
+2026-02-06 20:31:11 [INFO] TheConstituent.Scheduler: Scheduler started (5 tasks)
+2026-02-06 20:31:11 [INFO] TheConstituent.Autonomy: 🧠 Autonomy v4.0 STARTED
+├ Engagement: 10min
+├ Constitution: 2h
+├ Exploration: 4h
+├ Posts tracked: 6
+└ Articles: 2
+2026-02-06 20:31:11 [INFO] TheConstituent.Autonomy: 📅 Engagement: first in 60s
+2026-02-06 20:31:11 [INFO] TheConstituent.Autonomy: 📅 Constitution: first in 5min
+2026-02-06 20:31:11 [INFO] TheConstituent.Autonomy: 📅 Exploration: first in 15min
+2026-02-06 20:31:14 [INFO] TheConstituent.GitSync: Git commit: startup: v4.0 builder mode
+2026-02-06 20:31:14 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 20:31:14 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 20:31:15 [INFO] TheConstituent.Main: 🚀 LIVE — builder mode active
+2026-02-06 20:32:11 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:37:11 UTC)" (scheduled at 2026-02-06 19:32:11.121990+00:00)
+2026-02-06 20:32:11 [INFO] TheConstituent.Twitter: Posting 1 approved tweets...
+2026-02-06 20:32:11 [ERROR] TheConstituent.Twitter: Failed to post tweet #1: 403 Forbidden
+453 - You currently have access to a subset of X API V2 endpoints and limited v1.1 endpoints (e.g. media post, oauth) only. If you need access to this endpoint, you may need a different access level. You can learn more here: https://developer.x.com/en/portal/product
