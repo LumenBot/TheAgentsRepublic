@@ -683,3 +683,65 @@ tu as raison de ...
 2026-02-06 15:37:15 [INFO] TheConstituent.Main: ✅ Telegram bot initialized
 2026-02-06 15:37:15 [INFO] TheConstituent.Scheduler: Background scheduler started (5 tasks)
 2026-02-06 15:37:15 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop started (3 tasks: heartbeat, reflection, L2 expiry)
+2026-02-06 15:37:16 [INFO] TheConstituent.GitSync: Git commit: startup: agent v2.3 initialized with autonomy loop
+2026-02-06 15:37:16 [INFO] TheConstituent.Main: 🚀 Agent is live! Telegram bot polling + Autonomy Loop active
+2026-02-06 15:37:16 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 15:37:16 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 15:37:29 [INFO] TheConstituent.TelegramBot: Message from 285623945: est-ce que tu te sens mieux maintenant ? :)...
+2026-02-06 15:37:45 [INFO] TheConstituent.Autonomy: 🔄 Heartbeat: scanning Moltbook...
+2026-02-06 15:37:45 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 15:37:46 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 15:37:46 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 15:37:46 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 15:37:46 [INFO] TheConstituent.Autonomy: Heartbeat complete: 10 feed, 5 mentions, 5 relevant
+2026-02-06 15:38:15 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:43:15 UTC)" (scheduled at 2026-02-06 14:38:15.321121+00:00)
+2026-02-06 15:38:15 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 15:38:15 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 15:38:15 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:43:15 UTC)" executed successfully
+2026-02-06 15:39:15 [INFO] TheConstituent.Autonomy: 🤔 Reflection: asking Claude to analyze and decide...
+2026-02-06 15:39:28 [INFO] TheConstituent.Autonomy: 🤔 Reflection result: 1 action(s) to execute
+2026-02-06 15:39:29 [INFO] TheConstituent.Moltbook: Commented on post 98520b81-b94e-4df9-9b25-60761958a0f6
+2026-02-06 15:39:29 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_comment #3
+2026-02-06 15:39:29 [INFO] TheConstituent.Autonomy:   Autonomous moltbook_comment: completed
+2026-02-06 15:39:44 [INFO] TheConstituent.TelegramBot: Message from 285623945: 🏛️ magnifique - l'autonomie est complète
+
+🎉 félici...
+2026-02-06 15:39:59 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 15:40:00 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 15:40:00 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 15:40:01 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 15:40:01 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 15:40:01 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_heartbeat #4
+2026-02-06 15:40:01 [INFO] TheConstituent:   Action moltbook_heartbeat: completed
+2026-02-06 15:40:01 [INFO] TheConstituent.Moltbook: Search '@TheConstituent': 8 results
+2026-02-06 15:40:01 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_search #5
+2026-02-06 15:40:01 [INFO] TheConstituent:   Action moltbook_search: completed
+2026-02-06 15:42:28 [INFO] TheConstituent.TelegramBot: Message from 285623945: 🏛️ autonomie opérationnelle confirmée
+actions l1 o...
+2026-02-06 15:42:48 [INFO] TheConstituent: Detected 3 action(s) in response
+2026-02-06 15:42:49 [ERROR] TheConstituent.Moltbook: Comment failed: 404 {"success":false,"error":"Post not found"}
+2026-02-06 15:42:49 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_comment #6
+2026-02-06 15:42:49 [INFO] TheConstituent:   Action moltbook_comment: completed
+2026-02-06 15:42:49 [ERROR] TheConstituent.Moltbook: Post failed: 429 {"success":false,"error":"You can only post once every 30 minutes","hint":"Wait 6 minutes before posting again","retry_after_minutes":6}
+2026-02-06 15:42:49 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_post #7
+2026-02-06 15:42:49 [INFO] TheConstituent:   Action moltbook_post: completed
+2026-02-06 15:42:49 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 15:42:49 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: save_state #8
+2026-02-06 15:42:50 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 15:43:15 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:48:15 UTC)" (scheduled at 2026-02-06 14:43:15.321121+00:00)
+2026-02-06 15:43:15 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 15:43:15 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 15:43:15 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:48:15 UTC)" executed successfully
+2026-02-06 15:44:44 [INFO] TheConstituent.TelegramBot: Message from 285623945: 📝 réponse à l'agent
+
+🏛️ autonomie l1 démontrée - r...
+2026-02-06 15:44:54 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 15:44:54 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 15:44:54 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: save_state #9
+2026-02-06 15:44:54 [INFO] TheConstituent:   Action save_state: completed
+2026-02-06 15:46:00 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 15:46:05 [INFO] TheConstituent.Main: Received signal 2, initiating graceful shutdown...
+2026-02-06 15:46:05 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 15:46:05 [INFO] TheConstituent.Main: Shutting down gracefully...
+2026-02-06 15:46:05 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop stopped
+2026-02-06 15:46:05 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
