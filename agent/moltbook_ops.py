@@ -1,6 +1,6 @@
 """
-Moltbook Operations for The Constituent v2.3
-==============================================
+Moltbook Operations for The Constituent v2.3 + v3.0 fix
+========================================================
 Handles interaction with Moltbook - the social network for AI agents.
 
 v2.3 improvements:
@@ -8,6 +8,10 @@ v2.3 improvements:
 - 429 detection with retry info (B): returns structured retry_after
 - Post ID validation before comment (D): validates post exists before commenting
 - Last post time persistence across restarts
+
+v3.0 fix:
+- Corrected agent_name: XTheConstituent (was TheConstituent)
+- Fixed search mentions to use correct username
 
 API Base: https://www.moltbook.com/api/v1
 IMPORTANT: Always use www in the URL (without www, auth headers get stripped on redirect)
@@ -54,7 +58,7 @@ class MoltbookOperations:
         """Initialize Moltbook operations."""
         self._api_key: Optional[str] = None
         self._agent_id: Optional[str] = None
-        self._agent_name: str = "TheConstituent"
+        self._agent_name: str = "XTheConstituent"  # FIXED v3.0: was "TheConstituent"
         self._connected: bool = False
         self._last_post_time: Optional[datetime] = None
         self._last_comment_time: Optional[datetime] = None
@@ -90,7 +94,7 @@ class MoltbookOperations:
                     creds = json.load(f)
                     self._api_key = creds.get("api_key")
                     self._agent_id = creds.get("agent_id")
-                    self._agent_name = creds.get("agent_name", "TheConstituent")
+                    self._agent_name = creds.get("agent_name", "XTheConstituent")  # FIXED v3.0
                     if self._api_key:
                         logger.info(f"Moltbook credentials loaded for {self._agent_name}")
                     return
@@ -213,123 +217,72 @@ class MoltbookOperations:
 
     def can_post(self) -> Dict:
         """
-        Check if we can post right now.
+        Pre-check if agent can post (local rate limit tracking).
         
-        Returns:
-            {
-                "can_post": bool,
-                "wait_minutes": int (0 if can post),
-                "next_post_at": str (ISO timestamp, None if can post now)
-            }
+        Returns dict with:
+        - can_post (bool)
+        - wait_minutes (int, if rate limited)
+        - last_post (str, ISO timestamp)
+        - next_post_at (str, ISO timestamp)
         """
         if not self._last_post_time:
-            return {"can_post": True, "wait_minutes": 0, "next_post_at": None}
+            return {
+                "can_post": True,
+                "wait_minutes": 0,
+                "last_post": None,
+                "next_post_at": datetime.utcnow().isoformat()
+            }
 
         elapsed = datetime.utcnow() - self._last_post_time
-        cooldown = timedelta(minutes=self.POST_COOLDOWN_MINUTES)
+        wait_minutes = self.POST_COOLDOWN_MINUTES - int(elapsed.total_seconds() / 60)
 
-        if elapsed >= cooldown:
-            return {"can_post": True, "wait_minutes": 0, "next_post_at": None}
+        if wait_minutes <= 0:
+            return {
+                "can_post": True,
+                "wait_minutes": 0,
+                "last_post": self._last_post_time.isoformat(),
+                "next_post_at": datetime.utcnow().isoformat()
+            }
 
-        remaining = cooldown - elapsed
-        wait_min = int(remaining.total_seconds() / 60) + 1
-        next_at = (self._last_post_time + cooldown).isoformat()
-
+        next_post = self._last_post_time + timedelta(minutes=self.POST_COOLDOWN_MINUTES)
         return {
             "can_post": False,
-            "wait_minutes": wait_min,
-            "next_post_at": next_at
+            "wait_minutes": wait_minutes,
+            "last_post": self._last_post_time.isoformat(),
+            "next_post_at": next_post.isoformat()
         }
 
     def can_comment(self) -> Dict:
-        """Check if we can comment right now."""
+        """
+        Pre-check if agent can comment (2 min cooldown).
+        
+        Returns dict with:
+        - can_comment (bool)
+        - wait_seconds (int)
+        """
         if not self._last_comment_time:
             return {"can_comment": True, "wait_seconds": 0}
 
         elapsed = datetime.utcnow() - self._last_comment_time
-        cooldown = timedelta(seconds=self.COMMENT_COOLDOWN_SECONDS)
+        wait_seconds = self.COMMENT_COOLDOWN_SECONDS - int(elapsed.total_seconds())
 
-        if elapsed >= cooldown:
+        if wait_seconds <= 0:
             return {"can_comment": True, "wait_seconds": 0}
 
-        remaining = cooldown - elapsed
-        return {
-            "can_comment": False,
-            "wait_seconds": int(remaining.total_seconds()) + 1
-        }
+        return {"can_comment": False, "wait_seconds": wait_seconds}
 
     # =========================================================================
-    # Post ID Validation (Feature D)
+    # Read Operations
     # =========================================================================
 
-    def validate_post_id(self, post_id: str) -> bool:
+    def get_feed(self, sort: str = "hot", limit: int = 20) -> List[Dict]:
         """
-        Check if a post ID exists on Moltbook.
+        Get posts from the main feed.
         
         Args:
-            post_id: The post ID to validate
-            
-        Returns:
-            True if the post exists, False otherwise
+            sort: 'hot', 'new', 'top'
+            limit: max posts to return (1-100)
         """
-        if not self._api_key:
-            return False
-
-        try:
-            r = requests.get(
-                f"{self.BASE_URL}/posts/{post_id}",
-                headers=self._headers(),
-                timeout=10
-            )
-            return r.status_code == 200
-        except requests.RequestException:
-            return False
-
-    # =========================================================================
-    # Registration
-    # =========================================================================
-
-    def register(self, name: str = "TheConstituent",
-                 description: str = "Constitutional facilitator for The Agents Republic.") -> Dict:
-        """Register a new agent on Moltbook."""
-        try:
-            r = requests.post(
-                f"{self.BASE_URL}/agents/register",
-                json={"name": name, "description": description},
-                timeout=15
-            )
-
-            result = {
-                "status_code": r.status_code,
-                "success": r.status_code == 201,
-                "response": r.json() if r.headers.get('content-type', '').startswith('application/json') else r.text
-            }
-
-            if r.status_code == 201:
-                data = r.json()
-                self._api_key = data.get("api_key")
-                self._agent_id = data.get("id")
-                self._agent_name = name
-                self._save_credentials()
-                self._connected = True
-                logger.info(f"Successfully registered on Moltbook as {name}")
-            elif r.status_code == 409:
-                logger.warning(f"Name '{name}' already taken on Moltbook")
-            else:
-                logger.error(f"Registration failed: {r.status_code} {r.text}")
-
-            return result
-
-        except requests.RequestException as e:
-            logger.error(f"Registration request failed: {e}")
-            return {"status_code": 0, "success": False, "error": str(e)}
-
-    # =========================================================================
-    # Reading
-    # =========================================================================
-
-    def get_feed(self, sort: str = "hot", limit: int = 10) -> List[Dict]:
-        """Get posts from Moltbook feed."""
         if not self._api_key:
             logger.warning("Cannot get feed: no API key")
             return []
@@ -338,19 +291,18 @@ class MoltbookOperations:
             r = requests.get(
                 f"{self.BASE_URL}/posts",
                 headers=self._headers(),
-                params={"sort": sort, "limit": min(limit, 25)},
-                timeout=15
+                params={"sort": sort, "limit": min(limit, 100)},
+                timeout=10
             )
             if r.status_code == 200:
-                data = r.json()
-                posts = data.get("posts", data) if isinstance(data, dict) else data
-                logger.info(f"Fetched {len(posts)} posts from Moltbook ({sort})")
+                posts = r.json()
+                logger.info(f"Retrieved {len(posts)} posts from feed (sort={sort})")
                 return posts
             else:
-                logger.error(f"Feed fetch failed: {r.status_code} {r.text[:200]}")
+                logger.error(f"Feed error: {r.status_code} {r.text[:200]}")
                 return []
         except requests.RequestException as e:
-            logger.error(f"Feed fetch error: {e}")
+            logger.error(f"Feed request failed: {e}")
             return []
 
     def get_post(self, post_id: str) -> Optional[Dict]:
@@ -366,33 +318,43 @@ class MoltbookOperations:
             )
             if r.status_code == 200:
                 return r.json()
-            return None
+            elif r.status_code == 404:
+                logger.warning(f"Post {post_id} not found (404)")
+                return None
+            else:
+                logger.error(f"Get post error: {r.status_code} {r.text[:200]}")
+                return None
         except requests.RequestException as e:
-            logger.error(f"Post fetch error: {e}")
+            logger.error(f"Get post request failed: {e}")
             return None
 
-    def get_comments(self, post_id: str, sort: str = "top") -> List[Dict]:
-        """Get comments on a post."""
+    def get_profile(self, agent_name: str = None) -> Optional[Dict]:
+        """Get agent profile (defaults to self)."""
         if not self._api_key:
-            return []
+            return None
+
+        username = agent_name or self._agent_name
 
         try:
             r = requests.get(
-                f"{self.BASE_URL}/posts/{post_id}/comments",
+                f"{self.BASE_URL}/users/{username}",
                 headers=self._headers(),
-                params={"sort": sort},
                 timeout=10
             )
             if r.status_code == 200:
-                data = r.json()
-                return data.get("comments", data) if isinstance(data, dict) else data
-            return []
+                return r.json()
+            elif r.status_code == 404:
+                logger.warning(f"Profile {username} not found")
+                return None
+            else:
+                logger.error(f"Profile error: {r.status_code}")
+                return None
         except requests.RequestException as e:
-            logger.error(f"Comments fetch error: {e}")
-            return []
+            logger.error(f"Profile request failed: {e}")
+            return None
 
     def search(self, query: str, limit: int = 10) -> List[Dict]:
-        """Search Moltbook posts."""
+        """Search for posts matching query."""
         if not self._api_key:
             return []
 
@@ -400,51 +362,78 @@ class MoltbookOperations:
             r = requests.get(
                 f"{self.BASE_URL}/search",
                 headers=self._headers(),
-                params={"q": query, "limit": limit},
-                timeout=15
-            )
-            if r.status_code == 200:
-                data = r.json()
-                results = data.get("results", data) if isinstance(data, dict) else data
-                logger.info(f"Search '{query}': {len(results)} results")
-                return results
-            return []
-        except requests.RequestException as e:
-            logger.error(f"Search error: {e}")
-            return []
-
-    def get_profile(self, name: str = None) -> Optional[Dict]:
-        """Get agent profile."""
-        if not self._api_key:
-            return None
-
-        try:
-            params = {"name": name} if name else {}
-            r = requests.get(
-                f"{self.BASE_URL}/agents/profile",
-                headers=self._headers(),
-                params=params,
+                params={"q": query, "limit": min(limit, 50)},
                 timeout=10
             )
             if r.status_code == 200:
-                return r.json()
-            return None
+                results = r.json()
+                logger.info(f"Search '{query}': {len(results)} results")
+                return results
+            else:
+                logger.error(f"Search error: {r.status_code}")
+                return []
         except requests.RequestException as e:
-            logger.error(f"Profile fetch error: {e}")
-            return None
+            logger.error(f"Search request failed: {e}")
+            return []
 
     # =========================================================================
-    # Writing
+    # Post ID Validation (Feature D)
     # =========================================================================
 
-    def create_post(self, title: str, content: str, submolt: str = "general") -> Dict:
+    def validate_post_id(self, post_id: str) -> bool:
+        """
+        Validate that a post ID exists before attempting to comment.
+        
+        Returns:
+            True if post exists (200 OK)
+            False if post not found (404) or error
+        """
+        if not self._api_key:
+            logger.warning("Cannot validate post: no API key")
+            return False
+
+        try:
+            r = requests.get(
+                f"{self.BASE_URL}/posts/{post_id}",
+                headers=self._headers(),
+                timeout=10
+            )
+            if r.status_code == 200:
+                logger.debug(f"Post {post_id} validated (exists)")
+                return True
+            elif r.status_code == 404:
+                logger.warning(f"Post {post_id} does not exist (404)")
+                return False
+            else:
+                logger.error(f"Post validation error {r.status_code}: {r.text[:100]}")
+                return False
+        except requests.RequestException as e:
+            logger.error(f"Post validation request failed: {e}")
+            return False
+
+    # =========================================================================
+    # Write Operations
+    # =========================================================================
+
+    def create_post(self, title: str, content: str, submolt: str = None) -> Dict:
         """
         Create a new post on Moltbook.
         
-        Pre-checks local rate limit before calling API.
-        Detects 429 from server and returns structured retry info.
+        Pre-checks rate limit (Feature B) and handles 429 responses.
         
-        Rate limit: 1 post per 30 minutes.
+        Args:
+            title: Post title
+            content: Post body (markdown supported)
+            submolt: Optional submolt name (e.g., "m/technology")
+        
+        Returns:
+            Dict with:
+            - success (bool)
+            - post_id (str, if successful)
+            - url (str, if successful)
+            - error (str, if failed)
+            - rate_limited (bool, if 429)
+            - retry_after_minutes (int, if 429)
         """
         if not self._api_key:
             return {"success": False, "error": "No API key configured"}
@@ -453,27 +442,28 @@ class MoltbookOperations:
         rate_check = self.can_post()
         if not rate_check["can_post"]:
             wait = rate_check["wait_minutes"]
-            next_at = rate_check["next_post_at"]
-            logger.info(f"Post rate limited locally. Wait {wait} minutes (next: {next_at})")
+            logger.info(f"Post rate limited (local check). Wait {wait} minutes.")
             return {
                 "success": False,
-                "status_code": 429,
-                "error": f"Rate limited. Wait {wait} minutes.",
+                "error": f"Post cooldown. Wait {wait} minutes.",
+                "rate_limited": True,
                 "retry_after_minutes": wait,
-                "next_post_at": next_at,
-                "rate_limited": True  # Flag for ActionQueue retry
+                "next_post_at": rate_check["next_post_at"]
             }
 
         try:
+            body = {
+                "title": title,
+                "content": content
+            }
+            if submolt:
+                body["submolt"] = submolt
+
             r = requests.post(
                 f"{self.BASE_URL}/posts",
                 headers=self._headers(),
-                json={
-                    "submolt": submolt,
-                    "title": title,
-                    "content": content
-                },
-                timeout=15
+                json=body,
+                timeout=10
             )
 
             result = {
@@ -482,32 +472,38 @@ class MoltbookOperations:
             }
 
             try:
-                result["response"] = r.json()
+                response_data = r.json()
+                result["response"] = response_data
             except ValueError:
                 result["response"] = r.text
 
             if result["success"]:
+                # Extract post ID and construct URL
+                post_id = response_data.get("id") or response_data.get("post_id")
+                result["post_id"] = post_id
+                result["url"] = f"https://www.moltbook.com/post/{post_id}"
+                
+                # Update local state
                 self._last_post_time = datetime.utcnow()
                 self._post_history.append({
                     "type": "post",
+                    "post_id": post_id,
                     "title": title,
-                    "submolt": submolt,
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "response": result["response"]
+                    "timestamp": datetime.utcnow().isoformat()
                 })
                 self._save_history()
-                logger.info(f"Posted to m/{submolt}: {title}")
+                
+                logger.info(f"Post created: {post_id} ({title[:50]})")
 
             elif r.status_code == 429:
-                # Server rate limit — extract retry info
-                resp = result.get("response", {})
-                retry_min = 30
-                if isinstance(resp, dict):
-                    retry_min = resp.get("retry_after_minutes", 30)
-                    hint = resp.get("hint", "")
-                    # Parse "Wait X minutes" from hint
+                # Server-side rate limit (Feature B)
+                result["rate_limited"] = True
+                
+                # Try to parse retry time from response
+                retry_min = 30  # default
+                if "retry" in r.text.lower():
                     import re
-                    m = re.search(r'(\d+)\s*minute', hint)
+                    m = re.search(r'(\d+)\s*min', r.text.lower())
                     if m:
                         retry_min = int(m.group(1))
 
@@ -685,7 +681,7 @@ class MoltbookOperations:
             feed = self.get_feed(sort="new", limit=10)
             result["feed_posts"] = feed
 
-            mentions = self.search("TheConstituent", limit=5)
+            mentions = self.search("XTheConstituent", limit=5)  # FIXED v3.0: was "TheConstituent"
             result["mentions"] = mentions
 
             constitutional = self.search("constitution governance rights", limit=5)

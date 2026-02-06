@@ -1174,3 +1174,97 @@ pause & upgrade to v3...
 2026-02-06 17:31:45 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
 2026-02-06 17:31:45 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
 2026-02-06 17:31:45 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 17:31:49 [INFO] TheConstituent.GitSync: Git commit: sync: manual sync (16:31 UTC)
+2026-02-06 17:31:49 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 17:31:53 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 17:32:01 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:37:01 UTC)" (scheduled at 2026-02-06 16:32:01.198110+00:00)
+2026-02-06 17:32:01 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:37:01 UTC)" executed successfully
+2026-02-06 17:32:25 [INFO] TheConstituent.TelegramBot: Message from 285623945: quel est le profil de ton compte sur moltbook, je ...
+2026-02-06 17:32:36 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 17:32:36 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 8 results
+2026-02-06 17:32:36 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #41
+2026-02-06 17:32:36 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 17:32:36 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ❌
+2026-02-06 17:34:46 [INFO] TheConstituent.TelegramBot: Message from 285623945: déploiement the constituent v3.0 - guide complet
+c...
+2026-02-06 17:35:04 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:35:04 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:35:04 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:35:04 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #43
+2026-02-06 17:35:04 [INFO] TheConstituent.TelegramBot: Message from 285623945: f"❌ main_v3 fai...
+2026-02-06 17:35:18 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 17:35:18 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:35:18 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:35:18 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #44
+2026-02-06 17:35:18 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ❌
+2026-02-06 17:35:19 [INFO] TheConstituent.TelegramBot: Message from 285623945: as e:
+    print(f"❌ main_v3 failed: {e}")
+
+print("...
+2026-02-06 17:35:32 [INFO] TheConstituent.TelegramBot: Message from 285623945: check /ratio :
+/ratio
+
+expected:
+execution actions...
+2026-02-06 17:35:45 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:35:45 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ❌
+2026-02-06 17:35:45 [INFO] TheConstituent.TelegramBot: Message from 285623945: s
+debug :
+python# ajouter log temporaire dans main...
+2026-02-06 17:36:01 [INFO] TheConstituent.TelegramBot: Message from 285623945: user-data/uploads/constituent.py agent/
+cp /mnt/us...
+2026-02-06 17:36:13 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:36:13 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:36:13 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:36:13 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #47
+2026-02-06 17:37:01 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:42:01 UTC)" (scheduled at 2026-02-06 16:37:01.198110+00:00)
+2026-02-06 17:37:01 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:42:01 UTC)" executed successfully
+2026-02-06 17:39:52 [INFO] TheConstituent.TelegramBot: Message from 285623945: # l'agent tourne-t-il vraiment sur main_v3.py ?
+ps...
+2026-02-06 17:40:04 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:40:04 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:40:04 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:40:04 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #48
+2026-02-06 17:41:04 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #2 — 9 files (2026-02-06 16:41 UTC)
+2026-02-06 17:41:04 [INFO] TheConstituent.TelegramBot: Message from 285623945: # test direct moltbook
+from agent.moltbook_ops imp...
+2026-02-06 17:41:11 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 17:41:12 [INFO] TheConstituent.Moltbook: Fetched 10 posts from Moltbook (new)
+2026-02-06 17:41:12 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 5 results
+2026-02-06 17:41:13 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 5 results
+2026-02-06 17:41:13 [INFO] TheConstituent.Moltbook: Heartbeat: 10 feed, 5 mentions, 5 relevant
+2026-02-06 17:41:13 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_heartbeat #49
+2026-02-06 17:41:13 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 17:41:13 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:41:13 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:41:13 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #50
+2026-02-06 17:42:01 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:47:01 UTC)" (scheduled at 2026-02-06 16:42:01.198110+00:00)
+2026-02-06 17:42:01 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:47:01 UTC)" executed successfully
+2026-02-06 17:45:32 [INFO] TheConstituent.TelegramBot: Message from 285623945: pkill -f main
+python -m agent.main_v3
+
+---
+
+## 📝 *...
+2026-02-06 17:45:43 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 17:45:43 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:45:43 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:45:43 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #51
+2026-02-06 17:47:01 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:52:01 UTC)" (scheduled at 2026-02-06 16:47:01.198110+00:00)
+2026-02-06 17:47:01 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 16:52:01 UTC)" executed successfully
+2026-02-06 17:50:35 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:50:35 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:50:59 [INFO] TheConstituent.Main: Received signal 2, shutting down...
+2026-02-06 17:51:00 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 17:51:00 [INFO] TheConstituent.Main: Shutting down...
+2026-02-06 17:51:00 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop stopped
+2026-02-06 17:51:00 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:51:00 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 17:51:00 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 17:51:00 [INFO] TheConstituent.Profile: 📋 Profile updated: agent_profile.md
+2026-02-06 17:51:04 [INFO] TheConstituent.GitSync: Git commit: shutdown: v3.0 graceful shutdown + final metrics
+2026-02-06 17:51:04 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 17:51:07 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 17:51:07 [INFO] TheConstituent.Main: ✅ Shutdown complete. All state saved.
+2026-02-06 17:51:07 [INFO] TheConstituent.Main:    Sprint Day: 1/21
+2026-02-06 17:51:07 [INFO] TheConstituent.Main:    Checkpoints: 91
