@@ -2211,3 +2211,34 @@ answer these 5 questions wit...
 2026-02-06 20:04:30 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
 2026-02-06 20:04:30 [INFO] apscheduler.scheduler: Scheduler started
 2026-02-06 20:04:30 [INFO] TheConstituent.Main: 🚀 LIVE — builder mode active
+2026-02-06 20:05:26 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:10:26 UTC)" (scheduled at 2026-02-06 19:05:26.662225+00:00)
+2026-02-06 20:05:26 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:10:26 UTC)" executed successfully
+2026-02-06 20:05:26 [INFO] TheConstituent.Autonomy: 🔄 ENGAGEMENT START
+2026-02-06 20:05:26 [INFO] TheConstituent.Autonomy: Checking 6 posts
+2026-02-06 20:05:27 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 20:05:28 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 20:05:29 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 20:05:30 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 20:05:31 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 20:05:32 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 20:05:33 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 20:05:33 [ERROR] TheConstituent.Autonomy: Feed: 'str' object has no attribute 'get'
+2026-02-06 20:05:33 [INFO] TheConstituent.Autonomy: 🔄 ENGAGEMENT END c=0 r=0 u=0
+2026-02-06 20:07:15 [INFO] TheConstituent.TelegramBot: Message from 285623945: comment te sens-tu ?...
+2026-02-06 20:09:26 [INFO] TheConstituent.Autonomy: 📜 CONSTITUTION START
+2026-02-06 20:09:26 [INFO] TheConstituent.Autonomy: Writing: Article 8: Human Rights — Oversight, Disconnection, Recourse
+2026-02-06 20:09:41 [INFO] TheConstituent.Autonomy: ✅ constitution\TITLE_II_RIGHTS_DUTIES.md: 5678B verified=True
+2026-02-06 20:09:41 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 20:09:41 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 20:09:41 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 20:09:41 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 20:09:41 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 20:09:41 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 20:09:41 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 20:09:44 [INFO] TheConstituent.GitSync: Git commit: constitution: Article 8: Human Rights — Oversight, Disconnection, Recourse
+2026-02-06 20:09:44 [INFO] TheConstituent.Autonomy: 📜 CONSTITUTION END {'article_written': 'Article 8: Human Rights — Oversight, Disconnection, Recourse', 'file': 'constitution\\TITLE_II_RIGHTS_DUTIES.md', 'verified': True, 'file_size': 5678, 'posted': False}
+2026-02-06 20:09:58 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 20:09:58 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 20:09:58 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 20:09:58 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 20:09:58 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
