@@ -745,3 +745,8 @@ actions l1 o...
 2026-02-06 15:46:05 [INFO] TheConstituent.Main: Shutting down gracefully...
 2026-02-06 15:46:05 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop stopped
 2026-02-06 15:46:05 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 15:46:06 [INFO] TheConstituent.GitSync: Git commit: shutdown: graceful shutdown state save
+2026-02-06 15:46:09 [INFO] TheConstituent.GitSync: Git push to origin/main successful
+2026-02-06 15:46:09 [INFO] TheConstituent.Main: ✅ Shutdown complete. All state saved.
+2026-02-06 15:46:09 [INFO] TheConstituent.Main:    Checkpoints: 54
+2026-02-06 15:46:09 [INFO] TheConstituent.Main:    Git commits: 0

@@ -1,17 +1,17 @@
 """
-The Constituent — Main Entry Point v2
-=======================================
+The Constituent — Main Entry Point v2.3
+=========================================
+Phase 2B: Autonomous agent with background intelligence.
+
 Orchestrates:
 - Agent initialization with memory recovery
 - Telegram bot (iPhone interface)
 - Background tasks: auto-save, checkpoints, git sync
+- AUTONOMY LOOP: observe, think, act (NEW)
 - Graceful shutdown with state preservation
 
 Usage:
     python -m agent.main_v2
-    
-Or via Docker:
-    docker-compose up
 """
 
 import asyncio
@@ -26,6 +26,7 @@ from .constituent import TheConstituent
 from .memory_manager import MemoryManager
 from .git_sync import GitSync
 from .telegram_bot import TelegramBotHandler, TELEGRAM_AVAILABLE
+from .autonomy_loop import AutonomyLoop
 
 # ============================================================================
 # Logging setup
@@ -153,7 +154,7 @@ class BackgroundScheduler:
         """Database backup every 30 minutes."""
         while self._running:
             try:
-                await asyncio.sleep(1800)  # 30 minutes
+                await asyncio.sleep(1800)
                 self.agent.memory.backup_database()
             except asyncio.CancelledError:
                 break
@@ -174,12 +175,13 @@ async def run():
     # Banner
     print("""
     ╔══════════════════════════════════════════════╗
-    ║         THE CONSTITUENT v2.0                 ║
+    ║         THE CONSTITUENT v2.3                 ║
     ║     AI Agent for The Agents Republic         ║
     ║                                              ║
     ║     🛡️  Resilient Memory System Active       ║
     ║     📱 Telegram Interface Ready              ║
     ║     🔄 Git Auto-Sync Enabled                 ║
+    ║     🧠 Autonomy Loop Active                  ║
     ╚══════════════════════════════════════════════╝
     """)
 
@@ -219,11 +221,34 @@ async def run():
 
     # --- Initialize Telegram Bot ---
     telegram_bot = None
+    notify_fn = None
+
     if TELEGRAM_AVAILABLE and settings.api.TELEGRAM_BOT_TOKEN:
         try:
             telegram_bot = TelegramBotHandler(agent=agent)
             telegram_bot.build_application()
             logger.info("✅ Telegram bot initialized")
+
+            # Create notification function for autonomy loop
+            operator_chat_id = settings.api.OPERATOR_TELEGRAM_CHAT_ID
+            if operator_chat_id:
+                bot_instance = telegram_bot.application.bot
+                async def send_telegram_notification(text: str):
+                    """Send notification to operator via Telegram."""
+                    try:
+                        # Truncate if too long
+                        if len(text) > 4000:
+                            text = text[:4000] + "\n... (truncated)"
+                        await bot_instance.send_message(
+                            chat_id=int(operator_chat_id),
+                            text=text
+                        )
+                    except Exception as e:
+                        logging.getLogger("TheConstituent.Notify").error(
+                            f"Telegram notification failed: {e}"
+                        )
+                notify_fn = send_telegram_notification
+
         except Exception as e:
             logger.error(f"❌ Telegram bot failed to initialize: {e}")
             logger.info("Agent will run without Telegram interface")
@@ -233,6 +258,13 @@ async def run():
         if not settings.api.TELEGRAM_BOT_TOKEN:
             logger.warning("TELEGRAM_BOT_TOKEN not set")
         logger.info("Running without Telegram interface")
+
+    # --- Initialize Autonomy Loop ---
+    autonomy = AutonomyLoop(agent=agent, notify_fn=notify_fn)
+
+    # Store autonomy reference on the bot for Telegram commands
+    if telegram_bot:
+        telegram_bot.autonomy_loop = autonomy
 
     # --- Graceful shutdown handler ---
     shutdown_event = asyncio.Event()
@@ -249,15 +281,18 @@ async def run():
         # Start background scheduler
         await scheduler.start()
 
+        # Start autonomy loop
+        await autonomy.start()
+
         # Initial checkpoint
         agent.memory.create_checkpoint(trigger="startup")
 
         # Initial git commit
-        git_sync.auto_commit("startup: agent v2.0 initialized")
+        git_sync.auto_commit("startup: agent v2.3 initialized with autonomy loop")
 
         if telegram_bot:
             # Run Telegram bot (this blocks until shutdown)
-            logger.info("🚀 Agent is live! Telegram bot polling...")
+            logger.info("🚀 Agent is live! Telegram bot polling + Autonomy Loop active")
 
             # Start the bot in polling mode
             app = telegram_bot.application
@@ -283,6 +318,9 @@ async def run():
     finally:
         # --- Graceful shutdown ---
         logger.info("Shutting down gracefully...")
+
+        # Stop autonomy loop
+        await autonomy.stop()
 
         # Stop background tasks
         await scheduler.stop()
