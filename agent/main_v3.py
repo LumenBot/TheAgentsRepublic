@@ -1,12 +1,13 @@
 """
-The Constituent — Main Entry Point v3.0
-=========================================
-Constitutional Sprint Mode.
+The Constituent — Main Entry Point v3.0 + Engagement Loop
+==========================================================
+Constitutional Sprint Mode with 5-minute engagement automation.
 
 Orchestrates:
 - Agent initialization with memory recovery
 - Telegram bot (iPhone interface)
 - Background tasks: auto-save, checkpoints, git sync
+- Engagement Loop: Check posts every 5min, respond, extract insights, update Constitution
 - Autonomy Loop: observe, think, act
 - Daily tasks: metrics update, profile refresh (23:00 UTC)
 - Graceful shutdown with state preservation
@@ -28,6 +29,7 @@ from .memory_manager import MemoryManager
 from .git_sync import GitSync
 from .telegram_bot import TelegramBotHandler, TELEGRAM_AVAILABLE
 from .autonomy_loop import AutonomyLoop
+from .engagement_loop import EngagementLoop  # NEW: 5min engagement loop
 
 # ============================================================================
 # Logging setup
@@ -68,7 +70,8 @@ class BackgroundScheduler:
     - Git commit (every 15min)
     - Git push (every 1h)
     - Database backup (every 30min)
-    - Daily metrics + profile update (23:00 UTC) — NEW v3.0
+    - Engagement loop (every 5min) — NEW: Comment checking + Constitution updates
+    - Daily metrics + profile update (23:00 UTC)
     """
 
     def __init__(self, agent: TheConstituent, git_sync: GitSync, notify_fn=None):
@@ -77,6 +80,9 @@ class BackgroundScheduler:
         self.notify_fn = notify_fn
         self._running = False
         self._tasks = []
+        
+        # Initialize engagement loop
+        self.engagement = EngagementLoop(agent)
 
     async def start(self):
         self._running = True
@@ -86,10 +92,11 @@ class BackgroundScheduler:
             asyncio.create_task(self._git_commit_loop()),
             asyncio.create_task(self._git_push_loop()),
             asyncio.create_task(self._db_backup_loop()),
-            asyncio.create_task(self._daily_metrics_loop()),  # NEW v3.0
+            asyncio.create_task(self._engagement_loop()),  # NEW: 5min engagement loop
+            asyncio.create_task(self._daily_metrics_loop()),
         ]
         logging.getLogger("TheConstituent.Scheduler").info(
-            "Background scheduler started (6 tasks, including daily metrics)"
+            "Background scheduler started (7 tasks, including 5min engagement loop)"
         )
 
     async def stop(self):
@@ -147,6 +154,53 @@ class BackgroundScheduler:
                 break
             except Exception as e:
                 logging.getLogger("TheConstituent.Scheduler").error(f"DB backup failed: {e}")
+
+    async def _engagement_loop(self):
+        """
+        Engagement loop: Every 5 minutes, check posts for comments,
+        respond, extract insights, update Constitution.
+        
+        This is the CORE constitutional iteration loop.
+        """
+        eng_logger = logging.getLogger("TheConstituent.Engagement")
+        
+        while self._running:
+            try:
+                await asyncio.sleep(300)  # 5 minutes
+                
+                eng_logger.info("🔄 Engagement loop starting...")
+                
+                # Run one iteration
+                stats = self.engagement.run_iteration()
+                
+                # Log summary
+                eng_logger.info(
+                    f"📊 Loop complete: {stats['new_comments']} comments, "
+                    f"{stats['responses_posted']} responses, "
+                    f"{stats['insights_extracted']} insights, "
+                    f"Constitution updated: {stats['constitution_updated']}"
+                )
+                
+                # Notify operator if significant activity
+                if self.notify_fn and (stats['new_comments'] > 5 or stats['constitution_updated']):
+                    await self.notify_fn(
+                        f"🔄 Engagement update:\n"
+                        f"• {stats['new_comments']} new comments\n"
+                        f"• {stats['responses_posted']} responses posted\n"
+                        f"• {stats['insights_extracted']} insights extracted\n"
+                        f"• Constitution: {'✅ Updated' if stats['constitution_updated'] else 'No changes'}"
+                    )
+                
+                # Log errors if any
+                if stats.get('errors'):
+                    for error in stats['errors']:
+                        eng_logger.error(error)
+                
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                eng_logger.error(f"Engagement loop error: {e}")
+                # Continue running despite errors
 
     async def _daily_metrics_loop(self):
         """
@@ -225,6 +279,7 @@ async def run():
     ║     🔄 Git Auto-Sync Enabled                 ║
     ║     🧠 Autonomy Loop Active                  ║
     ║     📈 Metrics Tracking ON                   ║
+    ║     ⚡ Engagement Loop: 5min cycles          ║
     ╚══════════════════════════════════════════════╝
     """)
 
@@ -315,14 +370,14 @@ async def run():
         await autonomy.start()
 
         agent.memory.create_checkpoint(trigger="startup")
-        git_sync.auto_commit("startup: agent v3.0 initialized — Constitutional Sprint Mode")
+        git_sync.auto_commit("startup: agent v3.0 initialized — Constitutional Sprint Mode + Engagement Loop")
 
         # Generate initial metrics + profile
         agent.metrics.update_metrics_file()
         agent.profile.update_profile()
 
         if telegram_bot:
-            logger.info("🚀 Agent is LIVE! Sprint Mode active.")
+            logger.info("🚀 Agent is LIVE! Sprint Mode active with 5min engagement loop.")
 
             app = telegram_bot.application
             await app.initialize()
@@ -335,7 +390,8 @@ async def run():
                     f"🚀 **The Constituent v3.0 is LIVE**\n\n"
                     f"🚨 Constitutional Sprint Mode ACTIVE\n"
                     f"📊 Sprint Day: {sprint_day}/21\n"
-                    f"📈 Metrics tracking ON\n\n"
+                    f"📈 Metrics tracking ON\n"
+                    f"⚡ Engagement Loop: Every 5 minutes\n\n"
                     f"Commands: /metrics /profile /ratio /status"
                 )
 
@@ -361,11 +417,12 @@ async def run():
         agent.metrics.update_metrics_file()
         agent.profile.update_profile()
 
-        git_sync.commit_and_push("shutdown: v3.0 graceful shutdown + final metrics")
+        git_sync.commit_and_push("shutdown: v3.0 graceful shutdown + final metrics + engagement stats")
 
         logger.info("✅ Shutdown complete. All state saved.")
         logger.info(f"   Sprint Day: {agent.metrics.get_sprint_day()}/21")
         logger.info(f"   Checkpoints: {agent.memory.working.checkpoint_count}")
+        logger.info(f"   Engagement stats: {scheduler.engagement.get_stats()}")
 
 
 def main():

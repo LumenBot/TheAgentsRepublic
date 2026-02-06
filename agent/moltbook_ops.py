@@ -447,6 +447,9 @@ class MoltbookOperations:
             return []
 
         try:
+            # Ensure limit is int (fix for type comparison error)
+            limit = int(limit) if limit else 10
+            
             r = requests.get(
                 f"{self.BASE_URL}/search",
                 headers=self._headers(),
