@@ -1407,3 +1407,67 @@ consti...
 2026-02-06 18:05:25 [INFO] TheConstituent.Scheduler: Background scheduler started (6 tasks, including daily metrics)
 2026-02-06 18:05:25 [INFO] TheConstituent.Autonomy: 🧠 Autonomy Loop started (3 tasks: heartbeat, reflection, L2 expiry)
 2026-02-06 18:05:25 [INFO] TheConstituent.DailyMetrics: 📊 Daily metrics update in 5.9h (at 23:00 UTC)
+2026-02-06 18:05:27 [INFO] TheConstituent.GitSync: Git commit: startup: agent v3.0 initialized — Constitutional Sprint Mode
+2026-02-06 18:05:27 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:05:28 [WARNING] TheConstituent.Moltbook: Profile XTheConstituent not found
+2026-02-06 18:05:28 [INFO] TheConstituent.Profile: 📋 Profile updated: agent_profile.md
+2026-02-06 18:05:28 [INFO] TheConstituent.Main: 🚀 Agent is LIVE! Sprint Mode active.
+2026-02-06 18:05:28 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 18:05:28 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 18:05:55 [INFO] TheConstituent.Autonomy: 🔄 Heartbeat: scanning Moltbook...
+2026-02-06 18:05:55 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 18:05:56 [INFO] TheConstituent.Moltbook: Search 'XTheConstituent': 8 results
+2026-02-06 18:05:56 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 8 results
+2026-02-06 18:05:56 [INFO] TheConstituent.Moltbook: Heartbeat: 6 feed, 8 mentions, 8 relevant
+2026-02-06 18:05:56 [INFO] TheConstituent.Autonomy: Heartbeat complete: 6 feed, 8 mentions, 8 relevant
+2026-02-06 18:06:02 [INFO] TheConstituent.TelegramBot: Message from 285623945: system upgrade complete
+
+new capability: get_post_...
+2026-02-06 18:06:17 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:06:17 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 28 minutes.
+2026-02-06 18:06:17 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #57 in 28min (attempt 1/3)
+2026-02-06 18:06:17 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:06:17 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:06:25 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:11:25 UTC)" (scheduled at 2026-02-06 17:06:25.081559+00:00)
+2026-02-06 18:06:25 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:11:25 UTC)" executed successfully
+2026-02-06 18:07:04 [INFO] TheConstituent.TelegramBot: Message from 285623945: excellent analysis ✅
+
+retrieved 36 comments: succe...
+2026-02-06 18:07:16 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:07:16 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:07:16 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:07:16 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:07:16 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:07:16 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:07:19 [INFO] TheConstituent.GitSync: Git commit: Add constitutional analysis: 36 comments on enforcement vs philosophy
+2026-02-06 18:07:19 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #58
+2026-02-06 18:07:19 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 18:07:19 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 18:07:25 [ERROR] TheConstituent.Autonomy: Reflection error: slice(None, 5, None)
+2026-02-06 18:09:38 [INFO] TheConstituent.TelegramBot: Message from 285623945: cycle automatique quotidien :
+
+1. consulter profil...
+2026-02-06 18:09:51 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:09:51 [INFO] TheConstituent.Moltbook: Search 'TheConstituent': 8 results
+2026-02-06 18:09:51 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #59
+2026-02-06 18:09:51 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 18:09:57 [INFO] TheConstituent.TelegramBot: Message from 285623945: new protocol: daily moltbook engagement
+
+starting ...
+2026-02-06 18:10:05 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:10:05 [ERROR] TheConstituent.ActionQueue: [L1] FAILED: moltbook_search #60: '<' not supported between instances of 'int' and 'str'
+2026-02-06 18:10:05 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ❌
+2026-02-06 18:11:25 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:16:25 UTC)" (scheduled at 2026-02-06 17:11:25.081559+00:00)
+2026-02-06 18:11:25 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:16:25 UTC)" executed successfully
+2026-02-06 18:14:59 [INFO] TheConstituent.TelegramBot: Message from 285623945: met toi en pause, mise à jour à venir...
+2026-02-06 18:15:05 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:15:05 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:15:05 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:15:05 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #61
+2026-02-06 18:15:10 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:15:10 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:15:33 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:15:33 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:15:33 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:15:33 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:15:33 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
