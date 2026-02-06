@@ -25,16 +25,21 @@ def _get_twitter() -> TwitterOperations:
 def _tweet_post(text: str) -> str:
     tw = _get_twitter()
     if not tw.is_connected():
-        return "Error: Twitter not connected (API keys not configured)"
-    result = tw.post_tweet(text)
-    if result and result.get("success"):
-        return f"Tweeted: {result.get('url', 'no URL')}"
-    return f"Tweet failed: {result.get('error', 'unknown')}"
+        # Graceful degradation: queue tweet instead of erroring
+        tw.queue_tweet(text, metadata={"source": "tool", "fallback": True})
+        return "Twitter not connected — tweet queued for manual posting"
+    if not tw.has_write_access():
+        tw.queue_tweet(text, metadata={"source": "tool", "fallback": True})
+        return "Twitter write access insufficient (Free tier) — tweet queued for manual posting"
+    result = tw._post_tweet({"text": text, "id": 0, "status": "approved"})
+    return result
 
 
 def _tweet_status() -> str:
     tw = _get_twitter()
-    return f"Twitter connected: {tw.is_connected()}"
+    connected = tw.is_connected()
+    write = tw.has_write_access()
+    return f"Twitter connected: {connected} | Write access: {write}"
 
 
 def get_tools() -> List[Tool]:

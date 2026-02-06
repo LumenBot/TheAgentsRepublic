@@ -1,10 +1,15 @@
 """
-Heartbeat Runner for The Constituent v5.0
+Heartbeat Runner for The Constituent v5.1
 ============================================
 Timer-based scheduler that:
 1. Runs due cron jobs (from data/cron_jobs.json)
 2. Sends heartbeat prompts to the engine (from HEARTBEAT.md)
 Inspired by OpenClaw heartbeat-runner.ts + cron service.
+
+v5.1 changes:
+- Uses interval from settings.rate_limits (default 1200s / 20min)
+- Limits to ONE cron job per tick to prevent token explosion
+- Logs budget status after each tick
 """
 
 import asyncio
@@ -14,13 +19,9 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from ..tools.cron_tool import _get_due_jobs, mark_job_run
+from ..config.settings import settings
 
 logger = logging.getLogger("TheConstituent.Heartbeat")
-
-# Default heartbeat interval
-DEFAULT_HEARTBEAT_INTERVAL = 600  # 10 minutes
-QUIET_HOURS_START = 23  # UTC
-QUIET_HOURS_END = 7    # UTC
 
 
 class HeartbeatRunner:
@@ -28,17 +29,21 @@ class HeartbeatRunner:
     Runs the engine's heartbeat cycle on a timer.
 
     Each tick:
-    1. Check cron jobs → run any that are due
-    2. Run heartbeat (reads HEARTBEAT.md via engine)
+    1. Check cron jobs → run ONE that is due (most overdue first)
+    2. If no cron jobs, run general heartbeat
     3. Schedule next tick
+
+    v5.1: Only ONE action per tick to control token usage.
     """
 
-    def __init__(self, engine, interval_seconds: int = DEFAULT_HEARTBEAT_INTERVAL):
+    def __init__(self, engine, interval_seconds: int = None):
         self.engine = engine
-        self.interval = interval_seconds
+        self.interval = interval_seconds or settings.rate_limits.HEARTBEAT_INTERVAL
         self._running = False
         self._task: Optional[asyncio.Task] = None
         self._tick_count = 0
+        self._quiet_start = settings.rate_limits.QUIET_HOURS_START
+        self._quiet_end = settings.rate_limits.QUIET_HOURS_END
 
     async def start(self):
         """Start the heartbeat loop."""
@@ -46,7 +51,7 @@ class HeartbeatRunner:
             return
         self._running = True
         self._task = asyncio.create_task(self._loop())
-        logger.info(f"Heartbeat started (every {self.interval}s)")
+        logger.info(f"Heartbeat started (every {self.interval}s / {self.interval//60}min)")
 
     async def stop(self):
         """Stop the heartbeat loop."""
@@ -70,27 +75,30 @@ class HeartbeatRunner:
             await asyncio.sleep(self.interval)
 
     async def _tick(self):
-        """Single heartbeat tick."""
+        """Single heartbeat tick — ONE action only."""
         self._tick_count += 1
         start = time.time()
 
         # Check quiet hours
         hour = datetime.now(timezone.utc).hour
-        if QUIET_HOURS_START <= hour or hour < QUIET_HOURS_END:
+        if self._quiet_start <= hour or hour < self._quiet_end:
             logger.debug(f"Heartbeat #{self._tick_count}: quiet hours, skipping")
             return
 
         logger.info(f"━━━ Heartbeat #{self._tick_count} START ━━━")
 
-        # 1. Run due cron jobs
+        # 1. Check for due cron jobs — run only the FIRST one (most overdue)
         due_jobs = _get_due_jobs()
-        for job in due_jobs:
+        if due_jobs:
+            # Sort by next_run_at to get most overdue first
+            due_jobs.sort(key=lambda j: j.get("next_run_at", 0))
+            job = due_jobs[0]  # Only run ONE job per tick
             job_name = job["name"]
             task = job["task"]
-            logger.info(f"  Cron job due: {job_name} → {task[:80]}")
+            logger.info(f"  Cron job due: {job_name} → {task[:80]} "
+                        f"({len(due_jobs)} total due, running 1)")
 
             try:
-                # Run via engine heartbeat with the specific section
                 result = self.engine.run_heartbeat(section=job_name)
                 status = result.get("status", "error")
                 mark_job_run(job_name, status)
@@ -98,16 +106,19 @@ class HeartbeatRunner:
             except Exception as e:
                 mark_job_run(job_name, f"error: {e}")
                 logger.error(f"  Cron job {job_name} failed: {e}")
-
-        # 2. Run general heartbeat (if no specific jobs ran)
-        if not due_jobs:
+        else:
+            # 2. No cron jobs due — run general heartbeat
             result = self.engine.run_heartbeat()
             status = result.get("status", "?")
             response = result.get("response", "")[:100]
             logger.info(f"  Heartbeat: {status} → {response}")
 
         duration_ms = int((time.time() - start) * 1000)
-        logger.info(f"━━━ Heartbeat #{self._tick_count} END [{duration_ms}ms] ━━━")
+
+        # Log budget status
+        budget = self.engine.get_budget_status()
+        logger.info(f"━━━ Heartbeat #{self._tick_count} END [{duration_ms}ms] "
+                    f"| API: {budget['api_calls_today']}/{budget['max_per_day']}/day ━━━")
 
     async def run_once(self, section: str = None):
         """Run a single heartbeat tick (for testing or manual trigger)."""
@@ -123,4 +134,5 @@ class HeartbeatRunner:
             "running": self._running,
             "interval_seconds": self.interval,
             "tick_count": self._tick_count,
+            "budget": self.engine.get_budget_status(),
         }

@@ -33,7 +33,8 @@ def _moltbook_post(title: str, content: str) -> str:
     result = mb.create_post(title=title, content=content)
     if result and result.get("success"):
         post_id = result.get("post_id", "?")
-        return f"Posted on Moltbook: id={post_id}"
+        url = result.get("url", f"https://www.moltbook.com/post/{post_id}")
+        return f"Posted on Moltbook: id={post_id} url={url}"
     return f"Post failed: {result.get('error', 'unknown')}"
 
 
@@ -46,7 +47,8 @@ def _moltbook_comment(post_id: str, content: str) -> str:
         return f"Comment rate limited: wait {rate.get('wait_minutes', '?')} minutes"
     result = mb.create_comment(post_id=post_id, content=content)
     if result and result.get("success"):
-        return f"Commented on post {post_id}"
+        url = f"https://www.moltbook.com/post/{post_id}"
+        return f"Commented on post {post_id} url={url}"
     return f"Comment failed: {result.get('error', 'unknown')}"
 
 

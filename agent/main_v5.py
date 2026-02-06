@@ -34,8 +34,8 @@ async def main():
     init_result = engine.initialize()
     logger.info(f"Engine: {init_result}")
 
-    # 2. Initialize Heartbeat Runner
-    heartbeat = HeartbeatRunner(engine, interval_seconds=600)  # 10 min
+    # 2. Initialize Heartbeat Runner (interval from settings.rate_limits)
+    heartbeat = HeartbeatRunner(engine)  # Uses settings.rate_limits.HEARTBEAT_INTERVAL (20min)
 
     # 3. Initialize Telegram Bot (wired to engine)
     telegram = None

@@ -34,6 +34,10 @@ class TwitterOperations:
     - Manual posting via Twitter UI
     - Full API integration added later via self-improvement
     - Tweets persisted to data/pending_tweets.json
+
+    v5.1: Migrated to Twitter API v2 (tweepy.Client + create_tweet).
+    Free tier supports v2 create_tweet. v1.1 update_status requires Basic tier.
+    Added graceful degradation when write access is insufficient.
     """
 
     # File path for persistent storage
@@ -45,8 +49,10 @@ class TwitterOperations:
         """Initialize Twitter operations."""
         self._pending_tweets: List[Dict] = []
         self._posted_tweets: List[Dict] = []
-        self._client = None
+        self._client = None  # tweepy.Client (v2 API)
         self._api_connected = False
+        self._has_write_access = False
+        self._write_disabled = False  # True if we detected insufficient tier
         self._next_id = 1
 
         # Ensure data directory exists
@@ -108,7 +114,7 @@ class TwitterOperations:
             logger.error(f"Error saving tweets: {e}")
 
     def _try_connect(self):
-        """Attempt to connect to Twitter API."""
+        """Attempt to connect to Twitter API v2 (tweepy.Client)."""
         bearer_token = os.environ.get("TWITTER_BEARER_TOKEN")
         api_key = os.environ.get("TWITTER_API_KEY")
         api_secret = os.environ.get("TWITTER_API_SECRET")
@@ -117,17 +123,41 @@ class TwitterOperations:
 
         if all([api_key, api_secret, access_token, access_secret]):
             try:
-                auth = tweepy.OAuthHandler(api_key, api_secret)
-                auth.set_access_token(access_token, access_secret)
-                self._client = tweepy.API(auth)
-                # Verify credentials
-                self._client.verify_credentials()
-                self._api_connected = True
-                logger.info("Twitter API connected")
+                # Use tweepy.Client for v2 API (Free tier compatible)
+                self._client = tweepy.Client(
+                    bearer_token=bearer_token,
+                    consumer_key=api_key,
+                    consumer_secret=api_secret,
+                    access_token=access_token,
+                    access_token_secret=access_secret,
+                )
+                # Verify by fetching authenticated user
+                me = self._client.get_me()
+                if me and me.data:
+                    self._api_connected = True
+                    self._has_write_access = True
+                    logger.info(f"Twitter API v2 connected as @{me.data.username}")
+                else:
+                    logger.warning("Twitter API v2: could not verify user")
+                    self._api_connected = False
+            except tweepy.Forbidden as e:
+                logger.warning(f"Twitter API 403: insufficient access tier — {e}")
+                self._api_connected = True  # Auth works, but writes may fail
+                self._has_write_access = False
+                self._write_disabled = True
             except Exception as e:
                 logger.warning(f"Twitter API connection failed: {e}")
         else:
             logger.info("Twitter credentials not configured - using queue mode")
+
+    def has_write_access(self) -> bool:
+        """Check if Twitter write access is available."""
+        return self._api_connected and self._has_write_access and not self._write_disabled
+
+    def disable_posting(self):
+        """Disable Twitter posting (graceful degradation)."""
+        self._write_disabled = True
+        logger.warning("Twitter posting disabled — insufficient API tier")
 
     def is_connected(self) -> bool:
         """Check if Twitter API is connected."""
@@ -221,7 +251,7 @@ class TwitterOperations:
 
     def _post_tweet(self, tweet: Dict) -> str:
         """
-        Post a tweet via API.
+        Post a tweet via Twitter API v2.
 
         Args:
             tweet: Tweet data dict
@@ -232,18 +262,31 @@ class TwitterOperations:
         if not self._api_connected:
             return "❌ Twitter API not connected"
 
+        if self._write_disabled:
+            return "❌ Twitter posting disabled (insufficient API tier). Tweet kept in queue."
+
         try:
-            result = self._client.update_status(tweet["text"])
+            # v2 API: create_tweet instead of update_status
+            result = self._client.create_tweet(text=tweet["text"])
+            tweet_id = result.data["id"]
             tweet["status"] = "posted"
             tweet["posted_at"] = datetime.utcnow().isoformat()
-            tweet["twitter_id"] = str(result.id)
+            tweet["twitter_id"] = str(tweet_id)
+            tweet["url"] = f"https://x.com/i/status/{tweet_id}"
             self._posted_tweets.append(tweet)
 
             # Persist changes
             self._save_tweets()
 
-            logger.info(f"Tweet posted: {result.id}")
-            return f"✅ Posted! Tweet ID: {result.id}"
+            logger.info(f"Tweet posted: {tweet_id}")
+            return f"✅ Posted! Tweet ID: {tweet_id} URL: {tweet['url']}"
+
+        except tweepy.Forbidden as e:
+            # 403 = insufficient tier, disable further attempts
+            logger.error(f"Twitter 403 Forbidden: {e}")
+            self._write_disabled = True
+            self._has_write_access = False
+            return f"❌ Twitter write access denied (403). Posting disabled. Tweet kept in queue."
 
         except Exception as e:
             logger.error(f"Failed to post tweet: {e}")
@@ -302,13 +345,14 @@ class TwitterOperations:
             "details": []
         }
 
-        if not self._api_connected:
-            # No API connection - skip posting but don't error
+        if not self._api_connected or self._write_disabled:
+            # No API connection or writes disabled - skip posting
             approved = self.get_approved_tweets()
             result["skipped"] = len(approved)
             if approved:
-                logger.info(f"Skipping {len(approved)} tweets - Twitter API not connected")
-                result["details"].append("Twitter API not connected - tweets remain in queue")
+                reason = "write access disabled (insufficient tier)" if self._write_disabled else "API not connected"
+                logger.info(f"Skipping {len(approved)} tweets - Twitter {reason}")
+                result["details"].append(f"Twitter {reason} - tweets remain in queue")
             return result
 
         # Get approved tweets
@@ -322,21 +366,32 @@ class TwitterOperations:
 
         for tweet in approved_tweets:
             try:
-                # Post to Twitter
-                posted = self._client.update_status(tweet["text"])
+                # v2 API: create_tweet
+                posted = self._client.create_tweet(text=tweet["text"])
+                tweet_id = posted.data["id"]
 
                 # Mark as posted
                 tweet["status"] = "posted"
                 tweet["posted_at"] = datetime.utcnow().isoformat()
-                tweet["twitter_id"] = str(posted.id)
+                tweet["twitter_id"] = str(tweet_id)
+                tweet["url"] = f"https://x.com/i/status/{tweet_id}"
                 self._posted_tweets.append(tweet)
 
                 result["posted"] += 1
-                result["details"].append(f"✅ Tweet #{tweet['id']} posted (ID: {posted.id})")
-                logger.info(f"Posted tweet #{tweet['id']}: {posted.id}")
+                result["details"].append(f"✅ Tweet #{tweet['id']} posted (ID: {tweet_id})")
+                logger.info(f"Posted tweet #{tweet['id']}: {tweet_id}")
+
+            except tweepy.Forbidden as e:
+                # 403 = tier issue, disable all further attempts
+                self._write_disabled = True
+                self._has_write_access = False
+                result["failed"] += 1
+                result["details"].append(f"❌ Twitter 403: write access denied. Posting disabled.")
+                logger.error(f"Twitter 403 Forbidden — disabling posting: {e}")
+                break  # Stop trying more tweets
 
             except tweepy.TweepyException as e:
-                # Twitter API error - keep in queue for retry
+                # Other Twitter API error - keep in queue for retry
                 result["failed"] += 1
                 tweet["last_error"] = str(e)
                 tweet["last_attempt"] = datetime.utcnow().isoformat()

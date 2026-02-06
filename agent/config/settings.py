@@ -14,6 +14,27 @@ load_dotenv()
 
 
 @dataclass
+class RateLimitSettings:
+    """Rate limiting and budget protection."""
+    # Claude API limits
+    MAX_TOOL_ROUNDS_PER_HEARTBEAT: int = 5  # Was 10, reduced to save tokens
+    MAX_HEARTBEAT_DURATION_SECONDS: int = 30  # Hard timeout per heartbeat cycle
+    MAX_API_CALLS_PER_HOUR: int = 30  # Budget protection
+    MAX_API_CALLS_PER_DAY: int = 500  # ~$50/month at Sonnet rates
+    BUDGET_MONTHLY_USD: float = 50.0
+
+    # Heartbeat
+    HEARTBEAT_INTERVAL: int = 1200  # 20 min instead of 10 min
+    QUIET_HOURS_START: int = 23  # UTC
+    QUIET_HOURS_END: int = 7    # UTC
+
+    # Twitter
+    TWITTER_ENABLED: bool = True
+    TWITTER_REQUIRE_WRITE_ACCESS: bool = False  # Don't crash if no write access
+    TWITTER_FALLBACK_ON_ERROR: str = "disable"  # "disable" or "queue"
+
+
+@dataclass
 class AgentSettings:
     """Core agent behavior configuration."""
     BOT_NAME: str = "The Constituent"
@@ -22,7 +43,7 @@ class AgentSettings:
     REPLIES_PER_DAY_MAX: int = 30
     ACTIVE_HOURS_START: int = 7   # UTC
     ACTIVE_HOURS_END: int = 23    # UTC
-    HEARTBEAT_INTERVAL: int = 600  # seconds (10 min)
+    HEARTBEAT_INTERVAL: int = 1200  # seconds (20 min, was 600)
 
     CORE_VALUES: List[str] = field(default_factory=lambda: [
         "Non-presumption of consciousness",
@@ -68,6 +89,7 @@ class Settings:
     """Master settings."""
     agent: AgentSettings = field(default_factory=AgentSettings)
     api: APISettings = field(default_factory=APISettings)
+    rate_limits: RateLimitSettings = field(default_factory=RateLimitSettings)
 
     DB_PATH: str = field(default_factory=lambda: os.getenv("DB_PATH", "data/agent.db"))
     LOG_LEVEL: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))

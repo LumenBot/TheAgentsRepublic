@@ -11,6 +11,7 @@ we use Anthropic's native tool_use API. Claude calls tools directly.
 import os
 import json
 import logging
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,7 +27,6 @@ from .metrics_tracker import MetricsTracker
 logger = logging.getLogger("TheConstituent.Engine")
 
 HEARTBEAT_OK_TOKEN = "HEARTBEAT_OK"
-MAX_TOOL_ROUNDS = 10  # Max sequential tool calls per turn
 MAX_ROUTINE_CHARS = 500
 
 
@@ -42,7 +42,7 @@ class Engine:
     5. Engine dispatches, returns results, Claude continues
     """
 
-    VERSION = "5.0.0"
+    VERSION = "5.1.0"
 
     def __init__(
         self,
@@ -89,7 +89,19 @@ class Engine:
         # System prompt (built on first use)
         self._system_prompt: Optional[str] = None
 
-        logger.info(f"Engine v{self.VERSION} initialized | model={self.model}")
+        # Rate limiting / budget protection
+        self._api_calls_today = 0
+        self._api_calls_this_hour = 0
+        self._hour_reset_at = time.time() + 3600
+        self._day_reset_at = time.time() + 86400
+        self._max_tool_rounds = settings.rate_limits.MAX_TOOL_ROUNDS_PER_HEARTBEAT
+        self._max_heartbeat_duration = settings.rate_limits.MAX_HEARTBEAT_DURATION_SECONDS
+        self._max_api_calls_per_hour = settings.rate_limits.MAX_API_CALLS_PER_HOUR
+        self._max_api_calls_per_day = settings.rate_limits.MAX_API_CALLS_PER_DAY
+
+        logger.info(f"Engine v{self.VERSION} initialized | model={self.model} | "
+                     f"max_tool_rounds={self._max_tool_rounds} | "
+                     f"max_heartbeat_duration={self._max_heartbeat_duration}s")
 
     # =================================================================
     # Initialization
@@ -236,22 +248,40 @@ class Engine:
     # Chat (interactive, with tool use)
     # =================================================================
 
-    def chat(self, user_message: str) -> str:
+    def chat(self, user_message: str, max_tool_rounds: int = None,
+             max_duration: float = None) -> str:
         """
         Interactive chat with native Anthropic tool_use.
 
         The LLM can call tools, get results, and continue reasoning.
         This replaces the old ACTION TAG regex parsing.
+
+        Args:
+            user_message: The prompt to send
+            max_tool_rounds: Override max tool rounds (default from settings)
+            max_duration: Hard time limit in seconds (0 = unlimited)
         """
         if not self._system_prompt:
             self._system_prompt = self._build_system_prompt()
+
+        # Check budget limits before making any API call
+        if not self._check_budget():
+            return "(budget limit reached — skipping API call)"
+
+        effective_max_rounds = max_tool_rounds or self._max_tool_rounds
+        chat_start = time.time()
 
         tool_schemas = self.registry.get_tool_schemas()
         messages = [{"role": "user", "content": user_message}]
         tool_calls_made = []
 
         # Multi-round tool use loop
-        for round_num in range(MAX_TOOL_ROUNDS):
+        for round_num in range(effective_max_rounds):
+            # Time limit check
+            if max_duration and (time.time() - chat_start) > max_duration:
+                logger.info(f"Chat time limit reached ({max_duration}s) at round {round_num+1}")
+                break
+
             try:
                 api_kwargs = {
                     "model": self.model,
@@ -263,6 +293,7 @@ class Engine:
                     api_kwargs["tools"] = tool_schemas
 
                 response = self.claude.messages.create(**api_kwargs)
+                self._record_api_call()
             except Exception as e:
                 logger.error(f"Claude API error: {e}")
                 return f"Error: {e}"
@@ -291,7 +322,8 @@ class Engine:
                 tool_input = tool_block.input
                 tool_id = tool_block.id
 
-                logger.info(f"Tool call [{round_num+1}]: {tool_name}({json.dumps(tool_input)[:200]})")
+                logger.info(f"Tool call [{round_num+1}/{effective_max_rounds}]: "
+                           f"{tool_name}({json.dumps(tool_input)[:200]})")
                 result = self.registry.execute(tool_name, tool_input)
                 tool_calls_made.append({
                     "tool": tool_name,
@@ -299,7 +331,7 @@ class Engine:
                     "result": result,
                 })
 
-                # Log to metrics
+                # Log to metrics (with URL extraction)
                 self._log_tool_to_metrics(tool_name, result)
 
                 # Format result for Claude
@@ -318,6 +350,9 @@ class Engine:
             # Max rounds reached
             final_text = "\n".join(text_parts) if text_parts else "(max tool rounds reached)"
 
+        duration = time.time() - chat_start
+        logger.info(f"Chat completed: {round_num+1} rounds, {len(tool_calls_made)} tools, {duration:.1f}s")
+
         # Save to memory
         self.memory.working.last_conversation_with = "operator"
         self.memory.working.last_conversation_summary = user_message[:200]
@@ -335,11 +370,59 @@ class Engine:
         return final_text
 
     # =================================================================
+    # Budget / Rate Limit Protection
+    # =================================================================
+
+    def _check_budget(self) -> bool:
+        """Check if we're within budget limits. Returns True if OK to proceed."""
+        now = time.time()
+
+        # Reset hourly counter
+        if now >= self._hour_reset_at:
+            self._api_calls_this_hour = 0
+            self._hour_reset_at = now + 3600
+
+        # Reset daily counter
+        if now >= self._day_reset_at:
+            self._api_calls_today = 0
+            self._day_reset_at = now + 86400
+
+        if self._api_calls_this_hour >= self._max_api_calls_per_hour:
+            logger.warning(f"Hourly API call limit reached ({self._api_calls_this_hour}/{self._max_api_calls_per_hour})")
+            return False
+
+        if self._api_calls_today >= self._max_api_calls_per_day:
+            logger.warning(f"Daily API call limit reached ({self._api_calls_today}/{self._max_api_calls_per_day})")
+            return False
+
+        return True
+
+    def _record_api_call(self):
+        """Record that an API call was made."""
+        self._api_calls_this_hour += 1
+        self._api_calls_today += 1
+        if self._api_calls_today % 50 == 0:
+            logger.info(f"API calls today: {self._api_calls_today}/{self._max_api_calls_per_day}")
+
+    def get_budget_status(self) -> Dict:
+        """Get current budget/rate limit status."""
+        return {
+            "api_calls_this_hour": self._api_calls_this_hour,
+            "max_per_hour": self._max_api_calls_per_hour,
+            "api_calls_today": self._api_calls_today,
+            "max_per_day": self._max_api_calls_per_day,
+            "hour_resets_in": max(0, int(self._hour_reset_at - time.time())),
+            "day_resets_in": max(0, int(self._day_reset_at - time.time())),
+        }
+
+    # =================================================================
     # Think (simple, no tool use — for internal use)
     # =================================================================
 
     def think(self, prompt: str, max_tokens: int = 2000) -> str:
         """Simple Claude call without tool use. For internal agent reasoning."""
+        if not self._check_budget():
+            return "(budget limit reached — skipping think() call)"
         try:
             response = self.claude.messages.create(
                 model=self.model,
@@ -347,6 +430,7 @@ class Engine:
                 system=self._system_prompt or "You are The Constituent.",
                 messages=[{"role": "user", "content": prompt}],
             )
+            self._record_api_call()
             return response.content[0].text
         except Exception as e:
             logger.error(f"think() error: {e}")
@@ -361,12 +445,20 @@ class Engine:
         Run a heartbeat cycle. Reads HEARTBEAT.md, sends to Claude with tools.
         Inspired by OpenClaw heartbeat-runner.ts.
 
+        v5.1: Added time limit (max_heartbeat_duration) and reduced tool rounds
+        to prevent runaway token consumption.
+
         Args:
             section: Optional specific section to run (e.g., "engagement", "constitution")
 
         Returns:
             {"status": "ok"|"skipped", "response": "...", "tools_used": [...]}
         """
+        # Budget check before starting
+        if not self._check_budget():
+            return {"status": "skipped", "reason": "budget limit reached",
+                    "budget": self.get_budget_status()}
+
         heartbeat_path = self.workspace_dir / "HEARTBEAT.md"
 
         # Skip if HEARTBEAT.md empty or missing
@@ -380,15 +472,35 @@ class Engine:
         ):
             return {"status": "skipped", "reason": "empty heartbeat"}
 
-        # Build heartbeat prompt
+        # Build heartbeat prompt — focused and concise
         if section:
-            prompt = f"Execute the '{section}' section of your HEARTBEAT.md now:\n\n{content}\n\nFocus ONLY on the {section} section. If nothing to do, reply HEARTBEAT_OK."
+            prompt = (
+                f"Execute ONLY the '{section}' section of your HEARTBEAT.md.\n\n"
+                f"{content}\n\n"
+                f"IMPORTANT: Do ONE action maximum for this section. "
+                f"Be efficient — you have a {self._max_heartbeat_duration}s time limit "
+                f"and {self._max_tool_rounds} tool calls max.\n"
+                f"If nothing to do, reply HEARTBEAT_OK."
+            )
         else:
-            prompt = f"Read your HEARTBEAT.md and execute any due tasks:\n\n{content}\n\nIf nothing needs attention, reply HEARTBEAT_OK."
+            prompt = (
+                f"Read your HEARTBEAT.md and execute the MOST IMPORTANT due task:\n\n"
+                f"{content}\n\n"
+                f"IMPORTANT CONSTRAINTS:\n"
+                f"- Do ONE task only (the most urgent/important)\n"
+                f"- You have {self._max_tool_rounds} tool calls max\n"
+                f"- Time limit: {self._max_heartbeat_duration}s\n"
+                f"- Prioritize: Constitution > Engagement > Research\n"
+                f"If nothing needs attention, reply HEARTBEAT_OK."
+            )
 
-        # Run with tools
+        # Run with tools — time-limited
         start = time.time()
-        response = self.chat(prompt)
+        response = self.chat(
+            prompt,
+            max_tool_rounds=self._max_tool_rounds,
+            max_duration=self._max_heartbeat_duration,
+        )
         duration_ms = int((time.time() - start) * 1000)
 
         # Check for HEARTBEAT_OK
@@ -404,6 +516,7 @@ class Engine:
             "status": "ok",
             "response": response,
             "duration_ms": duration_ms,
+            "budget": self.get_budget_status(),
         }
 
     # =================================================================
@@ -424,7 +537,7 @@ class Engine:
         }
 
     def _log_tool_to_metrics(self, tool_name: str, result: Dict):
-        """Log tool execution to metrics tracker."""
+        """Log tool execution to metrics tracker, extracting verifiable URLs."""
         status = result.get("status", "error")
         platform = "system"
         if "moltbook" in tool_name:
@@ -439,14 +552,51 @@ class Engine:
             metric_type = "commit"
         elif "comment" in tool_name or "reply" in tool_name:
             metric_type = "comment"
+        elif "upvote" in tool_name:
+            metric_type = "upvote"
+
+        # Extract URL from tool result for verifiable metrics
+        url = self._extract_url_from_result(tool_name, result)
 
         self.metrics.log_action(
             action_type=metric_type,
             platform=platform,
             success=(status == "ok"),
             error=result.get("error"),
+            url=url,
             details={"tool": tool_name},
         )
+
+    def _extract_url_from_result(self, tool_name: str, result: Dict) -> Optional[str]:
+        """
+        Extract a verifiable URL from a tool result.
+
+        Looks for URLs in common result structures:
+        - result["result"] as string containing URL
+        - result["result"]["url"]
+        - result["result"]["post_id"] -> construct Moltbook URL
+        - result["result"]["twitter_id"] -> construct Twitter URL
+        """
+        inner = result.get("result")
+        if inner is None:
+            return None
+
+        # If result is a dict, look for url/post_id/twitter_id keys
+        if isinstance(inner, dict):
+            if inner.get("url"):
+                return inner["url"]
+            if inner.get("post_id") and "moltbook" in tool_name:
+                return f"https://www.moltbook.com/post/{inner['post_id']}"
+            if inner.get("twitter_id"):
+                return f"https://x.com/i/status/{inner['twitter_id']}"
+
+        # If result is a string, try to extract URL
+        if isinstance(inner, str):
+            url_match = re.search(r'https?://\S+', inner)
+            if url_match:
+                return url_match.group(0).rstrip('.,;)')
+
+        return None
 
     def save_state(self):
         """Force-save all state."""
