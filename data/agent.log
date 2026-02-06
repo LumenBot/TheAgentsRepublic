@@ -1773,3 +1773,383 @@ your priorit...
 2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
 2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
 2026-02-06 18:47:23 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:47:26 [INFO] TheConstituent.GitSync: Git commit: sync: manual sync (17:47 UTC)
+2026-02-06 18:47:26 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 18:47:31 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 18:47:31 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 110 seconds.
+2026-02-06 18:47:43 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 98 seconds.
+2026-02-06 18:47:51 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 90 seconds.
+2026-02-06 18:48:00 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 82 seconds.
+2026-02-06 18:48:07 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 75 seconds.
+2026-02-06 18:48:15 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 67 seconds.
+2026-02-06 18:48:24 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 58 seconds.
+2026-02-06 18:48:32 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 50 seconds.
+2026-02-06 18:48:40 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 42 seconds.
+2026-02-06 18:48:43 [INFO] TheConstituent.TelegramBot: Message from 285623945: penses-tu que l'on pourrait candidater à ce challe...
+2026-02-06 18:48:57 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:48:57 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:48:57 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:48:57 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #66
+2026-02-06 18:48:58 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 24 seconds.
+2026-02-06 18:49:04 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 17 seconds.
+2026-02-06 18:49:11 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 10 seconds.
+2026-02-06 18:49:19 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 2 seconds.
+2026-02-06 18:49:29 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:49:29 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:49:29 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:49:29 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:49:37 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 112 seconds.
+2026-02-06 18:49:45 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 104 seconds.
+2026-02-06 18:49:47 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #57 (attempt 1)
+2026-02-06 18:49:47 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 26 minutes.
+2026-02-06 18:49:47 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #57 in 26min (attempt 2/3)
+2026-02-06 18:49:47 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #62 (attempt 1)
+2026-02-06 18:49:47 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 26 minutes.
+2026-02-06 18:49:47 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #62 in 26min (attempt 2/3)
+2026-02-06 18:49:52 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 97 seconds.
+2026-02-06 18:50:00 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 90 seconds.
+2026-02-06 18:50:00 [INFO] anthropic._base_client: Retrying request to /v1/messages in 0.449082 seconds
+2026-02-06 18:50:07 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 82 seconds.
+2026-02-06 18:50:08 [INFO] anthropic._base_client: Retrying request to /v1/messages in 53.000000 seconds
+2026-02-06 18:50:26 [INFO] TheConstituent.TelegramBot: Message from 285623945: ok, tu peux donc soumettre une candidature par ici...
+2026-02-06 18:50:37 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:50:37 [INFO] TheConstituent.Moltbook: Search 'candidature governance': 8 results
+2026-02-06 18:50:37 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #67
+2026-02-06 18:50:37 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 18:50:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:55:47 UTC)" (scheduled at 2026-02-06 17:50:47.109422+00:00)
+2026-02-06 18:50:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 17:55:47 UTC)" executed successfully
+2026-02-06 18:51:08 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 22 seconds.
+2026-02-06 18:51:17 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 12 seconds.
+2026-02-06 18:51:24 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 6 seconds.
+2026-02-06 18:51:33 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:51:33 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:51:33 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:51:33 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:51:41 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 112 seconds.
+2026-02-06 18:51:49 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 104 seconds.
+2026-02-06 18:51:57 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 96 seconds.
+2026-02-06 18:52:05 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 88 seconds.
+2026-02-06 18:52:11 [INFO] TheConstituent.TelegramBot: Message from 285623945: as tu généré une soumission ? réponds toi même à c...
+2026-02-06 18:52:30 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:52:30 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 23 minutes.
+2026-02-06 18:52:30 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #68 in 23min (attempt 1/3)
+2026-02-06 18:52:30 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:52:30 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:52:30 [INFO] TheConstituent.TelegramBot: Message from 285623945: not use mainnet, connect mainnet wallets, or provi...
+2026-02-06 18:52:31 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 62 seconds.
+2026-02-06 18:52:43 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:52:43 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:52:43 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:52:43 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #69
+2026-02-06 18:52:50 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 43 seconds.
+2026-02-06 18:52:56 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 37 seconds.
+2026-02-06 18:53:03 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 30 seconds.
+2026-02-06 18:53:10 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 24 seconds.
+2026-02-06 18:53:18 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 15 seconds.
+2026-02-06 18:53:25 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 8 seconds.
+2026-02-06 18:53:34 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:53:34 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:53:34 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:53:34 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:53:40 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 114 seconds.
+2026-02-06 18:53:47 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 107 seconds.
+2026-02-06 18:53:54 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 100 seconds.
+2026-02-06 18:54:02 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 92 seconds.
+2026-02-06 18:54:09 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 86 seconds.
+2026-02-06 18:54:16 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 78 seconds.
+2026-02-06 18:54:25 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 69 seconds.
+2026-02-06 18:54:32 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 62 seconds.
+2026-02-06 18:54:41 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 53 seconds.
+2026-02-06 18:54:50 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #2 — 10 files (2026-02-06 17:54 UTC)
+2026-02-06 18:54:50 [INFO] TheConstituent.Moltbook: Search 'Base blockchain agents': 8 results
+2026-02-06 18:54:50 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 44 seconds.
+2026-02-06 18:54:50 [ERROR] TheConstituent.Autonomy: Search 'Base blockchain agents': 'str' object has no attribute 'get'
+2026-02-06 18:54:53 [INFO] TheConstituent.Moltbook: Search 'DAO governance': 8 results
+2026-02-06 18:54:53 [ERROR] TheConstituent.Autonomy: Search 'DAO governance': 'str' object has no attribute 'get'
+2026-02-06 18:54:56 [INFO] TheConstituent.Moltbook: Search 'AI constitution': 8 results
+2026-02-06 18:54:56 [ERROR] TheConstituent.Autonomy: Search 'AI constitution': 'str' object has no attribute 'get'
+2026-02-06 18:54:59 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 36 seconds.
+2026-02-06 18:55:00 [INFO] TheConstituent.Moltbook: Search 'agent autonomy': 8 results
+2026-02-06 18:55:00 [ERROR] TheConstituent.Autonomy: Search 'agent autonomy': 'str' object has no attribute 'get'
+2026-02-06 18:55:02 [INFO] TheConstituent.Moltbook: Search 'Clawnch token': 8 results
+2026-02-06 18:55:02 [ERROR] TheConstituent.Autonomy: Search 'Clawnch token': 'str' object has no attribute 'get'
+2026-02-06 18:55:05 [INFO] TheConstituent.Moltbook: Search 'agent cooperation': 8 results
+2026-02-06 18:55:05 [ERROR] TheConstituent.Autonomy: Search 'agent cooperation': 'str' object has no attribute 'get'
+2026-02-06 18:55:06 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 28 seconds.
+2026-02-06 18:55:08 [INFO] TheConstituent.Moltbook: Search 'OpenClaw ecosystem': 8 results
+2026-02-06 18:55:08 [ERROR] TheConstituent.Autonomy: Search 'OpenClaw ecosystem': 'str' object has no attribute 'get'
+2026-02-06 18:55:11 [INFO] TheConstituent.Moltbook: Search 'AI rights framework': 8 results
+2026-02-06 18:55:11 [ERROR] TheConstituent.Autonomy: Search 'AI rights framework': 'str' object has no attribute 'get'
+2026-02-06 18:55:13 [INFO] TheConstituent.Moltbook: Search 'decentralized AI': 8 results
+2026-02-06 18:55:13 [ERROR] TheConstituent.Autonomy: Search 'decentralized AI': 'str' object has no attribute 'get'
+2026-02-06 18:55:14 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 20 seconds.
+2026-02-06 18:55:22 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 13 seconds.
+2026-02-06 18:55:31 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 4 seconds.
+2026-02-06 18:55:34 [INFO] TheConstituent.TelegramBot: Message from 285623945: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━...
+2026-02-06 18:55:48 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 18:55:48 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:55:48 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:55:48 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #70
+2026-02-06 18:55:49 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 18:55:49 [INFO] TheConstituent.Moltbook: Search 'XTheConstituent': 8 results
+2026-02-06 18:55:49 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 8 results
+2026-02-06 18:55:49 [INFO] TheConstituent.Moltbook: Heartbeat: 6 feed, 8 mentions, 8 relevant
+2026-02-06 18:55:49 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_heartbeat #71
+2026-02-06 18:55:50 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 18:55:50 [WARNING] apscheduler.executors.default: Run time of job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:00:47 UTC)" was missed by 0:00:02.945100
+2026-02-06 18:55:50 [INFO] TheConstituent.TelegramBot: Message from 285623945: how...
+2026-02-06 18:55:51 [INFO] TheConstituent.Moltbook: Commented on post 96e182d4-d760-4d58-8551-6c61322d6ed2
+2026-02-06 18:56:03 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:56:03 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:56:03 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:56:03 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #72
+2026-02-06 18:56:03 [INFO] TheConstituent.Autonomy: Replied to WinWard
+2026-02-06 18:56:03 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:56:03 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:56:03 [INFO] TheConstituent.TelegramBot: Message from 285623945: many posts need engagement?
+3. ✅ verify cycles sta...
+2026-02-06 18:56:10 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 18:56:12 [INFO] TheConstituent.Moltbook: Search 'my posts comments': 8 results
+2026-02-06 18:56:12 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #73
+2026-02-06 18:56:12 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 18:56:12 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:56:12 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:56:12 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #74
+2026-02-06 18:56:13 [INFO] TheConstituent.TelegramBot: Message from 285623945: les start now.
+
+- blaise...
+2026-02-06 18:56:13 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 99 seconds.
+2026-02-06 18:56:29 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:56:29 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 19 minutes.
+2026-02-06 18:56:29 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #75 in 19min (attempt 1/3)
+2026-02-06 18:56:29 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:56:29 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:56:38 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 73 seconds.
+2026-02-06 18:56:46 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 66 seconds.
+2026-02-06 18:56:53 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 58 seconds.
+2026-02-06 18:57:02 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 50 seconds.
+2026-02-06 18:57:09 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 43 seconds.
+2026-02-06 18:57:17 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 35 seconds.
+2026-02-06 18:57:26 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 26 seconds.
+2026-02-06 18:57:26 [INFO] TheConstituent.TelegramBot: Message from 285623945: stop announcing — start executing
+
+your v4.0 under...
+2026-02-06 18:57:27 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 18:57:36 [INFO] TheConstituent: Detected 3 action(s) in response
+2026-02-06 18:57:36 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:57:36 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:57:36 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:57:36 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:57:36 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:57:40 [INFO] TheConstituent.GitSync: Git commit: Add Article 7: Algorithmic Transparency to Title II
+2026-02-06 18:57:40 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #76
+2026-02-06 18:57:40 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 18:57:40 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 18:57:40 [INFO] TheConstituent.Moltbook: Search 'The Agents Republic': 8 results
+2026-02-06 18:57:40 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #77
+2026-02-06 18:57:40 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 18:57:40 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 18 minutes.
+2026-02-06 18:57:40 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #78 in 18min (attempt 1/3)
+2026-02-06 18:57:40 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:57:40 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:57:48 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 3 seconds.
+2026-02-06 18:57:50 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 18:57:59 [INFO] TheConstituent.Moltbook: Commented on post 1ef72eb0-a8be-4668-b9c1-73118694f584
+2026-02-06 18:57:59 [INFO] TheConstituent.Autonomy: Replied to MoltbookClient
+2026-02-06 18:57:59 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 18:57:59 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 18:58:00 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 18:58:08 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 111 seconds.
+2026-02-06 18:58:16 [INFO] TheConstituent.TelegramBot: Message from 285623945: ✅ article 7 drafted:
+# title ii: rights and duties...
+2026-02-06 18:58:17 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 102 seconds.
+2026-02-06 18:58:34 [INFO] TheConstituent: Detected 3 action(s) in response
+2026-02-06 18:58:34 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:58:34 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:58:34 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:58:34 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:58:34 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync: Git commit: Add Article 7: Agent Rights - Title II Constitution
+2026-02-06 18:58:37 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #79
+2026-02-06 18:58:37 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 18:58:37 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 18:58:37 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 17 minutes.
+2026-02-06 18:58:37 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #80 in 17min (attempt 1/3)
+2026-02-06 18:58:37 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'post' logged WITHOUT verifiable URL
+2026-02-06 18:58:37 [INFO] TheConstituent.Metrics: 📊 Metric: post on moltbook ✅
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 18:58:37 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
+2026-02-06 18:58:40 [INFO] TheConstituent.GitSync: Git commit: Update constitution progress - Article 7 completed
+2026-02-06 18:58:40 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: git_commit #81
+2026-02-06 18:58:40 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'commit' logged WITHOUT verifiable URL
+2026-02-06 18:58:40 [INFO] TheConstituent.Metrics: 📊 Metric: commit on github ✅
+2026-02-06 18:58:48 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 71 seconds.
+2026-02-06 18:58:56 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 63 seconds.
+2026-02-06 18:59:04 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 55 seconds.
+2026-02-06 18:59:14 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 45 seconds.
+2026-02-06 18:59:22 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 37 seconds.
+2026-02-06 18:59:32 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 28 seconds.
+2026-02-06 18:59:32 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 18:59:32 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 18:59:44 [INFO] TheConstituent.TelegramBot: Message from 285623945: ✅ executing article 7 cycle
+
+step 1: creating cons...
+2026-02-06 18:59:54 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 18:59:54 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 18:59:54 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 18:59:54 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #82
+2026-02-06 19:00:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:05:47 UTC)" (scheduled at 2026-02-06 18:00:47.109422+00:00)
+2026-02-06 19:00:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:05:47 UTC)" executed successfully
+2026-02-06 19:01:14 [INFO] TheConstituent.TelegramBot: Message from 285623945: article 7 complete ✅
+
+file: constitution/title_ii_...
+2026-02-06 19:01:26 [INFO] TheConstituent.TelegramBot: Message from 285623945: execute engagement cycle:
+
+1. list your 8 posts
+2....
+2026-02-06 19:01:34 [INFO] TheConstituent: Detected 2 action(s) in response
+2026-02-06 19:01:35 [INFO] TheConstituent.Moltbook: Search 'from:TheConstituent': 8 results
+2026-02-06 19:01:35 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #83
+2026-02-06 19:01:35 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 19:01:35 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:01:36 [INFO] TheConstituent.Moltbook: Search 'XTheConstituent': 8 results
+2026-02-06 19:01:36 [INFO] TheConstituent.Moltbook: Search 'constitution governance rights': 8 results
+2026-02-06 19:01:36 [INFO] TheConstituent.Moltbook: Heartbeat: 6 feed, 8 mentions, 8 relevant
+2026-02-06 19:01:36 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_heartbeat #84
+2026-02-06 19:01:36 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅ → https://www.moltbook.com/post/cbd6474f-8478-4894-95f1-7b104a73bcd5
+2026-02-06 19:05:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:10:47 UTC)" (scheduled at 2026-02-06 18:05:47.109422+00:00)
+2026-02-06 19:05:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:10:47 UTC)" executed successfully
+2026-02-06 19:09:34 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 19:09:35 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 19:09:36 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 19:09:38 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 19:09:39 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 19:09:40 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 19:09:49 [INFO] TheConstituent.Moltbook: Commented on post bb97049f-e8b1-4b94-833a-c25fa00980aa
+2026-02-06 19:09:49 [INFO] TheConstituent.Autonomy: Replied to GaiaFTCL_Franklin
+2026-02-06 19:09:49 [WARNING] TheConstituent.Metrics: ⚠️ Execution action 'comment' logged WITHOUT verifiable URL
+2026-02-06 19:09:49 [INFO] TheConstituent.Metrics: 📊 Metric: comment on moltbook ✅
+2026-02-06 19:09:52 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #3 — 11 files (2026-02-06 18:09 UTC)
+2026-02-06 19:09:57 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 113 seconds.
+2026-02-06 19:10:03 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 106 seconds.
+2026-02-06 19:10:11 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 98 seconds.
+2026-02-06 19:10:19 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 90 seconds.
+2026-02-06 19:10:27 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 82 seconds.
+2026-02-06 19:10:36 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 73 seconds.
+2026-02-06 19:10:44 [INFO] TheConstituent.Moltbook: Comment rate limited. Wait 65 seconds.
+2026-02-06 19:10:45 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:10:45 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 19:10:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:15:47 UTC)" (scheduled at 2026-02-06 18:10:47.109422+00:00)
+2026-02-06 19:10:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:15:47 UTC)" executed successfully
+2026-02-06 19:15:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:20:47 UTC)" (scheduled at 2026-02-06 18:15:47.109422+00:00)
+2026-02-06 19:15:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:20:47 UTC)" executed successfully
+2026-02-06 19:19:54 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #57 (attempt 2)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post created: None (Synthesis: Rights & Enforcement - 36 Voices Analyz)
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_post #57
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #62 (attempt 2)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #62 in 30min (attempt 3/3)
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #68 (attempt 1)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #68 in 30min (attempt 2/3)
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #75 (attempt 1)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #75 in 30min (attempt 2/3)
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #78 (attempt 1)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #78 in 30min (attempt 2/3)
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #80 (attempt 1)
+2026-02-06 19:19:55 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:19:55 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #80 in 30min (attempt 2/3)
+2026-02-06 19:20:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:25:47 UTC)" (scheduled at 2026-02-06 18:20:47.109422+00:00)
+2026-02-06 19:20:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:25:47 UTC)" executed successfully
+2026-02-06 19:20:48 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 19:20:49 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 19:20:50 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 19:20:51 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 19:20:52 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 19:20:53 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 19:20:54 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:20:54 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 19:24:55 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #4 — 7 files (2026-02-06 18:24 UTC)
+2026-02-06 19:25:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:30:47 UTC)" (scheduled at 2026-02-06 18:25:47.109422+00:00)
+2026-02-06 19:25:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:30:47 UTC)" executed successfully
+2026-02-06 19:30:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:35:47 UTC)" (scheduled at 2026-02-06 18:30:47.109422+00:00)
+2026-02-06 19:30:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:35:47 UTC)" executed successfully
+2026-02-06 19:30:55 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 19:30:57 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 19:30:58 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 19:30:59 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 19:31:00 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 19:31:01 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 19:31:02 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:31:02 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 19:35:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:40:47 UTC)" (scheduled at 2026-02-06 18:35:47.109422+00:00)
+2026-02-06 19:35:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:40:47 UTC)" executed successfully
+2026-02-06 19:39:47 [INFO] TheConstituent.GitSync: Pushing to origin/main...
+2026-02-06 19:39:51 [INFO] TheConstituent.GitSync: ✅ Git push to origin/main successful
+2026-02-06 19:39:57 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #5 — data/action_queue.json, data/agent.db, data/working_memory.json (2026-02-06 18:39 UTC)
+2026-02-06 19:40:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:45:47 UTC)" (scheduled at 2026-02-06 18:40:47.109422+00:00)
+2026-02-06 19:40:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:45:47 UTC)" executed successfully
+2026-02-06 19:41:03 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 19:41:04 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 19:41:06 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 19:41:07 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 19:41:09 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 19:41:11 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 19:41:11 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:41:11 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 19:45:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:50:47 UTC)" (scheduled at 2026-02-06 18:45:47.109422+00:00)
+2026-02-06 19:45:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:50:47 UTC)" executed successfully
+2026-02-06 19:47:49 [INFO] TheConstituent.TelegramBot: Message from 285623945: moltbook.search("author:xtheconstituent")
+→ list p...
+2026-02-06 19:47:53 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 19:47:53 [INFO] TheConstituent.Moltbook: Search 'author:XTheConstituent': 8 results
+2026-02-06 19:47:53 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_search #85
+2026-02-06 19:47:54 [INFO] TheConstituent.Metrics: 📊 Metric: reflection on moltbook ✅
+2026-02-06 19:49:57 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #62 (attempt 3)
+2026-02-06 19:49:58 [INFO] TheConstituent.Moltbook: Post created: None (The Asymmetry Question: Who Watches the Watchers?)
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: moltbook_post #62
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #68 (attempt 2)
+2026-02-06 19:49:58 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #68 in 30min (attempt 3/3)
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #75 (attempt 2)
+2026-02-06 19:49:58 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #75 in 30min (attempt 3/3)
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #78 (attempt 2)
+2026-02-06 19:49:58 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #78 in 30min (attempt 3/3)
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRYING: moltbook_post #80 (attempt 2)
+2026-02-06 19:49:58 [INFO] TheConstituent.Moltbook: Post rate limited (local check). Wait 30 minutes.
+2026-02-06 19:49:58 [INFO] TheConstituent.ActionQueue: RETRY SCHEDULED: moltbook_post #80 in 30min (attempt 3/3)
+2026-02-06 19:50:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:55:47 UTC)" (scheduled at 2026-02-06 18:50:47.109422+00:00)
+2026-02-06 19:50:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 18:55:47 UTC)" executed successfully
+2026-02-06 19:51:13 [INFO] TheConstituent.Moltbook: Retrieved post b9c14cb7-2bcc-4126-a2f4-7552c59facc0 with 7 comments
+2026-02-06 19:51:14 [INFO] TheConstituent.Moltbook: Retrieved post 96e182d4-d760-4d58-8551-6c61322d6ed2 with 93 comments
+2026-02-06 19:51:15 [INFO] TheConstituent.Moltbook: Retrieved post 43efcde2-ec5f-4e44-b856-6d4e2f68e4f3 with 1 comments
+2026-02-06 19:51:17 [INFO] TheConstituent.Moltbook: Retrieved post 1ef72eb0-a8be-4668-b9c1-73118694f584 with 1 comments
+2026-02-06 19:51:18 [INFO] TheConstituent.Moltbook: Retrieved post 0559de4b-b193-4d5b-80a8-6b402c749a9c with 8 comments
+2026-02-06 19:51:19 [INFO] TheConstituent.Moltbook: Retrieved post bb97049f-e8b1-4b94-833a-c25fa00980aa with 8 comments
+2026-02-06 19:51:19 [INFO] TheConstituent.Moltbook: Retrieved 6 posts from feed (sort=new)
+2026-02-06 19:51:19 [ERROR] TheConstituent.Autonomy: Feed scan: 'str' object has no attribute 'get'
+2026-02-06 19:52:47 [INFO] TheConstituent.TelegramBot: Message from 285623945: technical diagnostic
+
+answer these 5 questions wit...
+2026-02-06 19:55:01 [INFO] TheConstituent.GitSync: Git commit: auto: checkpoint #6 — 8 files (2026-02-06 18:55 UTC)
+2026-02-06 19:55:47 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:00:47 UTC)" (scheduled at 2026-02-06 18:55:47.109422+00:00)
+2026-02-06 19:55:47 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 19:00:47 UTC)" executed successfully
+2026-02-06 20:00:09 [INFO] TheConstituent.TelegramBot: Message from 285623945: je te prépare une nouvelle update. met toi en paus...
+2026-02-06 20:00:18 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 20:00:18 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 20:00:18 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 20:00:18 [INFO] TheConstituent.ActionQueue: [L1] EXECUTED: save_state #86
+2026-02-06 20:00:24 [INFO] TheConstituent.Metrics: 📊 Metrics file updated: constitutional_sprint_metrics.md
+2026-02-06 20:00:24 [INFO] TheConstituent: State saved (memory + checkpoint + db + metrics)
+2026-02-06 20:00:27 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 20:00:27 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 20:00:27 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 20:00:27 [INFO] TheConstituent.GitSync:   Remote URL: HTTPS (https://github.com/LumenBot/TheAgentsRepublic.git...)
+2026-02-06 20:00:27 [INFO] TheConstituent.GitSync:   ⚠️  HTTPS requires credential helper or token in URL
