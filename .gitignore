@@ -1,0 +1,35 @@
+# Secrets — NEVER commit
+.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Data files that are auto-synced separately
+# (agent.db is committed via git_sync for backup)
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Replit leftovers
+.replit
+replit.nix
+replit.md
+.local/
+.config/

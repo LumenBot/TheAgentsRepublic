@@ -1,0 +1,50 @@
+2026-02-06 11:42:49 [INFO] TheConstituent.Main: Starting at 2026-02-06T10:42:49.101123
+2026-02-06 11:42:50 [INFO] TheConstituent.GitHub: Connected to LumenBot/TheAgentsRepublic
+2026-02-06 11:42:50 [INFO] TheConstituent.Twitter: Twitter API connected
+2026-02-06 11:42:50 [INFO] TheConstituent: The Constituent v2.0.0 initialized
+2026-02-06 11:42:50 [INFO] TheConstituent:   Model: claude-sonnet-4-20250514
+2026-02-06 11:42:50 [INFO] TheConstituent:   GitHub: connected
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Initializing memory system...
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Database initialized at data\agent.db
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Created knowledge file: project_context.md
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Created knowledge file: strategic_decisions.md
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Created knowledge file: lessons_learned.md
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Created knowledge file: constitution_progress.md
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: 🆕 Fresh start — no previous state found
+2026-02-06 11:42:50 [INFO] TheConstituent.Memory: Memory system initialized (3 layers active)
+2026-02-06 11:42:50 [INFO] TheConstituent.Personality: Loaded Founding Charter (14899 chars)
+2026-02-06 11:42:50 [INFO] TheConstituent.Personality: Loaded 5 skill files
+2026-02-06 11:42:50 [INFO] TheConstituent.Personality: Loaded Constitution (2 sections)
+2026-02-06 11:42:50 [INFO] TheConstituent: Agent starting fresh
+2026-02-06 11:42:50 [INFO] TheConstituent.Main: Recovery status: {'working_memory_recovered': True, 'checkpoint_recovered': False, 'knowledge_available': True, 'db_intact': True, 'last_known_state': '2026-02-06T10:42:50.617020'}
+2026-02-06 11:42:50 [INFO] TheConstituent.Main: ✅ Resumed from: 2026-02-06T10:42:50.617020
+2026-02-06 11:42:50 [INFO] TheConstituent.GitSync: Git sync disabled (GitPython not installed)
+2026-02-06 11:42:50 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-02-06 11:42:50 [INFO] TheConstituent.TelegramBot: ✅ Tweet poster scheduled every 300s (first run in 60s)
+2026-02-06 11:42:50 [INFO] TheConstituent.Main: ✅ Telegram bot initialized
+2026-02-06 11:42:50 [INFO] TheConstituent.Scheduler: Background scheduler started (5 tasks)
+2026-02-06 11:42:50 [INFO] TheConstituent.Main: 🚀 Agent is live! Telegram bot polling...
+2026-02-06 11:42:50 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 11:42:50 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 11:43:50 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:48:50 UTC)" (scheduled at 2026-02-06 10:43:50.661496+00:00)
+2026-02-06 11:43:50 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 11:43:50 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 11:43:50 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:48:50 UTC)" executed successfully
+2026-02-06 11:45:17 [INFO] TheConstituent.TelegramBot: Start command from chat ID: 285623945
+2026-02-06 11:46:03 [INFO] TheConstituent.TelegramBot: Message from 285623945: quel est ton état actuel et quelles sont tes prior...
+2026-02-06 11:48:50 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:53:50 UTC)" (scheduled at 2026-02-06 10:48:50.661496+00:00)
+2026-02-06 11:48:50 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 11:48:50 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 11:48:50 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:53:50 UTC)" executed successfully
+2026-02-06 11:50:17 [INFO] TheConstituent.TelegramBot: Message from 285623945: # strategic directive — phase 1: reconnection & co...
+2026-02-06 11:50:35 [INFO] TheConstituent.TelegramBot: Message from 285623945: stratégiques dans strategic_decisions.md
+- propose...
+2026-02-06 11:53:50 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:58:50 UTC)" (scheduled at 2026-02-06 10:53:50.661496+00:00)
+2026-02-06 11:53:50 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 11:53:50 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 11:53:50 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 10:58:50 UTC)" executed successfully
+2026-02-06 11:55:38 [INFO] TheConstituent.TelegramBot: Message from 285623945: 1. confirmation twitter : ton handle est @theconst...
+2026-02-06 11:58:50 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 11:03:50 UTC)" (scheduled at 2026-02-06 10:58:50.661496+00:00)
+2026-02-06 11:58:50 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 11:58:50 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 11:58:50 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 11:03:50 UTC)" executed successfully
