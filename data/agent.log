@@ -629,3 +629,21 @@ tu as raison de ...
 2026-02-06 15:27:43 [INFO] TheConstituent.TelegramBot: ✅ Tweet poster scheduled every 300s (first run in 60s)
 2026-02-06 15:27:43 [INFO] TheConstituent.Main: ✅ Telegram bot initialized
 2026-02-06 15:27:43 [INFO] TheConstituent.Scheduler: Background scheduler started (5 tasks)
+2026-02-06 15:27:44 [INFO] TheConstituent.GitSync: Git commit: startup: agent v2.0 initialized
+2026-02-06 15:27:44 [INFO] TheConstituent.Main: 🚀 Agent is live! Telegram bot polling...
+2026-02-06 15:27:44 [INFO] apscheduler.scheduler: Added job "tweet_poster" to job store "default"
+2026-02-06 15:27:44 [INFO] apscheduler.scheduler: Scheduler started
+2026-02-06 15:27:54 [INFO] TheConstituent.TelegramBot: Message from 285623945: poste sur moltbook que the constituent a acquis so...
+2026-02-06 15:28:07 [INFO] TheConstituent: Detected 1 action(s) in response
+2026-02-06 15:28:08 [ERROR] TheConstituent.Moltbook: Post failed: 429 {"success":false,"error":"You can only post once every 30 minutes","hint":"Wait 20 minutes before posting again","retry_after_minutes":20}
+2026-02-06 15:28:08 [INFO] TheConstituent.ActionQueue: [LL1] EXECUTED: moltbook_post #2
+2026-02-06 15:28:08 [INFO] TheConstituent:   Action moltbook_post: completed
+2026-02-06 15:28:43 [INFO] apscheduler.executors.default: Running job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:33:43 UTC)" (scheduled at 2026-02-06 14:28:43.568190+00:00)
+2026-02-06 15:28:43 [INFO] TheConstituent.TelegramBot: 🔄 Tweet poster task running...
+2026-02-06 15:28:43 [INFO] TheConstituent.TelegramBot: Tweet poster result: {'posted': 0, 'failed': 0, 'skipped': 0, 'details': []}
+2026-02-06 15:28:43 [INFO] apscheduler.executors.default: Job "tweet_poster (trigger: interval[0:05:00], next run at: 2026-02-06 14:33:43 UTC)" executed successfully
+2026-02-06 15:29:59 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 15:30:05 [INFO] TheConstituent.Main: Received signal 2, initiating graceful shutdown...
+2026-02-06 15:30:05 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-02-06 15:30:05 [INFO] TheConstituent.Main: Shutting down gracefully...
+2026-02-06 15:30:05 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
