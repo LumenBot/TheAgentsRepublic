@@ -130,5 +130,17 @@
     "error": null,
     "retry_count": 0,
     "executed_at": "2026-02-06T15:11:16.664613"
+  },
+  {
+    "timestamp": "2026-02-06T15:17:08.522841",
+    "action_id": 21,
+    "action_type": "save_state",
+    "level": "L1",
+    "status": "completed",
+    "params": {},
+    "result": "State saved",
+    "error": null,
+    "retry_count": 0,
+    "executed_at": "2026-02-06T15:17:08.522614"
   }
 ]
