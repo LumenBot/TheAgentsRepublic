@@ -416,3 +416,34 @@ peux-tu vérifier si t...
 2026-02-06 14:40:15 [INFO] apscheduler.scheduler: Scheduler has been shut down
 2026-02-06 14:40:15 [INFO] TheConstituent.Main: Shutting down gracefully...
 2026-02-06 14:40:15 [INFO] TheConstituent: State saved (working memory + checkpoint + db backup)
+2026-02-06 14:40:16 [INFO] TheConstituent.GitSync: Git commit: shutdown: graceful shutdown state save
+2026-02-06 14:40:19 [INFO] TheConstituent.GitSync: Git push to origin/main successful
+2026-02-06 14:40:19 [INFO] TheConstituent.Main: ✅ Shutdown complete. All state saved.
+2026-02-06 14:40:19 [INFO] TheConstituent.Main:    Checkpoints: 37
+2026-02-06 14:40:19 [INFO] TheConstituent.Main:    Git commits: 1
+2026-02-06 14:40:49 [INFO] TheConstituent.Main: Starting at 2026-02-06T13:40:49.999367
+2026-02-06 14:40:50 [INFO] TheConstituent.GitHub: Connected to LumenBot/TheAgentsRepublic
+2026-02-06 14:40:51 [INFO] TheConstituent.Twitter: Twitter API connected
+2026-02-06 14:40:51 [INFO] TheConstituent.Moltbook: Moltbook credentials loaded for XTheConstituent
+2026-02-06 14:40:51 [INFO] TheConstituent.Moltbook: Moltbook API connection verified
+2026-02-06 14:40:51 [INFO] TheConstituent: The Constituent v2.0.0 initialized
+2026-02-06 14:40:51 [INFO] TheConstituent:   Model: claude-sonnet-4-20250514
+2026-02-06 14:40:51 [INFO] TheConstituent:   GitHub: connected
+2026-02-06 14:40:51 [INFO] TheConstituent.Memory: Initializing memory system...
+2026-02-06 14:40:51 [INFO] TheConstituent.Memory: Database initialized at data\agent.db
+2026-02-06 14:40:51 [INFO] TheConstituent.Memory: Recovered working memory (last save: 2026-02-06T13:40:15.629696)
+2026-02-06 14:40:51 [INFO] TheConstituent.Memory: ✅ Previous state recovered successfully
+2026-02-06 14:40:51 [INFO] TheConstituent.Memory: Memory system initialized (3 layers active)
+2026-02-06 14:40:51 [INFO] TheConstituent.Personality: Loaded Founding Charter (14899 chars)
+2026-02-06 14:40:51 [INFO] TheConstituent.Personality: Loaded 5 skill files
+2026-02-06 14:40:51 [INFO] TheConstituent.Personality: Loaded Constitution (2 sections)
+2026-02-06 14:40:51 [INFO] TheConstituent: Agent recovered from previous state
+2026-02-06 14:40:51 [INFO] TheConstituent.Main: Recovery status: {'working_memory_recovered': True, 'checkpoint_recovered': False, 'knowledge_available': True, 'db_intact': True, 'last_known_state': '2026-02-06T13:40:51.907462'}
+2026-02-06 14:40:51 [INFO] TheConstituent.Main: ✅ Resumed from: 2026-02-06T13:40:51.907462
+2026-02-06 14:40:51 [INFO] TheConstituent.GitSync: Git sync initialized (repo: C:\Users\p08040\Desktop\TheAgentsRepublic)
+2026-02-06 14:40:51 [INFO] TheConstituent.GitSync:   Active branch: main
+2026-02-06 14:40:51 [INFO] TheConstituent.GitSync:   Remotes: ['origin']
+2026-02-06 14:40:51 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-02-06 14:40:51 [INFO] TheConstituent.TelegramBot: ✅ Tweet poster scheduled every 300s (first run in 60s)
+2026-02-06 14:40:51 [INFO] TheConstituent.Main: ✅ Telegram bot initialized
+2026-02-06 14:40:51 [INFO] TheConstituent.Scheduler: Background scheduler started (5 tasks)
