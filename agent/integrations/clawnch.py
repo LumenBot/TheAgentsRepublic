@@ -446,21 +446,14 @@ class ClawnchLauncher:
     def validate_launch(self, image_url: str, burn_tx_hash: str = "") -> Dict:
         """Validate launch content via Clawnch preview API.
 
+        The API expects a "content" field with the full !clawnch post text.
+
         Args:
             image_url: Hosted image URL (from upload_image)
             burn_tx_hash: Transaction hash of the $CLAWNCH burn
         """
-        payload = {
-            "name": tokenomics.NAME,
-            "symbol": tokenomics.SYMBOL,
-            "wallet": self.wallet_address,
-            "description": tokenomics.DESCRIPTION,
-            "image": image_url,
-            "website": tokenomics.WEBSITE,
-            "twitter": tokenomics.TWITTER,
-        }
-        if burn_tx_hash:
-            payload["burnTxHash"] = burn_tx_hash
+        post_content = self.build_launch_post(image_url, burn_tx_hash)
+        payload = {"content": post_content}
 
         try:
             resp = requests.post(
