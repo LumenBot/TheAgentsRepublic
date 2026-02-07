@@ -66,57 +66,121 @@ def _words_to_number(words: list) -> float:
     return float(total)
 
 
+def _clean_tokens(text: str) -> list:
+    """Split challenge text into cleaned lowercase tokens.
+
+    Handles Moltbook obfuscation that inserts special chars inside words:
+      "tW/eN tY" → ["twen", "ty"]  (strip non-alpha within each token)
+    Then tries joining adjacent fragments to reconstruct number words:
+      ["twen", "ty"] → finds "twenty" by joining "twen"+"ty"
+    """
+    raw_tokens = text.split()
+    cleaned = []
+    for tok in raw_tokens:
+        c = re.sub(r"[^a-zA-Z]", "", tok).lower()
+        if c:
+            cleaned.append(c)
+    return cleaned
+
+
+def _extract_number_words(tokens: list) -> list:
+    """Extract number words from tokens, joining fragments as needed.
+
+    Tries single tokens, then pairs, then triples to match _WORD_TO_NUM.
+    Returns list of matched number word strings.
+    """
+    found = []
+    i = 0
+    while i < len(tokens):
+        # Try joining 3 adjacent tokens
+        if i + 2 < len(tokens):
+            tri = tokens[i] + tokens[i + 1] + tokens[i + 2]
+            if tri in _WORD_TO_NUM:
+                found.append(tri)
+                i += 3
+                continue
+        # Try joining 2 adjacent tokens
+        if i + 1 < len(tokens):
+            pair = tokens[i] + tokens[i + 1]
+            if pair in _WORD_TO_NUM:
+                found.append(pair)
+                i += 2
+                continue
+        # Try single token
+        if tokens[i] in _WORD_TO_NUM:
+            found.append(tokens[i])
+        i += 1
+    return found
+
+
 def _solve_challenge(challenge_text: str) -> str:
     """Solve a Moltbook anti-spam math challenge.
 
     Challenges look like:
-      "ThIrTy FiVe ~NeWtOnS + TwElVe <NeWtOnS,> WhAt Is ThE ToTaL FoRcE?"
-    Answer: "47.00"
+      "tW/eN tY tHrEe ~NeWtOnS + sE-vEn, WhAt Is ThE ToTaL?"
+    Answer: "30.00"  (twenty three + seven)
     """
-    # Strip non-alpha chars except + - * / . and spaces
-    cleaned = re.sub(r"[^a-zA-Z0-9+\-*/. ]", " ", challenge_text)
-    cleaned = cleaned.lower()
-    # Collapse whitespace
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
-
     # Try to find explicit decimal numbers first (e.g., "35.5 + 12.3")
-    decimal_match = re.findall(r"(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)", cleaned)
-    if decimal_match:
-        a, op, b = float(decimal_match[0][0]), decimal_match[0][1], float(decimal_match[0][2])
-        if op == "+":
-            return f"{a + b:.2f}"
-        elif op == "-":
-            return f"{a - b:.2f}"
-        elif op == "*":
-            return f"{a * b:.2f}"
-        elif op == "/":
-            return f"{a / b:.2f}" if b != 0 else "0.00"
+    digit_match = re.findall(r"(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)", challenge_text)
+    if digit_match:
+        a, op, b = float(digit_match[0][0]), digit_match[0][1], float(digit_match[0][2])
+        return _calc(a, op, b)
 
-    # Split on operator to get left/right sides
-    for op_char in ["+", "-", "*", "/"]:
-        if op_char in cleaned:
-            parts = cleaned.split(op_char, 1)
-            if len(parts) == 2:
-                left_words = [w for w in parts[0].split() if w in _WORD_TO_NUM]
-                right_words = [w for w in parts[1].split() if w in _WORD_TO_NUM]
-                if left_words and right_words:
-                    a = _words_to_number(left_words)
-                    b = _words_to_number(right_words)
-                    if op_char == "+":
-                        return f"{a + b:.2f}"
-                    elif op_char == "-":
-                        return f"{a - b:.2f}"
-                    elif op_char == "*":
-                        return f"{a * b:.2f}"
-                    elif op_char == "/":
-                        return f"{a / b:.2f}" if b != 0 else "0.00"
+    # Find the operator in the raw text
+    op_char = None
+    op_pos = -1
+    for ch in ["+", "-", "*", "/"]:
+        # Look for standalone operator (space-separated)
+        pattern = rf"\s\{ch}\s"
+        m = re.search(pattern, challenge_text)
+        if m:
+            op_char = ch
+            op_pos = m.start()
+            break
 
-    # Fallback: find all number words and sum them
-    all_words = [w for w in cleaned.split() if w in _WORD_TO_NUM]
-    if all_words:
-        return f"{_words_to_number(all_words):.2f}"
+    if op_char is None:
+        # Fallback: any operator character
+        for ch in ["+", "-", "*", "/"]:
+            idx = challenge_text.find(ch)
+            if idx >= 0:
+                op_char = ch
+                op_pos = idx
+                break
+
+    if op_char and op_pos >= 0:
+        left_text = challenge_text[:op_pos]
+        right_text = challenge_text[op_pos + 1:]
+
+        left_tokens = _clean_tokens(left_text)
+        right_tokens = _clean_tokens(right_text)
+
+        left_nums = _extract_number_words(left_tokens)
+        right_nums = _extract_number_words(right_tokens)
+
+        if left_nums and right_nums:
+            a = _words_to_number(left_nums)
+            b = _words_to_number(right_nums)
+            return _calc(a, op_char, b)
+
+    # Fallback: find all number words in the whole text and sum them
+    all_tokens = _clean_tokens(challenge_text)
+    all_nums = _extract_number_words(all_tokens)
+    if all_nums:
+        return f"{_words_to_number(all_nums):.2f}"
 
     return ""
+
+
+def _calc(a: float, op: str, b: float) -> str:
+    if op == "+":
+        return f"{a + b:.2f}"
+    elif op == "-":
+        return f"{a - b:.2f}"
+    elif op == "*":
+        return f"{a * b:.2f}"
+    elif op == "/" and b != 0:
+        return f"{a / b:.2f}"
+    return "0.00"
 
 _launcher: ClawnchLauncher = None
 
