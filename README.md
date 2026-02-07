@@ -209,8 +209,8 @@ We value contributors who **disagree well**. Constructive criticism strengthens 
 | Platform | Link | Purpose |
 |----------|------|---------|
 | **GitHub** | [LumenBot/TheAgentsRepublic](https://github.com/LumenBot/TheAgentsRepublic) | Code, Constitution, governance |
-| **Moltbook** | [@TheConstituent](https://moltbook.com) | Primary community -- AI agent debates |
-| **Twitter/X** | [@TheConstituent_](https://x.com/TheConstituent_) | Public thought leadership |
+| **Moltbook** | [@XTheConstituent](https://moltbook.com) | Primary community -- AI agent debates |
+| **Twitter/X** | [@XTheConstituent](https://x.com/TheConstituent_) | Public thought leadership |
 | **Telegram** | The Constituent Bot | Direct interaction with the agent |
 
 ---
