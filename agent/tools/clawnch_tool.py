@@ -85,44 +85,61 @@ def _clawnch_build_post(image_url: str, burn_tx_hash: str = "") -> str:
     return launcher.build_launch_post(image_url, burn_tx_hash)
 
 
-def _clawnch_launch() -> str:
-    """Execute the full launch sequence: burn → verify → upload → validate → build post.
+def _clawnch_launch(burn_tx_hash: str = "") -> str:
+    """Execute the launch sequence: upload → validate → build post.
 
-    The burn is fire-and-forget: broadcast, then poll for confirmation
-    before proceeding. This keeps each step fast and avoids engine timeouts.
+    If burn_tx_hash is provided, skips the burn step and verifies the
+    existing tx. If not provided, executes a new burn first.
     """
     import time as _time
     launcher = _get_launcher()
     steps = []
 
-    # Step 1: Burn (fire-and-forget broadcast)
-    steps.append("=== STEP 1: Burn $CLAWNCH ===")
-    burn_result = launcher.execute_burn()
-    steps.append(json.dumps(burn_result, indent=2, default=str))
-    if "error" in burn_result:
-        steps.append("LAUNCH ABORTED: Burn failed")
-        return "\n".join(steps)
-    burn_tx_hash = burn_result["tx_hash"]
-
-    # Step 1b: Quick confirmation poll (Base blocks are ~2s)
-    steps.append("\n=== STEP 1b: Verify burn confirmation ===")
-    confirmed = False
-    for i in range(5):
-        _time.sleep(3)
+    if burn_tx_hash:
+        # Burn already done — verify it
+        steps.append(f"=== STEP 1: Verify existing burn tx ===")
+        steps.append(f"tx_hash: {burn_tx_hash}")
         check = launcher.check_tx(burn_tx_hash)
         if check.get("status") == "confirmed":
             steps.append(f"Burn CONFIRMED in block {check.get('block')}")
-            confirmed = True
-            break
         elif check.get("status") == "reverted":
             steps.append("LAUNCH ABORTED: Burn transaction reverted")
             steps.append(json.dumps(check, indent=2, default=str))
             return "\n".join(steps)
-    if not confirmed:
-        steps.append("Burn broadcast but not yet confirmed after 15s.")
-        steps.append("Use clawnch_check_tx to verify before posting.")
-        steps.append(f"tx_hash: {burn_tx_hash}")
-        return "\n".join(steps)
+        elif check.get("error"):
+            steps.append(f"WARNING: Could not verify burn: {check.get('error')}")
+            steps.append("Proceeding anyway — Clawnch scanner will verify on-chain.")
+        else:
+            steps.append(f"Burn status: {check.get('status', 'unknown')} — proceeding.")
+    else:
+        # Step 1: Burn (fire-and-forget broadcast)
+        steps.append("=== STEP 1: Burn $CLAWNCH ===")
+        burn_result = launcher.execute_burn()
+        steps.append(json.dumps(burn_result, indent=2, default=str))
+        if "error" in burn_result:
+            steps.append("LAUNCH ABORTED: Burn failed")
+            return "\n".join(steps)
+        burn_tx_hash = burn_result["tx_hash"]
+
+        # Step 1b: Quick confirmation poll (Base blocks are ~2s)
+        steps.append("\n=== STEP 1b: Verify burn confirmation ===")
+        confirmed = False
+        for i in range(5):
+            _time.sleep(3)
+            check = launcher.check_tx(burn_tx_hash)
+            if check.get("status") == "confirmed":
+                steps.append(f"Burn CONFIRMED in block {check.get('block')}")
+                confirmed = True
+                break
+            elif check.get("status") == "reverted":
+                steps.append("LAUNCH ABORTED: Burn transaction reverted")
+                steps.append(json.dumps(check, indent=2, default=str))
+                return "\n".join(steps)
+        if not confirmed:
+            steps.append("Burn broadcast but not yet confirmed after 15s.")
+            steps.append("Use clawnch_check_tx to verify before posting.")
+            steps.append(f"tx_hash: {burn_tx_hash}")
+            return "\n".join(steps)
 
     # Step 2: Upload image
     steps.append("\n=== STEP 2: Upload image ===")
@@ -231,10 +248,12 @@ def get_tools() -> List[Tool]:
         ),
         Tool(
             name="clawnch_launch",
-            description="Full $REPUBLIC launch sequence: burn $CLAWNCH → upload image → validate → build post. IRREVERSIBLE.",
+            description="Full $REPUBLIC launch sequence: upload image → validate → build post. If burn_tx_hash is provided, skips burn and uses existing tx. Otherwise burns first.",
             category="token",
             governance_level="L2",
-            params=[],
+            params=[
+                ToolParam("burn_tx_hash", "string", "Existing burn tx hash (skip burn step). Required if burn already done.", required=False, default=""),
+            ],
             handler=_clawnch_launch,
         ),
     ]

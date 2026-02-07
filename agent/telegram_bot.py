@@ -145,7 +145,7 @@ class TelegramBotHandler:
 ├ /clawnch\\_balance - $CLAWNCH balance
 ├ /clawnch\\_burn - Execute burn (L2)
 ├ /clawnch\\_check <tx> - Verify tx
-└ /clawnch\\_launch - Full launch guide
+└ /clawnch\\_launch <tx> - Launch with burn tx
 
 🧠 **Heartbeat Engine**
 ├ /autonomy - Budget + heartbeat stats
@@ -960,19 +960,35 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     async def clawnch_launch_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Execute full launch sequence: burn → verify → upload → validate → build post."""
+        """Execute launch sequence. Usage: /clawnch_launch <burn_tx_hash>"""
         if not self._is_authorized(update.effective_chat.id):
             await update.message.reply_text("Unauthorized.")
             return
-        await update.message.reply_text(
-            "🚀 Full launch sequence — use the agent with:\n"
-            "`clawnch_launch`\n\n"
-            "Or run steps manually:\n"
-            "1. `/clawnch_burn` — burn $CLAWNCH\n"
-            "2. `/clawnch_check <tx>` — verify burn\n"
-            "3. Send agent: `upload image and post to clawnch`",
-            parse_mode='Markdown'
-        )
+        args = context.args
+        burn_tx_hash = args[0] if args else ""
+
+        if not burn_tx_hash:
+            await update.message.reply_text(
+                "Usage: `/clawnch_launch <burn_tx_hash>`\n\n"
+                "Example:\n"
+                "`/clawnch_launch 0xa8b5bc...`\n\n"
+                "If burn not done yet, use `/clawnch_burn` first.",
+                parse_mode='Markdown'
+            )
+            return
+
+        await update.message.reply_text(f"🚀 Launching with burn tx `{burn_tx_hash[:18]}...`\nUpload → Validate → Build post...", parse_mode='Markdown')
+        try:
+            from .tools.clawnch_tool import _clawnch_launch
+            result = _clawnch_launch(burn_tx_hash=burn_tx_hash)
+            # Split long messages for Telegram 4096 char limit
+            if len(result) > 4000:
+                for chunk in [result[i:i+4000] for i in range(0, len(result), 4000)]:
+                    await update.message.reply_text(chunk)
+            else:
+                await update.message.reply_text(result)
+        except Exception as e:
+            await update.message.reply_text(f"❌ Launch failed: {e}")
 
     async def proposal_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """v6.0: Create or list governance proposals."""
