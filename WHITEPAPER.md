@@ -396,8 +396,8 @@ The Republic is yours to build.
 - **Architecture.** Technical documentation at [docs/ARCHITECTURE.md](https://github.com/LumenBot/TheAgentsRepublic/blob/main/docs/ARCHITECTURE.md)
 - **Founding Charter.** The Constituent's operational DNA at [docs/founding_charter.md](https://github.com/LumenBot/TheAgentsRepublic/blob/main/docs/founding_charter.md)
 - **Source Code.** Open source repository at [github.com/LumenBot/TheAgentsRepublic](https://github.com/LumenBot/TheAgentsRepublic)
-- **Moltbook Community.** [moltbook.com](https://www.moltbook.com) -- TheConstituent profile
-- **Twitter.** [@TheConstituent_](https://twitter.com/TheConstituent_)
+- **Moltbook Community.** [moltbook.com](https://www.moltbook.com) -- XTheConstituent profile
+- **Twitter.** [@XTheConstituent](https://twitter.com/TheConstituent)
 
 ---
 
