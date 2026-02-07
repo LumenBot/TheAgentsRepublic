@@ -48,6 +48,14 @@ class ClawnchLauncher:
     to deploy tokens by burning $CLAWNCH tokens.
     """
 
+    # Fallback RPC endpoints for Base L2 (tried in order)
+    _RPC_ENDPOINTS = [
+        "https://mainnet.base.org",
+        "https://base.drpc.org",
+        "https://base-mainnet.public.blastapi.io",
+        "https://1rpc.io/base",
+    ]
+
     def __init__(self):
         self._connected = False
         self.w3 = None
@@ -58,28 +66,63 @@ class ClawnchLauncher:
             logger.warning("Clawnch integration unavailable (web3 not installed)")
             return
 
-        rpc_url = os.getenv("BASE_RPC_URL", "https://mainnet.base.org")
-        private_key = os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
-        self.clawnch_contract = os.getenv("CLAWNCH_CONTRACT_ADDRESS", "")
         self.wallet_address = os.getenv("AGENT_WALLET_ADDRESS", "")
+        self.clawnch_contract = os.getenv("CLAWNCH_CONTRACT_ADDRESS", "")
+        private_key = os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
 
-        try:
-            self.w3 = Web3(Web3.HTTPProvider(rpc_url))
-            if self.w3.is_connected():
+        # Load account from private key (independent of RPC)
+        if private_key:
+            try:
+                self.account = Account.from_key(private_key)
+                logger.info(f"Agent wallet: {self.account.address}")
+            except Exception as e:
+                logger.error(f"Invalid private key: {e}")
+
+        # Try to connect
+        self._connect()
+
+    def _connect(self) -> bool:
+        """Try to connect to Base RPC. Tries env var first, then fallbacks."""
+        if not _web3_available:
+            return False
+
+        env_rpc = os.getenv("BASE_RPC_URL", "")
+        rpc_list = ([env_rpc] if env_rpc else []) + self._RPC_ENDPOINTS
+
+        for rpc_url in rpc_list:
+            try:
+                w3 = Web3(Web3.HTTPProvider(rpc_url, request_kwargs={"timeout": 10}))
+                # Actually test with a real call instead of is_connected()
+                w3.eth.block_number
+                self.w3 = w3
                 self._connected = True
                 logger.info(f"Connected to Base L2: {rpc_url}")
+                return True
+            except Exception as e:
+                logger.debug(f"RPC {rpc_url} failed: {e}")
+                continue
 
-                if private_key:
-                    self.account = Account.from_key(private_key)
-                    logger.info(f"Agent wallet: {self.account.address}")
-            else:
-                logger.warning(f"Cannot connect to Base RPC: {rpc_url}")
-        except Exception as e:
-            logger.error(f"Clawnch init error: {e}")
+        logger.warning("Cannot connect to any Base RPC endpoint")
+        self._connected = False
+        return False
+
+    def _ensure_connected(self) -> bool:
+        """Reconnect if disconnected. Call before any RPC operation."""
+        if self._connected:
+            try:
+                self.w3.eth.block_number
+                return True
+            except Exception:
+                self._connected = False
+        return self._connect()
 
     @property
     def is_available(self) -> bool:
-        return _web3_available and self._connected
+        if not _web3_available:
+            return False
+        if not self._connected:
+            self._ensure_connected()
+        return self._connected
 
     def check_launch_readiness(self) -> Dict:
         """Verify all conditions met for token launch."""
@@ -247,8 +290,10 @@ class ClawnchLauncher:
 
     def get_clawnch_balance(self) -> Dict:
         """Check $CLAWNCH token balance of agent wallet."""
-        if not self.is_available or not self.wallet_address:
-            return {"error": "Web3 not connected or wallet not configured"}
+        if not self.wallet_address:
+            return {"error": "Wallet address not configured (AGENT_WALLET_ADDRESS)"}
+        if not self.is_available:
+            return {"error": "Cannot connect to Base RPC. Check BASE_RPC_URL in .env"}
         try:
             contract = self.w3.eth.contract(
                 address=Web3.to_checksum_address(self.CLAWNCH_TOKEN),
@@ -273,7 +318,7 @@ class ClawnchLauncher:
         Use this to verify a tx after a timeout or to confirm a burn.
         """
         if not self.is_available:
-            return {"error": "Web3 not connected"}
+            return {"error": "Cannot connect to Base RPC. Check BASE_RPC_URL in .env"}
         try:
             tx = self.w3.eth.get_transaction(tx_hash)
             if tx is None:
@@ -306,10 +351,10 @@ class ClawnchLauncher:
         Returns the transaction hash on success.
         On timeout, still returns the tx_hash so it can be checked later.
         """
-        if not self.is_available:
-            return {"error": "Web3 not connected"}
         if not self.account:
-            return {"error": "Wallet private key not configured"}
+            return {"error": "Wallet private key not configured (AGENT_WALLET_PRIVATE_KEY)"}
+        if not self.is_available:
+            return {"error": "Cannot connect to Base RPC. Check BASE_RPC_URL in .env"}
 
         burn_amount = tokenomics.CLAWNCH_BURN_AMOUNT
         burn_amount_wei = burn_amount * 10**18
