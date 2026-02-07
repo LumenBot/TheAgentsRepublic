@@ -977,7 +977,7 @@ Full profile: agent_profile.md"""
             )
             return
 
-        await update.message.reply_text(f"🚀 Launching with burn tx `{burn_tx_hash[:18]}...`\nUpload → Validate → Build post...", parse_mode='Markdown')
+        await update.message.reply_text(f"🚀 Launching with burn tx `{burn_tx_hash[:18]}...`\nVerify → Upload → Validate → Post on m/clawnch...", parse_mode='Markdown')
         try:
             from .tools.clawnch_tool import _clawnch_launch
             result = _clawnch_launch(burn_tx_hash=burn_tx_hash)

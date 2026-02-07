@@ -162,11 +162,38 @@ def _clawnch_launch(burn_tx_hash: str = "") -> str:
     post_content = launcher.build_launch_post(image_url, burn_tx_hash)
     steps.append(post_content)
 
-    steps.append("\n=== READY TO POST ===")
-    steps.append("Use moltbook_post tool with:")
-    steps.append(f'  title: "$REPUBLIC Token Launch"')
-    steps.append(f"  content: (the !clawnch content above)")
-    steps.append(f'  submolt: "clawnch"')
+    # Step 5: Post on Moltbook m/clawnch
+    steps.append("\n=== STEP 5: Post on Moltbook m/clawnch ===")
+    try:
+        from ..moltbook_ops import MoltbookOperations
+        mb = MoltbookOperations()
+        if not mb.is_connected():
+            steps.append("ERROR: Moltbook not connected. Post manually:")
+            steps.append(f'  title: "$REPUBLIC Token Launch"')
+            steps.append(f'  submolt: "clawnch"')
+            steps.append(f"  content:\n{post_content}")
+            return "\n".join(steps)
+
+        result = mb.create_post(
+            title="$REPUBLIC Token Launch",
+            content=post_content,
+            submolt="clawnch",
+        )
+        steps.append(json.dumps(result, indent=2, default=str))
+
+        if result.get("success"):
+            post_url = result.get("url", "")
+            steps.append(f"\n=== LAUNCH POSTED SUCCESSFULLY ===")
+            steps.append(f"URL: {post_url}")
+            steps.append("Clawnch scanner will detect and deploy within ~1 minute.")
+        else:
+            steps.append(f"Post failed: {result.get('error', 'unknown')}")
+            steps.append("Post content for manual retry:")
+            steps.append(post_content)
+    except Exception as e:
+        steps.append(f"Post error: {e}")
+        steps.append("Post content for manual retry:")
+        steps.append(post_content)
 
     return "\n".join(steps)
 
