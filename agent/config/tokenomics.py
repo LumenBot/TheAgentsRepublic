@@ -34,6 +34,12 @@ class RepublicTokenomics:
     WEBSITE: str = "https://github.com/LumenBot/TheAgentsRepublic"
     TWITTER: str = "https://x.com/XTheConstituent"
 
+    # Deployed Token (Clawnch launch 2026-02-07)
+    TOKEN_ADDRESS: str = "0x06B09BE0EF93771ff6a6D378dF5C7AC1c673563f"
+    CHAIN_ID: int = 8453  # Base mainnet
+    EXPLORER_URL: str = "https://basescan.org/token/0x06B09BE0EF93771ff6a6D378dF5C7AC1c673563f"
+    BURN_TX_HASH: str = "0xa8b5bc2126e3c99d7769197d1248f68966b8d96e98d7aaa2c051060089beb055"
+
     # Clawnch Launch Parameters
     CLAWNCH_BURN_AMOUNT: int = 4_000_000       # 4M $CLAWNCH to burn
     DEV_ALLOCATION_PERCENT: int = 4             # 4% dev allocation (4B tokens on 100B)

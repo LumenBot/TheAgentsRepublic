@@ -71,12 +71,16 @@ def _clean_tokens(text: str) -> list:
 
     Handles Moltbook obfuscation that inserts special chars inside words:
       "tW/eN tY" → ["twen", "ty"]  (strip non-alpha within each token)
-    Then tries joining adjacent fragments to reconstruct number words:
-      ["twen", "ty"] → finds "twenty" by joining "twen"+"ty"
+    Preserves standalone operator symbols (+, -, *, /) as tokens.
     """
     raw_tokens = text.split()
     cleaned = []
     for tok in raw_tokens:
+        # Preserve standalone operator symbols
+        stripped = tok.strip()
+        if stripped in ("+", "-", "*", "/"):
+            cleaned.append(stripped)
+            continue
         c = re.sub(r"[^a-zA-Z]", "", tok).lower()
         if c:
             cleaned.append(c)
@@ -137,27 +141,39 @@ def _extract_number_words(tokens: list) -> list:
 def _fuzzy_match(token: str) -> str:
     """Try to find a number word inside a noisy token.
 
-    Checks if the token ends with or starts with a known number word.
-    Longer matches preferred. E.g., "qthree" → "three", "twentyq" → "twenty".
+    Handles Moltbook obfuscation strategies:
+    1. Prefix/suffix noise: "qthree" → "three", "twentyq" → "twenty"
+    2. Internal duplicate letters: "thiirty" → "thirty", "fooour" → "four"
+    Uses subsequence matching with strict constraints to avoid false positives.
     """
     # Sort by length descending to prefer longer matches
     for word in sorted(_WORD_TO_NUM.keys(), key=len, reverse=True):
-        if len(word) < 3:
-            continue  # Skip very short words to avoid false positives
-        if token.endswith(word) or token.startswith(word):
+        if len(word) < 4:
+            continue  # Skip short words (one/two/six/ten) to avoid false positives
+        # Exact containment
+        if word in token:
             return word
-        # Also check if the word is contained with at most 1 char noise on each side
-        idx = token.find(word)
-        if idx >= 0 and (len(token) - len(word)) <= 2:
+        # Subsequence match: word's letters appear in order within token
+        # Strict constraint: token length within word_len + 3 extra chars max
+        if len(token) <= len(word) + 3 and _is_subsequence(word, token):
             return word
     return ""
+
+
+def _is_subsequence(word: str, token: str) -> bool:
+    """Check if all chars of word appear in order within token."""
+    it = iter(token)
+    return all(c in it for c in word)
 
 
 def _solve_challenge(challenge_text: str) -> str:
     """Solve a Moltbook anti-spam math challenge.
 
-    Handles both explicit operators (+ - * /) and implicit ones
-    ("accelerates by", "and adds", "what is the total/new/combined").
+    Works entirely on the token list to avoid position-mapping bugs:
+    1. Tokenize (strip non-alpha per token, lowercase)
+    2. Find operator in token list (explicit symbol or keyword)
+    3. Split tokens at operator, extract numbers from each side
+    4. Calculate
     """
     # Try to find explicit decimal numbers first (e.g., "35.5 + 12.3")
     digit_match = re.findall(r"(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)", challenge_text)
@@ -165,83 +181,15 @@ def _solve_challenge(challenge_text: str) -> str:
         a, op, b = float(digit_match[0][0]), digit_match[0][1], float(digit_match[0][2])
         return _calc(a, op, b)
 
-    # Clean the full text for keyword analysis
-    cleaned_full = re.sub(r"[^a-zA-Z0-9+\-*/. ]", " ", challenge_text).lower()
-    cleaned_full = re.sub(r"\s+", " ", cleaned_full).strip()
+    # Tokenize the original challenge text
+    tokens = _clean_tokens(challenge_text)
 
-    # Detect operator: explicit symbol first, then implicit keywords
-    op_char = None
-    op_pos = -1
+    # Find operator and its position in the token list
+    op_char, op_idx = _find_operator_in_tokens(tokens)
 
-    # 1) Explicit standalone operator
-    for ch in ["+", "-", "*", "/"]:
-        pattern = rf"\s\{ch}\s"
-        m = re.search(pattern, challenge_text)
-        if m:
-            op_char = ch
-            op_pos = m.start()
-            break
-
-    # 2) Implicit addition keywords
-    if op_char is None:
-        add_patterns = [
-            r"accelerates?\s+by", r"and\s+adds?", r"adds?",
-            r"increases?\s+by", r"gains?", r"plus",
-            r"combined\s+with", r"and\s+another",
-        ]
-        for pat in add_patterns:
-            m = re.search(pat, cleaned_full)
-            if m:
-                op_char = "+"
-                # Find position in original text (approximate)
-                op_pos = m.start()
-                break
-
-    # 3) Implicit subtraction keywords
-    if op_char is None:
-        sub_patterns = [
-            r"decelerates?\s+by", r"slows?\s+(down\s+)?by",
-            r"loses?", r"minus", r"decreases?\s+by",
-            r"subtracts?", r"less",
-        ]
-        for pat in sub_patterns:
-            m = re.search(pat, cleaned_full)
-            if m:
-                op_char = "-"
-                op_pos = m.start()
-                break
-
-    # 4) Implicit multiplication keywords
-    if op_char is None:
-        mul_patterns = [r"times", r"multiplied\s+by"]
-        for pat in mul_patterns:
-            m = re.search(pat, cleaned_full)
-            if m:
-                op_char = "*"
-                op_pos = m.start()
-                break
-
-    # 5) Fallback: any operator character in the raw text
-    if op_char is None:
-        for ch in ["+", "-", "*", "/"]:
-            idx = challenge_text.find(ch)
-            if idx >= 0:
-                op_char = ch
-                op_pos = idx
-                break
-
-    # Split on operator position and extract numbers from each side
-    if op_char and op_pos >= 0:
-        # For implicit operators, split on cleaned_full position
-        if op_pos < len(cleaned_full):
-            left_text = cleaned_full[:op_pos]
-            right_text = cleaned_full[op_pos:]
-        else:
-            left_text = challenge_text[:op_pos]
-            right_text = challenge_text[op_pos:]
-
-        left_tokens = _clean_tokens(left_text)
-        right_tokens = _clean_tokens(right_text)
+    if op_char and op_idx >= 0:
+        left_tokens = tokens[:op_idx]
+        right_tokens = tokens[op_idx + 1:]  # skip the operator token itself
 
         left_nums = _extract_number_words(left_tokens)
         right_nums = _extract_number_words(right_tokens)
@@ -251,20 +199,54 @@ def _solve_challenge(challenge_text: str) -> str:
             b = _words_to_number(right_nums)
             return _calc(a, op_char, b)
 
-    # Last resort: find all number words and sum them (assume addition)
-    all_tokens = _clean_tokens(challenge_text)
-    all_nums = _extract_number_words(all_tokens)
+    # Last resort: find all number words and assume addition
+    all_nums = _extract_number_words(tokens)
     if len(all_nums) >= 2:
-        # Two groups of numbers found — assume addition
-        # Split into first group and rest
-        a = _words_to_number(all_nums[:len(all_nums)//2 + len(all_nums)%2])
-        b = _words_to_number(all_nums[len(all_nums)//2 + len(all_nums)%2:])
+        # Last number word is right operand, rest is left
+        a = _words_to_number(all_nums[:-1])
+        b = _words_to_number(all_nums[-1:])
         if a and b:
             return f"{a + b:.2f}"
     if all_nums:
         return f"{_words_to_number(all_nums):.2f}"
 
     return ""
+
+
+# Operator keyword sets (matched against token list)
+_OP_KEYWORDS = {
+    "+": {"accelerates", "accelerate", "adds", "add", "increases",
+          "increase", "gains", "gain", "plus", "combined"},
+    "-": {"decelerates", "decelerate", "slows", "slow", "loses",
+          "lose", "minus", "decreases", "decrease", "subtracts",
+          "subtract", "less"},
+    "*": {"multiplies", "multiply", "times", "multiplied"},
+}
+
+
+def _find_operator_in_tokens(tokens: list):
+    """Find operator type and position in the token list.
+
+    Returns (op_char, op_idx) or (None, -1) if not found.
+    Checks explicit symbols first, then keyword-based operators.
+    """
+    # 1) Explicit operator symbol as a standalone token
+    for i, tok in enumerate(tokens):
+        if tok in ("+", "-", "*", "/"):
+            return tok, i
+
+    # 2) Keyword-based operators
+    for i, tok in enumerate(tokens):
+        for op, keywords in _OP_KEYWORDS.items():
+            if tok in keywords:
+                # The split point is this keyword token.
+                # For "accelerates by", skip "by" too if next token is "by".
+                skip = i
+                if i + 1 < len(tokens) and tokens[i + 1] == "by":
+                    skip = i + 1
+                return op, skip
+
+    return None, -1
 
 
 def _calc(a: float, op: str, b: float) -> str:
@@ -410,6 +392,15 @@ def _clawnch_launch(burn_tx_hash: str = "") -> str:
     steps.append("\n=== STEP 3: Validate content ===")
     validate_result = launcher.validate_launch(image_url, burn_tx_hash)
     steps.append(json.dumps(validate_result, indent=2, default=str))
+
+    # Abort if validation failed
+    val_response = validate_result.get("response", {})
+    if val_response.get("valid") is False:
+        errors = val_response.get("errors", [])
+        steps.append("\nLAUNCH ABORTED: Validation failed")
+        for err in errors:
+            steps.append(f"  - {err}")
+        return "\n".join(steps)
 
     # Step 4: Build post
     steps.append("\n=== STEP 4: Launch post content ===")
