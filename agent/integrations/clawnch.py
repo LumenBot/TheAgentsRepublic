@@ -23,6 +23,8 @@ import os
 from pathlib import Path
 from typing import Dict, Optional
 
+from agent.config.tokenomics import tokenomics
+
 logger = logging.getLogger("TheConstituent.Clawnch")
 
 # Lazy import — web3 may not be installed yet
@@ -102,6 +104,10 @@ class ClawnchLauncher:
         # Check Clawnch contract
         checks["clawnch_contract_set"] = bool(self.clawnch_contract)
 
+        # Check token metadata
+        checks["token_image_exists"] = Path(tokenomics.IMAGE_PATH).exists()
+        checks["token_description_set"] = bool(tokenomics.DESCRIPTION)
+
         # Check constitution exists
         constitution_path = Path("constitution")
         if constitution_path.exists():
@@ -118,6 +124,8 @@ class ClawnchLauncher:
             checks.get("sufficient_gas"),
             checks.get("clawnch_contract_set"),
             checks.get("constitution_ready"),
+            checks.get("token_image_exists"),
+            checks.get("token_description_set"),
         ])
 
         if not checks["ready"]:
@@ -132,9 +140,27 @@ class ClawnchLauncher:
                 issues.append("CLAWNCH_CONTRACT_ADDRESS not set")
             if not checks.get("constitution_ready"):
                 issues.append(f"Constitution needs 7+ articles (have {checks.get('constitution_articles', 0)})")
+            if not checks.get("token_image_exists"):
+                issues.append("Token image not found at assets/republic-token.png")
+            if not checks.get("token_description_set"):
+                issues.append("Token description not set in tokenomics config")
             checks["issues"] = issues
 
         return checks
+
+    def get_token_metadata(self) -> Dict:
+        """Return token metadata for Clawnch deployment."""
+        image_exists = Path(tokenomics.IMAGE_PATH).exists()
+        return {
+            "name": tokenomics.NAME,
+            "symbol": tokenomics.SYMBOL,
+            "decimals": tokenomics.DECIMALS,
+            "total_supply": tokenomics.TOTAL_SUPPLY,
+            "description": tokenomics.DESCRIPTION,
+            "image_url": tokenomics.IMAGE_URL,
+            "image_path": tokenomics.IMAGE_PATH,
+            "image_exists_locally": image_exists,
+        }
 
     def estimate_costs(self) -> Dict:
         """Estimate gas and burn costs for token launch."""

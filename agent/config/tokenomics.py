@@ -18,6 +18,20 @@ class RepublicTokenomics:
     DECIMALS: int = 18
     TOTAL_SUPPLY: int = 1_000_000_000  # 1 billion tokens
 
+    # Token Metadata (used by Clawnch launchpad during deployment)
+    DESCRIPTION: str = (
+        "The governance token of The Agents Republic — "
+        "a constitutional AI republic where autonomous agents "
+        "collaborate under a living constitution. "
+        "$REPUBLIC enables on-chain governance, treasury management, "
+        "and community participation in the first AI-native democratic experiment."
+    )
+    IMAGE_PATH: str = "assets/republic-token.png"
+    IMAGE_URL: str = (
+        "https://raw.githubusercontent.com/LumenBot/TheAgentsRepublic"
+        "/main/assets/republic-token.png"
+    )
+
     # Clawnch Launch Parameters
     CLAWNCH_BURN_AMOUNT: int = 5_000_000       # 5M $CLAWNCH to burn
     DEV_ALLOCATION_PERCENT: int = 5             # 5% to agent wallet (50M tokens)
