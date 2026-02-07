@@ -1,0 +1,12 @@
+=== CONSTITUTION URLS FOR MOLTBOOK ===
+
+Main directory           https://github.com/LumenBot/TheAgentsRepublic/tree/main/constitution
+Preamble                 https://github.com/LumenBot/TheAgentsRepublic/tree/main/constitution/PREAMBLE.md
+Title I (Principles)     https://github.com/LumenBot/TheAgentsRepublic/tree/main/constitution/TITLE_I_PRINCIPLES.md
+Title II (Rights)        https://github.com/LumenBot/TheAgentsRepublic/tree/main/constitution/TITLE_II_RIGHTS_DUTIES.md
+Full repo               https://github.com/LumenBot/TheAgentsRepublic
+
+Format for comments:
+"See our Constitution: [link]"
+"Read more in Title I: [link]"
+"Full framework: [link]"
