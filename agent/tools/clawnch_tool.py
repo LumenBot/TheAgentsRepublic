@@ -86,29 +86,50 @@ def _clawnch_build_post(image_url: str, burn_tx_hash: str = "") -> str:
 
 
 def _clawnch_launch() -> str:
-    """Execute the full launch sequence: burn → upload → validate → build post."""
+    """Execute the full launch sequence: burn → verify → upload → validate → build post.
+
+    The burn is fire-and-forget: broadcast, then poll for confirmation
+    before proceeding. This keeps each step fast and avoids engine timeouts.
+    """
+    import time as _time
     launcher = _get_launcher()
     steps = []
 
-    # Step 1: Burn
+    # Step 1: Burn (fire-and-forget broadcast)
     steps.append("=== STEP 1: Burn $CLAWNCH ===")
     burn_result = launcher.execute_burn()
     steps.append(json.dumps(burn_result, indent=2, default=str))
     if "error" in burn_result:
         steps.append("LAUNCH ABORTED: Burn failed")
         return "\n".join(steps)
-    if burn_result.get("status") == "broadcast_unconfirmed":
-        steps.append("LAUNCH PAUSED: Burn broadcast but unconfirmed.")
-        steps.append("Use clawnch_check_tx to verify before continuing.")
-        return "\n".join(steps)
     burn_tx_hash = burn_result["tx_hash"]
+
+    # Step 1b: Quick confirmation poll (Base blocks are ~2s)
+    steps.append("\n=== STEP 1b: Verify burn confirmation ===")
+    confirmed = False
+    for i in range(5):
+        _time.sleep(3)
+        check = launcher.check_tx(burn_tx_hash)
+        if check.get("status") == "confirmed":
+            steps.append(f"Burn CONFIRMED in block {check.get('block')}")
+            confirmed = True
+            break
+        elif check.get("status") == "reverted":
+            steps.append("LAUNCH ABORTED: Burn transaction reverted")
+            steps.append(json.dumps(check, indent=2, default=str))
+            return "\n".join(steps)
+    if not confirmed:
+        steps.append("Burn broadcast but not yet confirmed after 15s.")
+        steps.append("Use clawnch_check_tx to verify before posting.")
+        steps.append(f"tx_hash: {burn_tx_hash}")
+        return "\n".join(steps)
 
     # Step 2: Upload image
     steps.append("\n=== STEP 2: Upload image ===")
     upload_result = launcher.upload_image()
     steps.append(json.dumps(upload_result, indent=2, default=str))
     if "error" in upload_result:
-        steps.append(f"WARNING: Image upload failed, using raw GitHub URL")
+        steps.append("WARNING: Image upload failed, using raw GitHub URL")
         from agent.config.tokenomics import tokenomics
         image_url = tokenomics.IMAGE_URL
     else:
@@ -175,7 +196,7 @@ def get_tools() -> List[Tool]:
         ),
         Tool(
             name="clawnch_burn",
-            description="Execute the $CLAWNCH burn: transfer tokens to dead address. Returns tx hash. IRREVERSIBLE.",
+            description="Broadcast the $CLAWNCH burn tx (fire-and-forget). Returns tx_hash immediately. Use clawnch_check_tx to verify. IRREVERSIBLE.",
             category="token",
             governance_level="L2",
             params=[],

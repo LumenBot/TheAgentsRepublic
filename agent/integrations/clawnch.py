@@ -348,12 +348,12 @@ class ClawnchLauncher:
         """Burn $CLAWNCH tokens by transferring to dead address.
 
         Sends tokenomics.CLAWNCH_BURN_AMOUNT tokens to 0x...dEaD.
-        Returns the transaction hash on success.
-        On timeout, still returns the tx_hash so it can be checked later.
+        Returns the tx_hash immediately after broadcast (fire-and-forget).
+        Use check_tx() afterwards to verify confirmation.
         """
         if not self.account:
             return {"error": "Wallet private key not configured (AGENT_WALLET_PRIVATE_KEY)"}
-        if not self.is_available:
+        if not self._ensure_connected():
             return {"error": "Cannot connect to Base RPC. Check BASE_RPC_URL in .env"}
 
         burn_amount = tokenomics.CLAWNCH_BURN_AMOUNT
@@ -402,46 +402,19 @@ class ClawnchLauncher:
 
             logger.info(f"Burn tx broadcast: {tx_hash_hex}")
 
-            # Wait for receipt with retry
-            receipt = None
-            for attempt in range(3):
-                try:
-                    receipt = self.w3.eth.wait_for_transaction_receipt(
-                        tx_hash, timeout=30
-                    )
-                    break
-                except Exception as wait_err:
-                    logger.warning(f"Receipt wait attempt {attempt + 1}/3 failed: {wait_err}")
-                    if attempt < 2:
-                        time.sleep(5)
-
-            if receipt is None:
-                # Tx was broadcast but we can't confirm — return hash for manual check
-                logger.warning(f"Burn tx broadcast but receipt not confirmed: {tx_hash_hex}")
-                return {
-                    "status": "broadcast_unconfirmed",
-                    "tx_hash": tx_hash_hex,
-                    "message": (
-                        "Transaction was broadcast but receipt could not be confirmed. "
-                        "Check basescan or use clawnch_check_tx to verify. "
-                        "DO NOT retry burn without checking first — tokens may already be burned."
-                    ),
-                    "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
-                }
-
-            if receipt.status == 1:
-                logger.info(f"Burn confirmed in block {receipt.blockNumber}: "
-                            f"{burn_amount} $CLAWNCH burned")
-                return {
-                    "success": True,
-                    "tx_hash": tx_hash_hex,
-                    "amount_burned": burn_amount,
-                    "block": receipt.blockNumber,
-                    "gas_used": receipt.gasUsed,
-                    "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
-                }
-            else:
-                return {"error": "Burn transaction reverted", "tx_hash": tx_hash_hex}
+            # Fire-and-forget: return immediately after broadcast.
+            # On Base L2 blocks are ~2s, so confirmation is near-instant.
+            # Use clawnch_check_tx to verify before continuing the launch.
+            return {
+                "status": "broadcast",
+                "tx_hash": tx_hash_hex,
+                "amount": burn_amount,
+                "message": (
+                    f"Burn tx broadcast: {burn_amount:,} $CLAWNCH to {self.BURN_ADDRESS}. "
+                    "Use clawnch_check_tx to verify confirmation before proceeding."
+                ),
+                "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
+            }
 
         except Exception as e:
             logger.error(f"Burn failed: {e}")
