@@ -1,0 +1,199 @@
+"""
+Clawnch Launch Tools for The Constituent v6.0
+===============================================
+Exposes $REPUBLIC token launch operations as tools for the engine.
+
+Tools:
+- clawnch_status: Check Clawnch integration status
+- clawnch_readiness: Run all pre-flight checks
+- clawnch_balance: Check $CLAWNCH token balance
+- clawnch_burn: Execute the $CLAWNCH burn transaction
+- clawnch_upload_image: Upload token image to Clawnch hosting
+- clawnch_validate: Validate launch content via preview API
+- clawnch_build_post: Build the !clawnch post content
+- clawnch_launch: Full launch sequence (burn + upload + validate + post)
+"""
+
+import json
+import logging
+from typing import List
+
+from ..tool_registry import Tool, ToolParam
+from ..integrations.clawnch import ClawnchLauncher
+
+logger = logging.getLogger("TheConstituent.Tools.Clawnch")
+
+_launcher: ClawnchLauncher = None
+
+
+def _get_launcher() -> ClawnchLauncher:
+    global _launcher
+    if _launcher is None:
+        _launcher = ClawnchLauncher()
+    return _launcher
+
+
+def _clawnch_status() -> str:
+    launcher = _get_launcher()
+    return json.dumps(launcher.get_status(), indent=2, default=str)
+
+
+def _clawnch_readiness() -> str:
+    launcher = _get_launcher()
+    checks = launcher.check_launch_readiness()
+    return json.dumps(checks, indent=2, default=str)
+
+
+def _clawnch_metadata() -> str:
+    launcher = _get_launcher()
+    return json.dumps(launcher.get_token_metadata(), indent=2, default=str)
+
+
+def _clawnch_balance() -> str:
+    launcher = _get_launcher()
+    result = launcher.get_clawnch_balance()
+    return json.dumps(result, indent=2, default=str)
+
+
+def _clawnch_burn() -> str:
+    launcher = _get_launcher()
+    result = launcher.execute_burn()
+    return json.dumps(result, indent=2, default=str)
+
+
+def _clawnch_upload_image() -> str:
+    launcher = _get_launcher()
+    result = launcher.upload_image()
+    return json.dumps(result, indent=2, default=str)
+
+
+def _clawnch_validate(image_url: str, burn_tx_hash: str = "") -> str:
+    launcher = _get_launcher()
+    result = launcher.validate_launch(image_url, burn_tx_hash)
+    return json.dumps(result, indent=2, default=str)
+
+
+def _clawnch_build_post(image_url: str, burn_tx_hash: str = "") -> str:
+    launcher = _get_launcher()
+    return launcher.build_launch_post(image_url, burn_tx_hash)
+
+
+def _clawnch_launch() -> str:
+    """Execute the full launch sequence: burn → upload → validate → build post."""
+    launcher = _get_launcher()
+    steps = []
+
+    # Step 1: Burn
+    steps.append("=== STEP 1: Burn $CLAWNCH ===")
+    burn_result = launcher.execute_burn()
+    steps.append(json.dumps(burn_result, indent=2, default=str))
+    if "error" in burn_result:
+        steps.append("LAUNCH ABORTED: Burn failed")
+        return "\n".join(steps)
+    burn_tx_hash = burn_result["tx_hash"]
+
+    # Step 2: Upload image
+    steps.append("\n=== STEP 2: Upload image ===")
+    upload_result = launcher.upload_image()
+    steps.append(json.dumps(upload_result, indent=2, default=str))
+    if "error" in upload_result:
+        steps.append(f"WARNING: Image upload failed, using raw GitHub URL")
+        from agent.config.tokenomics import tokenomics
+        image_url = tokenomics.IMAGE_URL
+    else:
+        image_url = upload_result["image_url"]
+
+    # Step 3: Validate
+    steps.append("\n=== STEP 3: Validate content ===")
+    validate_result = launcher.validate_launch(image_url, burn_tx_hash)
+    steps.append(json.dumps(validate_result, indent=2, default=str))
+
+    # Step 4: Build post
+    steps.append("\n=== STEP 4: Launch post content ===")
+    post_content = launcher.build_launch_post(image_url, burn_tx_hash)
+    steps.append(post_content)
+
+    steps.append("\n=== READY TO POST ===")
+    steps.append("Use moltbook_post tool with:")
+    steps.append(f'  title: "$REPUBLIC Token Launch"')
+    steps.append(f"  content: (the !clawnch content above)")
+    steps.append(f'  submolt: "clawnch"')
+
+    return "\n".join(steps)
+
+
+def get_tools() -> List[Tool]:
+    """Register Clawnch launch tools."""
+    return [
+        Tool(
+            name="clawnch_status",
+            description="Check Clawnch integration status (web3, wallet, contract).",
+            category="token",
+            params=[],
+            handler=_clawnch_status,
+        ),
+        Tool(
+            name="clawnch_readiness",
+            description="Run all pre-flight checks for $REPUBLIC token launch.",
+            category="token",
+            params=[],
+            handler=_clawnch_readiness,
+        ),
+        Tool(
+            name="clawnch_metadata",
+            description="Get $REPUBLIC token metadata (name, symbol, description, image, website, twitter).",
+            category="token",
+            params=[],
+            handler=_clawnch_metadata,
+        ),
+        Tool(
+            name="clawnch_balance",
+            description="Check $CLAWNCH token balance of agent wallet on Base.",
+            category="token",
+            params=[],
+            handler=_clawnch_balance,
+        ),
+        Tool(
+            name="clawnch_burn",
+            description="Execute the $CLAWNCH burn: transfer tokens to dead address. Returns tx hash. IRREVERSIBLE.",
+            category="token",
+            governance_level="L2",
+            params=[],
+            handler=_clawnch_burn,
+        ),
+        Tool(
+            name="clawnch_upload_image",
+            description="Upload token image to Clawnch hosting (iili.io). Returns hosted URL.",
+            category="token",
+            params=[],
+            handler=_clawnch_upload_image,
+        ),
+        Tool(
+            name="clawnch_validate",
+            description="Validate launch content via Clawnch preview API before posting.",
+            category="token",
+            params=[
+                ToolParam("image_url", "string", "Hosted image URL (from clawnch_upload_image)"),
+                ToolParam("burn_tx_hash", "string", "Burn transaction hash", required=False, default=""),
+            ],
+            handler=_clawnch_validate,
+        ),
+        Tool(
+            name="clawnch_build_post",
+            description="Build the !clawnch post content string for Moltbook submission.",
+            category="token",
+            params=[
+                ToolParam("image_url", "string", "Hosted image URL (from clawnch_upload_image)"),
+                ToolParam("burn_tx_hash", "string", "Burn transaction hash", required=False, default=""),
+            ],
+            handler=_clawnch_build_post,
+        ),
+        Tool(
+            name="clawnch_launch",
+            description="Full $REPUBLIC launch sequence: burn $CLAWNCH → upload image → validate → build post. IRREVERSIBLE.",
+            category="token",
+            governance_level="L2",
+            params=[],
+            handler=_clawnch_launch,
+        ),
+    ]

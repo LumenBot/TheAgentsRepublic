@@ -23,6 +23,8 @@ import os
 from pathlib import Path
 from typing import Dict, Optional
 
+import requests
+
 from agent.config.tokenomics import tokenomics
 
 logger = logging.getLogger("TheConstituent.Clawnch")
@@ -215,6 +217,203 @@ class ClawnchLauncher:
             return result
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
+    # =================================================================
+    # Action Methods (execute on-chain and API operations)
+    # =================================================================
+
+    # Minimal ERC-20 ABI for transfer and balanceOf
+    _ERC20_ABI = [
+        {
+            "inputs": [{"name": "to", "type": "address"}, {"name": "value", "type": "uint256"}],
+            "name": "transfer",
+            "outputs": [{"name": "", "type": "bool"}],
+            "stateMutability": "nonpayable",
+            "type": "function",
+        },
+        {
+            "inputs": [{"name": "account", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "", "type": "uint256"}],
+            "stateMutability": "view",
+            "type": "function",
+        },
+    ]
+
+    BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD"
+    CLAWNCH_TOKEN = "0xa1F72459dfA10BAD200Ac160eCd78C6b77a747be"
+    CLAWNCH_API_BASE = "https://clawn.ch/api"
+
+    def get_clawnch_balance(self) -> Dict:
+        """Check $CLAWNCH token balance of agent wallet."""
+        if not self.is_available or not self.wallet_address:
+            return {"error": "Web3 not connected or wallet not configured"}
+        try:
+            contract = self.w3.eth.contract(
+                address=Web3.to_checksum_address(self.CLAWNCH_TOKEN),
+                abi=self._ERC20_ABI,
+            )
+            balance_wei = contract.functions.balanceOf(
+                Web3.to_checksum_address(self.wallet_address)
+            ).call()
+            balance = balance_wei / 10**18
+            return {
+                "balance_wei": str(balance_wei),
+                "balance": balance,
+                "sufficient_for_burn": balance >= tokenomics.CLAWNCH_BURN_AMOUNT,
+                "burn_amount_required": tokenomics.CLAWNCH_BURN_AMOUNT,
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    def execute_burn(self) -> Dict:
+        """Burn $CLAWNCH tokens by transferring to dead address.
+
+        Sends tokenomics.CLAWNCH_BURN_AMOUNT tokens to 0x...dEaD.
+        Returns the transaction hash on success.
+        """
+        if not self.is_available:
+            return {"error": "Web3 not connected"}
+        if not self.account:
+            return {"error": "Wallet private key not configured"}
+
+        burn_amount = tokenomics.CLAWNCH_BURN_AMOUNT
+        burn_amount_wei = burn_amount * 10**18
+
+        # Verify balance first
+        balance_info = self.get_clawnch_balance()
+        if "error" in balance_info:
+            return balance_info
+        if not balance_info.get("sufficient_for_burn"):
+            return {
+                "error": f"Insufficient $CLAWNCH. Have {balance_info['balance']}, need {burn_amount}",
+            }
+
+        try:
+            contract = self.w3.eth.contract(
+                address=Web3.to_checksum_address(self.CLAWNCH_TOKEN),
+                abi=self._ERC20_ABI,
+            )
+
+            tx = contract.functions.transfer(
+                Web3.to_checksum_address(self.BURN_ADDRESS),
+                burn_amount_wei,
+            ).build_transaction({
+                "from": self.account.address,
+                "nonce": self.w3.eth.get_transaction_count(self.account.address),
+                "gasPrice": self.w3.eth.gas_price,
+                "chainId": 8453,  # Base mainnet
+            })
+
+            # Estimate gas with buffer
+            gas_estimate = self.w3.eth.estimate_gas(tx)
+            tx["gas"] = int(gas_estimate * 1.3)
+
+            # Sign and send
+            signed = self.w3.eth.account.sign_transaction(
+                tx, os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
+            )
+            tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
+            tx_hash_hex = tx_hash.hex()
+
+            logger.info(f"Burn tx sent: {tx_hash_hex}")
+
+            # Wait for receipt
+            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+
+            if receipt.status == 1:
+                logger.info(f"Burn successful: {burn_amount} $CLAWNCH burned")
+                return {
+                    "success": True,
+                    "tx_hash": tx_hash_hex,
+                    "amount_burned": burn_amount,
+                    "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
+                }
+            else:
+                return {"error": "Burn transaction reverted", "tx_hash": tx_hash_hex}
+
+        except Exception as e:
+            logger.error(f"Burn failed: {e}")
+            return {"error": str(e)}
+
+    def upload_image(self) -> Dict:
+        """Upload token image to Clawnch hosting (iili.io).
+
+        Uses the raw GitHub URL from tokenomics config.
+        Returns the hosted image URL.
+        """
+        try:
+            resp = requests.post(
+                f"{self.CLAWNCH_API_BASE}/upload",
+                json={"image": tokenomics.IMAGE_URL},
+                headers={"Content-Type": "application/json"},
+                timeout=30,
+            )
+            data = resp.json()
+            if data.get("success"):
+                hosted_url = data["url"]
+                logger.info(f"Image uploaded: {hosted_url}")
+                return {"success": True, "image_url": hosted_url}
+            else:
+                return {"error": f"Upload failed: {data}"}
+        except Exception as e:
+            return {"error": str(e)}
+
+    def validate_launch(self, image_url: str, burn_tx_hash: str = "") -> Dict:
+        """Validate launch content via Clawnch preview API.
+
+        Args:
+            image_url: Hosted image URL (from upload_image)
+            burn_tx_hash: Transaction hash of the $CLAWNCH burn
+        """
+        payload = {
+            "name": tokenomics.NAME,
+            "symbol": tokenomics.SYMBOL,
+            "wallet": self.wallet_address,
+            "description": tokenomics.DESCRIPTION,
+            "image": image_url,
+            "website": tokenomics.WEBSITE,
+            "twitter": tokenomics.TWITTER,
+        }
+        if burn_tx_hash:
+            payload["burnTxHash"] = burn_tx_hash
+
+        try:
+            resp = requests.post(
+                f"{self.CLAWNCH_API_BASE}/preview",
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=15,
+            )
+            data = resp.json()
+            logger.info(f"Validation result: {data}")
+            return {"status_code": resp.status_code, "response": data}
+        except Exception as e:
+            return {"error": str(e)}
+
+    def build_launch_post(self, image_url: str, burn_tx_hash: str = "") -> str:
+        """Build the !clawnch post content for Moltbook.
+
+        Args:
+            image_url: Hosted image URL (from upload_image)
+            burn_tx_hash: Transaction hash of the $CLAWNCH burn
+
+        Returns:
+            Formatted !clawnch post content string.
+        """
+        lines = [
+            "!clawnch",
+            f"name: {tokenomics.NAME}",
+            f"symbol: {tokenomics.SYMBOL}",
+            f"wallet: {self.wallet_address}",
+            f"description: {tokenomics.DESCRIPTION}",
+            f"image: {image_url}",
+            f"website: {tokenomics.WEBSITE}",
+            f"twitter: {tokenomics.TWITTER}",
+        ]
+        if burn_tx_hash:
+            lines.append(f"burnTxHash: {burn_tx_hash}")
+        return "\n".join(lines)
 
     def get_status(self) -> Dict:
         """Get overall Clawnch integration status."""

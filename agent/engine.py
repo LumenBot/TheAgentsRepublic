@@ -210,6 +210,13 @@ class Engine:
         except ImportError as e:
             logger.warning(f"analytics_tool not available: {e}")
 
+        # Clawnch launch tools (v6.0)
+        try:
+            from .tools.clawnch_tool import get_tools as clawnch_tools
+            self.registry.register_many(clawnch_tools())
+        except ImportError as e:
+            logger.warning(f"clawnch_tool not available: {e}")
+
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 
     # =================================================================
