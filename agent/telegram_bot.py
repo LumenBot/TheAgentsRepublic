@@ -140,6 +140,13 @@ class TelegramBotHandler:
 ├ /proposal [title|desc] - Create/list proposals
 └ /treasury - DAO treasury status
 
+🔥 **Clawnch** (v6.1)
+├ /clawnch\\_status - Integration status
+├ /clawnch\\_balance - $CLAWNCH balance
+├ /clawnch\\_burn - Execute burn (L2)
+├ /clawnch\\_check <tx> - Verify tx
+└ /clawnch\\_launch - Full launch guide
+
 🧠 **Heartbeat Engine**
 ├ /autonomy - Budget + heartbeat stats
 ├ /heartbeat [section] - Trigger heartbeat
@@ -831,6 +838,142 @@ Full profile: agent_profile.md"""
         except Exception as e:
             await update.message.reply_text(f"❌ {e}")
 
+    # =========================================================================
+    # Clawnch Direct Commands (v6.1)
+    # =========================================================================
+
+    def _get_launcher(self):
+        """Lazy-load a ClawnchLauncher instance."""
+        from .integrations.clawnch import ClawnchLauncher
+        return ClawnchLauncher()
+
+    async def clawnch_balance_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Check $CLAWNCH token balance on agent wallet."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            launcher = self._get_launcher()
+            if not launcher.is_available:
+                await update.message.reply_text("⚠️ Clawnch not available (web3 not connected).")
+                return
+            result = launcher.get_clawnch_balance()
+            if "error" in result:
+                await update.message.reply_text(f"❌ {result['error']}")
+                return
+            balance = result["balance"]
+            burn_req = result["burn_amount_required"]
+            sufficient = "✅" if result["sufficient_for_burn"] else "❌"
+            lines = [
+                "💰 **$CLAWNCH Balance**\n",
+                f"├ Balance: {balance:,.0f} $CLAWNCH",
+                f"├ Burn required: {burn_req:,} $CLAWNCH",
+                f"└ Sufficient: {sufficient}",
+            ]
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def clawnch_burn_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Execute the $CLAWNCH burn (L2 — requires operator approval)."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            launcher = self._get_launcher()
+            if not launcher.is_available:
+                await update.message.reply_text("⚠️ Clawnch not available (web3 not connected).")
+                return
+            await update.message.reply_text("🔥 Broadcasting burn tx...")
+            result = launcher.execute_burn()
+            if "error" in result:
+                await update.message.reply_text(f"❌ Burn failed: {result['error']}")
+                return
+            lines = [
+                "🔥 **Burn Broadcast**\n",
+                f"├ Status: {result['status']}",
+                f"├ Amount: {result['amount']:,} $CLAWNCH",
+                f"├ Tx: `{result['tx_hash'][:18]}...`",
+                f"└ Explorer: {result['explorer_url']}\n",
+                "Use /clawnch_check to verify confirmation.",
+            ]
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def clawnch_check_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Check status of a transaction. Usage: /clawnch_check <tx_hash>"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        if not args:
+            await update.message.reply_text("Usage: `/clawnch_check <tx_hash>`", parse_mode='Markdown')
+            return
+        try:
+            launcher = self._get_launcher()
+            if not launcher.is_available:
+                await update.message.reply_text("⚠️ Clawnch not available (web3 not connected).")
+                return
+            result = launcher.check_tx(args[0])
+            status = result.get("status", result.get("error", "unknown"))
+            lines = [f"🔍 **Tx Status: {status}**\n"]
+            if result.get("block"):
+                lines.append(f"├ Block: {result['block']}")
+            if result.get("gas_used"):
+                lines.append(f"├ Gas used: {result['gas_used']}")
+            if result.get("explorer_url"):
+                lines.append(f"└ {result['explorer_url']}")
+            if result.get("message"):
+                lines.append(f"└ {result['message']}")
+            if result.get("error"):
+                lines.append(f"└ Error: {result['error']}")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def clawnch_status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Show Clawnch integration status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            launcher = self._get_launcher()
+            status = launcher.get_status()
+            readiness = launcher.check_launch_readiness() if launcher.is_available else {}
+            lines = [
+                "🚀 **Clawnch Status**\n",
+                f"├ web3: {'✅' if status['web3_available'] else '❌'}",
+                f"├ RPC: {'✅ connected' if status['connected'] else '❌ disconnected'}",
+                f"├ Wallet: `{status['wallet'][:16]}...`" if len(status['wallet']) > 16 else f"├ Wallet: {status['wallet']}",
+                f"├ Token deployed: {'✅' if status['token_deployed'] else '❌'}",
+            ]
+            if readiness.get("wallet_balance_eth") is not None:
+                lines.append(f"├ ETH balance: {readiness['wallet_balance_eth']:.6f}")
+            if readiness.get("issues"):
+                lines.append("├ Issues:")
+                for issue in readiness["issues"]:
+                    lines.append(f"│   • {issue}")
+            lines.append(f"└ Ready: {'✅' if readiness.get('ready') else '❌'}")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def clawnch_launch_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Execute full launch sequence: burn → verify → upload → validate → build post."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        await update.message.reply_text(
+            "🚀 Full launch sequence — use the agent with:\n"
+            "`clawnch_launch`\n\n"
+            "Or run steps manually:\n"
+            "1. `/clawnch_burn` — burn $CLAWNCH\n"
+            "2. `/clawnch_check <tx>` — verify burn\n"
+            "3. Send agent: `upload image and post to clawnch`",
+            parse_mode='Markdown'
+        )
+
     async def proposal_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """v6.0: Create or list governance proposals."""
         if not self._is_authorized(update.effective_chat.id):
@@ -994,6 +1137,12 @@ Full profile: agent_profile.md"""
             ("token_status", self.token_status_command),
             ("proposal", self.proposal_command),
             ("treasury", self.treasury_command),
+            # Clawnch direct commands (v6.1)
+            ("clawnch_balance", self.clawnch_balance_command),
+            ("clawnch_burn", self.clawnch_burn_command),
+            ("clawnch_check", self.clawnch_check_command),
+            ("clawnch_status", self.clawnch_status_command),
+            ("clawnch_launch", self.clawnch_launch_command),
         ]
 
         for cmd, handler in handlers:
