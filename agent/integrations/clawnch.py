@@ -20,6 +20,7 @@ Requires:
 
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -96,7 +97,7 @@ class ClawnchLauncher:
                 balance_wei = self.w3.eth.get_balance(self.wallet_address)
                 balance_eth = self.w3.from_wei(balance_wei, "ether")
                 checks["wallet_balance_eth"] = float(balance_eth)
-                checks["sufficient_gas"] = float(balance_eth) > 0.01
+                checks["sufficient_gas"] = float(balance_eth) > 0.0005  # ERC-20 transfer on Base ~$0.01
             except Exception as e:
                 checks["wallet_balance_error"] = str(e)
                 checks["sufficient_gas"] = False
@@ -178,7 +179,7 @@ class ClawnchLauncher:
 
         try:
             gas_price = self.w3.eth.gas_price
-            estimated_gas = 500_000  # Conservative estimate for token deployment
+            estimated_gas = 65_000  # ERC-20 transfer on Base
             gas_cost_wei = gas_price * estimated_gas
             gas_cost_eth = float(self.w3.from_wei(gas_cost_wei, "ether"))
 
@@ -186,8 +187,8 @@ class ClawnchLauncher:
                 "gas_price_gwei": float(self.w3.from_wei(gas_price, "gwei")),
                 "estimated_gas_units": estimated_gas,
                 "gas_cost_eth": gas_cost_eth,
-                "clawnch_burn": "5,000,000 $CLAWNCH",
-                "total_eth_needed": gas_cost_eth + 0.001,  # Small buffer
+                "clawnch_burn": f"{tokenomics.CLAWNCH_BURN_AMOUNT:,} $CLAWNCH",
+                "total_eth_needed": gas_cost_eth + 0.0005,
             }
         except Exception as e:
             return {"error": str(e)}
@@ -266,11 +267,44 @@ class ClawnchLauncher:
         except Exception as e:
             return {"error": str(e)}
 
+    def check_tx(self, tx_hash: str) -> Dict:
+        """Check the status of a previously sent transaction.
+
+        Use this to verify a tx after a timeout or to confirm a burn.
+        """
+        if not self.is_available:
+            return {"error": "Web3 not connected"}
+        try:
+            tx = self.w3.eth.get_transaction(tx_hash)
+            if tx is None:
+                return {"status": "not_found", "tx_hash": tx_hash,
+                        "message": "Transaction not found on-chain. It was never broadcast or was dropped."}
+
+            # Transaction exists — check for receipt
+            try:
+                receipt = self.w3.eth.get_transaction_receipt(tx_hash)
+                if receipt is None:
+                    return {"status": "pending", "tx_hash": tx_hash,
+                            "message": "Transaction found but not yet confirmed (pending)."}
+                return {
+                    "status": "confirmed" if receipt.status == 1 else "reverted",
+                    "tx_hash": tx_hash,
+                    "block": receipt.blockNumber,
+                    "gas_used": receipt.gasUsed,
+                    "explorer_url": f"https://basescan.org/tx/{tx_hash}",
+                }
+            except Exception:
+                return {"status": "pending", "tx_hash": tx_hash,
+                        "message": "Transaction exists but receipt not available yet."}
+        except Exception as e:
+            return {"error": str(e), "tx_hash": tx_hash}
+
     def execute_burn(self) -> Dict:
         """Burn $CLAWNCH tokens by transferring to dead address.
 
         Sends tokenomics.CLAWNCH_BURN_AMOUNT tokens to 0x...dEaD.
         Returns the transaction hash on success.
+        On timeout, still returns the tx_hash so it can be checked later.
         """
         if not self.is_available:
             return {"error": "Web3 not connected"}
@@ -295,12 +329,15 @@ class ClawnchLauncher:
                 abi=self._ERC20_ABI,
             )
 
+            # Use 'pending' nonce to handle any stuck txs
+            nonce = self.w3.eth.get_transaction_count(self.account.address, "pending")
+
             tx = contract.functions.transfer(
                 Web3.to_checksum_address(self.BURN_ADDRESS),
                 burn_amount_wei,
             ).build_transaction({
                 "from": self.account.address,
-                "nonce": self.w3.eth.get_transaction_count(self.account.address),
+                "nonce": nonce,
                 "gasPrice": self.w3.eth.gas_price,
                 "chainId": 8453,  # Base mainnet
             })
@@ -309,24 +346,53 @@ class ClawnchLauncher:
             gas_estimate = self.w3.eth.estimate_gas(tx)
             tx["gas"] = int(gas_estimate * 1.3)
 
+            logger.info(f"Burn tx: nonce={nonce}, gas={tx['gas']}, "
+                        f"gasPrice={tx['gasPrice']}, amount={burn_amount}")
+
             # Sign and send
-            signed = self.w3.eth.account.sign_transaction(
-                tx, os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
-            )
+            private_key = os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
+            signed = self.w3.eth.account.sign_transaction(tx, private_key)
             tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
-            tx_hash_hex = tx_hash.hex()
+            tx_hash_hex = "0x" + tx_hash.hex() if not tx_hash.hex().startswith("0x") else tx_hash.hex()
 
-            logger.info(f"Burn tx sent: {tx_hash_hex}")
+            logger.info(f"Burn tx broadcast: {tx_hash_hex}")
 
-            # Wait for receipt
-            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+            # Wait for receipt with retry
+            receipt = None
+            for attempt in range(3):
+                try:
+                    receipt = self.w3.eth.wait_for_transaction_receipt(
+                        tx_hash, timeout=30
+                    )
+                    break
+                except Exception as wait_err:
+                    logger.warning(f"Receipt wait attempt {attempt + 1}/3 failed: {wait_err}")
+                    if attempt < 2:
+                        time.sleep(5)
+
+            if receipt is None:
+                # Tx was broadcast but we can't confirm — return hash for manual check
+                logger.warning(f"Burn tx broadcast but receipt not confirmed: {tx_hash_hex}")
+                return {
+                    "status": "broadcast_unconfirmed",
+                    "tx_hash": tx_hash_hex,
+                    "message": (
+                        "Transaction was broadcast but receipt could not be confirmed. "
+                        "Check basescan or use clawnch_check_tx to verify. "
+                        "DO NOT retry burn without checking first — tokens may already be burned."
+                    ),
+                    "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
+                }
 
             if receipt.status == 1:
-                logger.info(f"Burn successful: {burn_amount} $CLAWNCH burned")
+                logger.info(f"Burn confirmed in block {receipt.blockNumber}: "
+                            f"{burn_amount} $CLAWNCH burned")
                 return {
                     "success": True,
                     "tx_hash": tx_hash_hex,
                     "amount_burned": burn_amount,
+                    "block": receipt.blockNumber,
+                    "gas_used": receipt.gasUsed,
                     "explorer_url": f"https://basescan.org/tx/{tx_hash_hex}",
                 }
             else:

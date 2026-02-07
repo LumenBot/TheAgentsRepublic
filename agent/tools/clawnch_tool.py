@@ -11,6 +11,7 @@ Tools:
 - clawnch_upload_image: Upload token image to Clawnch hosting
 - clawnch_validate: Validate launch content via preview API
 - clawnch_build_post: Build the !clawnch post content
+- clawnch_check_tx: Check status of a previously sent transaction
 - clawnch_launch: Full launch sequence (burn + upload + validate + post)
 """
 
@@ -55,6 +56,12 @@ def _clawnch_balance() -> str:
     return json.dumps(result, indent=2, default=str)
 
 
+def _clawnch_check_tx(tx_hash: str) -> str:
+    launcher = _get_launcher()
+    result = launcher.check_tx(tx_hash)
+    return json.dumps(result, indent=2, default=str)
+
+
 def _clawnch_burn() -> str:
     launcher = _get_launcher()
     result = launcher.execute_burn()
@@ -89,6 +96,10 @@ def _clawnch_launch() -> str:
     steps.append(json.dumps(burn_result, indent=2, default=str))
     if "error" in burn_result:
         steps.append("LAUNCH ABORTED: Burn failed")
+        return "\n".join(steps)
+    if burn_result.get("status") == "broadcast_unconfirmed":
+        steps.append("LAUNCH PAUSED: Burn broadcast but unconfirmed.")
+        steps.append("Use clawnch_check_tx to verify before continuing.")
         return "\n".join(steps)
     burn_tx_hash = burn_result["tx_hash"]
 
@@ -152,6 +163,15 @@ def get_tools() -> List[Tool]:
             category="token",
             params=[],
             handler=_clawnch_balance,
+        ),
+        Tool(
+            name="clawnch_check_tx",
+            description="Check status of a transaction on Base (confirmed, pending, not_found). Use to verify burn.",
+            category="token",
+            params=[
+                ToolParam("tx_hash", "string", "Transaction hash (0x...)"),
+            ],
+            handler=_clawnch_check_tx,
         ),
         Tool(
             name="clawnch_burn",
