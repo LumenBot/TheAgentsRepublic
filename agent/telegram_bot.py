@@ -147,6 +147,13 @@ class TelegramBotHandler:
 ├ /clawnch\\_check <tx> - Verify tx
 └ /clawnch\\_launch <tx> - Launch with burn tx
 
+🧠 **CLAWS Memory** (v6.2)
+├ /claws\\_status - Memory connection status
+├ /claws\\_recall <query> - Search memories
+├ /claws\\_recent [n] - Recent memories
+├ /claws\\_remember <text> - Store a memory
+└ /claws\\_seed - Seed $REPUBLIC token data
+
 🧠 **Heartbeat Engine**
 ├ /autonomy - Budget + heartbeat stats
 ├ /heartbeat [section] - Trigger heartbeat
@@ -1054,6 +1061,140 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     # =========================================================================
+    # CLAWS Memory Commands (v6.2)
+    # =========================================================================
+
+    def _get_claws(self):
+        """Lazy-load a ClawsMemory instance."""
+        from .integrations.claws_memory import ClawsMemory
+        return ClawsMemory()
+
+    async def claws_status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Check CLAWS memory integration status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            claws = self._get_claws()
+            status = claws.get_status()
+            connected = "✅" if status.get("connected") else "❌"
+            stats = status.get("stats") or {}
+            total = stats.get("totalMemories", stats.get("total", "?"))
+            lines = [
+                "🧠 **CLAWS Memory Status**\n",
+                f"├ Connected: {connected}",
+                f"├ Agent ID: {status.get('agent_id', '?')}",
+                f"├ API Key: {'✅ set' if status.get('api_key_set') else '⚠️ not set'}",
+                f"├ Memories: {total}",
+            ]
+            if status.get("last_error"):
+                lines.append(f"└ Last error: {status['last_error']}")
+            else:
+                lines.append(f"└ Status: OK")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def claws_recall_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Search CLAWS memories. Usage: /claws_recall <query>"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        if not args:
+            await update.message.reply_text("Usage: `/claws_recall <query>`", parse_mode='Markdown')
+            return
+        try:
+            claws = self._get_claws()
+            query = " ".join(args)
+            result = claws.recall(query=query, limit=5)
+            if "error" in result:
+                await update.message.reply_text(f"❌ {result['error']}")
+                return
+            memories = result.get("memories", result.get("results", []))
+            if not memories:
+                await update.message.reply_text(f"No memories found for '{query}'")
+                return
+            lines = [f"🔍 **Recall: {query}**\n"]
+            for mem in memories[:5]:
+                if not isinstance(mem, dict):
+                    continue
+                content = mem.get("content", "")[:150]
+                score = mem.get("score", mem.get("relevance", 0))
+                mem_tags = mem.get("tags", [])
+                tag_str = f" `[{', '.join(mem_tags[:3])}]`" if mem_tags else ""
+                lines.append(f"• ({score:.2f}){tag_str} {content}")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def claws_recent_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Get recent CLAWS memories. Usage: /claws_recent [limit]"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            claws = self._get_claws()
+            limit = int(context.args[0]) if context.args else 5
+            result = claws.recent(limit=limit)
+            if "error" in result:
+                await update.message.reply_text(f"❌ {result['error']}")
+                return
+            memories = result.get("memories", result.get("results", []))
+            if not memories:
+                await update.message.reply_text("No recent memories")
+                return
+            lines = [f"🕐 **Recent Memories ({len(memories)})**\n"]
+            for mem in memories:
+                if not isinstance(mem, dict):
+                    continue
+                content = mem.get("content", "")[:150]
+                ts = mem.get("timestamp", mem.get("createdAt", ""))[:16]
+                lines.append(f"• [{ts}] {content}")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def claws_remember_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Store a memory. Usage: /claws_remember <content>"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        if not args:
+            await update.message.reply_text("Usage: `/claws_remember <content>`", parse_mode='Markdown')
+            return
+        try:
+            claws = self._get_claws()
+            content = " ".join(args)
+            result = claws.remember(content=content, tags=["telegram", "manual"])
+            if "error" in result:
+                await update.message.reply_text(f"❌ {result['error']}")
+                return
+            mem_id = result.get("id", result.get("memoryId", "?"))
+            await update.message.reply_text(f"✅ Memory stored (id={mem_id})")
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def claws_seed_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Seed CLAWS with $REPUBLIC token data."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            claws = self._get_claws()
+            await update.message.reply_text("🌱 Seeding $REPUBLIC token data...")
+            results = claws.seed_republic_token_data()
+            ok = sum(1 for r in results if "error" not in r)
+            fail = len(results) - ok
+            msg = f"✅ Seeded {ok} token memories"
+            if fail:
+                msg += f" ({fail} errors)"
+            await update.message.reply_text(msg)
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    # =========================================================================
     # Chat Handler
     # =========================================================================
 
@@ -1159,6 +1300,12 @@ Full profile: agent_profile.md"""
             ("clawnch_check", self.clawnch_check_command),
             ("clawnch_status", self.clawnch_status_command),
             ("clawnch_launch", self.clawnch_launch_command),
+            # CLAWS memory commands (v6.2)
+            ("claws_status", self.claws_status_command),
+            ("claws_recall", self.claws_recall_command),
+            ("claws_recent", self.claws_recent_command),
+            ("claws_remember", self.claws_remember_command),
+            ("claws_seed", self.claws_seed_command),
         ]
 
         for cmd, handler in handlers:

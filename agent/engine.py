@@ -217,6 +217,13 @@ class Engine:
         except ImportError as e:
             logger.warning(f"clawnch_tool not available: {e}")
 
+        # CLAWS memory tools (v6.2)
+        try:
+            from .tools.claws_tool import get_tools as claws_tools
+            self.registry.register_many(claws_tools())
+        except ImportError as e:
+            logger.warning(f"claws_tool not available: {e}")
+
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 
     # =================================================================
@@ -237,11 +244,26 @@ class Engine:
         # 2. Tools summary
         parts.append("\n" + self.registry.get_tools_summary())
 
-        # 3. Current context
+        # 3. Current context (local memory)
         try:
             knowledge = self.memory.get_full_context()
             if knowledge:
                 parts.append(f"\nCurrent knowledge (from memory):\n{knowledge[:2000]}")
+        except Exception:
+            pass
+
+        # 3b. CLAWS persistent memory context
+        try:
+            from .integrations.claws_memory import ClawsMemory
+            claws = ClawsMemory()
+            recent = claws.recent(limit=5)
+            memories = recent.get("memories", recent.get("results", []))
+            if memories:
+                mem_lines = ["Recent CLAWS memories:"]
+                for m in memories:
+                    if isinstance(m, dict):
+                        mem_lines.append(f"- {m.get('content', '')[:150]}")
+                parts.append("\n".join(mem_lines))
         except Exception:
             pass
 
