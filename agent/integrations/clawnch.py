@@ -149,7 +149,12 @@ class ClawnchLauncher:
         return checks
 
     def get_token_metadata(self) -> Dict:
-        """Return token metadata for Clawnch deployment."""
+        """Return token metadata for Clawnch deployment.
+
+        Maps to Clawnch !clawnch post fields:
+          Required: name, symbol, wallet, description, image
+          Optional: website, twitter, burnTxHash
+        """
         image_exists = Path(tokenomics.IMAGE_PATH).exists()
         return {
             "name": tokenomics.NAME,
@@ -160,6 +165,8 @@ class ClawnchLauncher:
             "image_url": tokenomics.IMAGE_URL,
             "image_path": tokenomics.IMAGE_PATH,
             "image_exists_locally": image_exists,
+            "website": tokenomics.WEBSITE,
+            "twitter": tokenomics.TWITTER,
         }
 
     def estimate_costs(self) -> Dict:

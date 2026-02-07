@@ -31,6 +31,8 @@ class RepublicTokenomics:
         "https://raw.githubusercontent.com/LumenBot/TheAgentsRepublic"
         "/main/assets/republic-token.png"
     )
+    WEBSITE: str = "https://github.com/LumenBot/TheAgentsRepublic"
+    TWITTER: str = "https://x.com/XTheConstituent"
 
     # Clawnch Launch Parameters
     CLAWNCH_BURN_AMOUNT: int = 5_000_000       # 5M $CLAWNCH to burn
