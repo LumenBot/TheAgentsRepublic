@@ -42,7 +42,7 @@ class Engine:
     5. Engine dispatches, returns results, Claude continues
     """
 
-    VERSION = "5.1.0"
+    VERSION = "5.3.0"
 
     def __init__(
         self,
@@ -266,7 +266,7 @@ class Engine:
 
         # Check budget limits before making any API call
         if not self._check_budget():
-            return "(budget limit reached — skipping API call)"
+            return self._budget_limit_message()
 
         effective_max_rounds = max_tool_rounds or self._max_tool_rounds
         chat_start = time.time()
@@ -347,8 +347,20 @@ class Engine:
 
             messages.append({"role": "user", "content": tool_results})
         else:
-            # Max rounds reached
-            final_text = "\n".join(text_parts) if text_parts else "(max tool rounds reached)"
+            # Max rounds reached — generate a summary of what was accomplished
+            if text_parts:
+                final_text = "\n".join(text_parts)
+            elif tool_calls_made:
+                # Build a readable summary from tool calls
+                summary_parts = [f"⚠ Reached {effective_max_rounds}-round limit. Work done:"]
+                for tc in tool_calls_made:
+                    status = tc["result"].get("status", "?")
+                    icon = "✅" if status == "ok" else "❌"
+                    summary_parts.append(f"  {icon} {tc['tool']}")
+                summary_parts.append("Next heartbeat will continue.")
+                final_text = "\n".join(summary_parts)
+            else:
+                final_text = f"⚠ Reached {effective_max_rounds}-round limit with no output. Will retry next heartbeat."
 
         duration = time.time() - chat_start
         logger.info(f"Chat completed: {round_num+1} rounds, {len(tool_calls_made)} tools, {duration:.1f}s")
@@ -397,6 +409,24 @@ class Engine:
 
         return True
 
+    def _budget_limit_message(self) -> str:
+        """Return an informative message when budget is exhausted."""
+        reset_min = self._time_until_hour_reset()
+        hour_used = self._api_calls_this_hour
+        day_used = self._api_calls_today
+
+        if day_used >= self._max_api_calls_per_day:
+            return (f"⏸ Budget paused — daily limit reached ({day_used}/{self._max_api_calls_per_day} calls). "
+                    f"Resets in {max(0, int((self._day_reset_at - time.time()) / 60))} min. "
+                    f"Use /status to check, /heartbeat to force-run after reset.")
+
+        return (f"⏸ Budget paused — hourly limit reached ({hour_used}/{self._max_api_calls_per_hour} calls). "
+                f"Resets in {reset_min} min. Agent will auto-resume.")
+
+    def _time_until_hour_reset(self) -> int:
+        """Minutes until hourly budget resets."""
+        return max(0, int((self._hour_reset_at - time.time()) / 60))
+
     def _record_api_call(self):
         """Record that an API call was made."""
         self._api_calls_this_hour += 1
@@ -411,7 +441,7 @@ class Engine:
             "max_per_hour": self._max_api_calls_per_hour,
             "api_calls_today": self._api_calls_today,
             "max_per_day": self._max_api_calls_per_day,
-            "hour_resets_in": max(0, int(self._hour_reset_at - time.time())),
+            "hour_resets_in_min": self._time_until_hour_reset(),
             "day_resets_in": max(0, int(self._day_reset_at - time.time())),
         }
 
@@ -422,7 +452,7 @@ class Engine:
     def think(self, prompt: str, max_tokens: int = 2000) -> str:
         """Simple Claude call without tool use. For internal agent reasoning."""
         if not self._check_budget():
-            return "(budget limit reached — skipping think() call)"
+            return self._budget_limit_message()
         try:
             response = self.claude.messages.create(
                 model=self.model,
@@ -456,7 +486,7 @@ class Engine:
         """
         # Budget check before starting
         if not self._check_budget():
-            return {"status": "skipped", "reason": "budget limit reached",
+            return {"status": "skipped", "reason": self._budget_limit_message(),
                     "budget": self.get_budget_status()}
 
         heartbeat_path = self.workspace_dir / "HEARTBEAT.md"
@@ -472,24 +502,27 @@ class Engine:
         ):
             return {"status": "skipped", "reason": "empty heartbeat"}
 
-        # Build heartbeat prompt — focused and concise, enforces builder mode
+        # Build heartbeat prompt — focused, concise, enforces builder mode
+        budget = self.get_budget_status()
         constraints = (
             f"CONSTRAINTS (non-negotiable):\n"
-            f"- ONE action only. Call tools, get result, report in <50 words.\n"
-            f"- Max {self._max_tool_rounds} tool calls, {self._max_heartbeat_duration}s time limit.\n"
-            f"- NO philosophy. NO explanations. Just: Action → Result → Next.\n"
+            f"- Complete ONE task FULLY. Use all {self._max_tool_rounds} tool rounds if needed.\n"
+            f"- Report result in <50 words: Action → Result → Next.\n"
+            f"- NO philosophy. NO planning. NO explanations. Just DO.\n"
             f"- If nothing to do, reply HEARTBEAT_OK (nothing else).\n"
             f"- Priority: Constitution > Engagement > Research\n"
+            f"- Budget: {budget['api_calls_this_hour']}/{budget['max_per_hour']} calls/hr, "
+            f"{budget['api_calls_today']}/{budget['max_per_day']} calls/day\n"
         )
 
         if section:
             prompt = (
-                f"Execute ONE action for '{section}':\n\n"
+                f"Complete ONE task for '{section}':\n\n"
                 f"{content}\n\n{constraints}"
             )
         else:
             prompt = (
-                f"Execute ONE due task from HEARTBEAT.md:\n\n"
+                f"Complete ONE due task from HEARTBEAT.md:\n\n"
                 f"{content}\n\n{constraints}"
             )
 

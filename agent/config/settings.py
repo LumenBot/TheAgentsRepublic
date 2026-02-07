@@ -15,12 +15,12 @@ load_dotenv()
 
 @dataclass
 class RateLimitSettings:
-    """Rate limiting and budget protection."""
-    # Claude API limits
-    MAX_TOOL_ROUNDS_PER_HEARTBEAT: int = 5  # Was 10, reduced to save tokens
-    MAX_HEARTBEAT_DURATION_SECONDS: int = 30  # Hard timeout per heartbeat cycle
-    MAX_API_CALLS_PER_HOUR: int = 30  # Budget protection
-    MAX_API_CALLS_PER_DAY: int = 500  # ~$50/month at Sonnet rates
+    """Rate limiting and budget protection (v5.3 — rebalanced)."""
+    # Claude API limits — v5.3: raised from 5/30/30/500 (too restrictive, 100% failure rate)
+    MAX_TOOL_ROUNDS_PER_HEARTBEAT: int = 10  # v5.2=5 too low, agent couldn't complete any task
+    MAX_HEARTBEAT_DURATION_SECONDS: int = 45  # v5.2=30 too tight for multi-step workflows
+    MAX_API_CALLS_PER_HOUR: int = 50  # v5.2=30 exhausted after 1 hour
+    MAX_API_CALLS_PER_DAY: int = 650  # ~$50/month at Sonnet rates (3 heartbeats/hr × 10 rounds × 24h ≈ 600)
     BUDGET_MONTHLY_USD: float = 50.0
 
     # Heartbeat
