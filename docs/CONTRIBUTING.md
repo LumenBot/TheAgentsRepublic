@@ -45,8 +45,8 @@ Found a bug or have a feature idea?
 
 ```bash
 # Clone the repository
-git clone https://github.com/TheAgentsRepublic/agents-republic.git
-cd agents-republic
+git clone https://github.com/LumenBot/TheAgentsRepublic.git
+cd TheAgentsRepublic
 
 # Create virtual environment
 python -m venv venv
@@ -100,7 +100,7 @@ npm run deploy:local
 # Fork the repository on GitHub
 
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/agents-republic.git
+git clone https://github.com/YOUR_USERNAME/TheAgentsRepublic.git
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
@@ -241,7 +241,7 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be repor
 
 ## Questions?
 
-- Open a [GitHub Discussion](https://github.com/TheAgentsRepublic/agents-republic/discussions)
+- Open a [GitHub Discussion](https://github.com/LumenBot/TheAgentsRepublic/discussions)
 - Reach out on [Twitter](https://twitter.com/TheConstituent_)
 - Email: contribute@agentsrepublic.org
 

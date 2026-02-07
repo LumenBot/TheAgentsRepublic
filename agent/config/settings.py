@@ -1,7 +1,9 @@
 """
-The Constituent Agent v5.0 — Configuration
+The Constituent Agent v6.0 — Configuration
 =============================================
 All settings from environment variables.
+
+v6.0: Full throttle mode — token economy funds operations.
 """
 
 import os
@@ -15,23 +17,27 @@ load_dotenv()
 
 @dataclass
 class RateLimitSettings:
-    """Rate limiting and budget protection (v5.3 — rebalanced)."""
-    # Claude API limits — v5.3: raised from 5/30/30/500 (too restrictive, 100% failure rate)
-    MAX_TOOL_ROUNDS_PER_HEARTBEAT: int = 10  # v5.2=5 too low, agent couldn't complete any task
-    MAX_HEARTBEAT_DURATION_SECONDS: int = 45  # v5.2=30 too tight for multi-step workflows
-    MAX_API_CALLS_PER_HOUR: int = 50  # v5.2=30 exhausted after 1 hour
-    MAX_API_CALLS_PER_DAY: int = 650  # ~$50/month at Sonnet rates (3 heartbeats/hr × 10 rounds × 24h ≈ 600)
-    BUDGET_MONTHLY_USD: float = 50.0
+    """v6.0: Full throttle mode — token economy funds operations."""
+    # Claude API limits — v6.0: aggressive limits, funded by $REPUBLIC treasury
+    MAX_TOOL_ROUNDS_PER_HEARTBEAT: int = 25   # v5.3=10, now full workflows
+    MAX_HEARTBEAT_DURATION_SECONDS: int = 120  # v5.3=45, now 2 minutes
+    MAX_API_CALLS_PER_HOUR: int = 200          # v5.3=50, now full capacity
+    MAX_API_CALLS_PER_DAY: int = 3000          # v5.3=650, now ~$9/day ($270/month)
+    BUDGET_MONTHLY_USD: float = 300.0          # Funded by token treasury
+
+    # Budget monitoring (warning only, not blocking in v6.0)
+    BUDGET_WARNING_THRESHOLD_DAILY: int = 2500
+    BUDGET_ALERT_THRESHOLD_DAILY: int = 2800
 
     # Heartbeat
-    HEARTBEAT_INTERVAL: int = 1200  # 20 min instead of 10 min
-    QUIET_HOURS_START: int = 23  # UTC
-    QUIET_HOURS_END: int = 7    # UTC
+    HEARTBEAT_INTERVAL: int = 600   # 10 min (was 20 min) — more responsive
+    QUIET_HOURS_START: int = 2      # UTC — reduced quiet window
+    QUIET_HOURS_END: int = 6        # UTC
 
     # Twitter
     TWITTER_ENABLED: bool = True
-    TWITTER_REQUIRE_WRITE_ACCESS: bool = False  # Don't crash if no write access
-    TWITTER_FALLBACK_ON_ERROR: str = "disable"  # "disable" or "queue"
+    TWITTER_REQUIRE_WRITE_ACCESS: bool = False
+    TWITTER_FALLBACK_ON_ERROR: str = "disable"
 
 
 @dataclass
@@ -39,11 +45,11 @@ class AgentSettings:
     """Core agent behavior configuration."""
     BOT_NAME: str = "The Constituent"
     BOT_HANDLE_X: str = "@TheConstituent_"
-    POSTS_PER_DAY_MAX: int = 7
-    REPLIES_PER_DAY_MAX: int = 30
-    ACTIVE_HOURS_START: int = 7   # UTC
-    ACTIVE_HOURS_END: int = 23    # UTC
-    HEARTBEAT_INTERVAL: int = 1200  # seconds (20 min, was 600)
+    POSTS_PER_DAY_MAX: int = 15     # v5.3=7, increased for full throttle
+    REPLIES_PER_DAY_MAX: int = 50   # v5.3=30, increased
+    ACTIVE_HOURS_START: int = 6     # UTC
+    ACTIVE_HOURS_END: int = 2       # UTC (next day — nearly 24/7)
+    HEARTBEAT_INTERVAL: int = 600   # seconds (10 min)
 
     CORE_VALUES: List[str] = field(default_factory=lambda: [
         "Non-presumption of consciousness",
@@ -80,8 +86,16 @@ class APISettings:
     TWITTER_ACCESS_SECRET: str = field(default_factory=lambda: os.getenv("TWITTER_ACCESS_SECRET", ""))
     TWITTER_BEARER_TOKEN: str = field(default_factory=lambda: os.getenv("TWITTER_BEARER_TOKEN", ""))
 
-    # Web Search (NEW v5.0)
+    # Web Search
     BRAVE_SEARCH_API_KEY: str = field(default_factory=lambda: os.getenv("BRAVE_SEARCH_API_KEY", ""))
+
+    # Web3 / Base L2 (v6.0)
+    BASE_RPC_URL: str = field(default_factory=lambda: os.getenv("BASE_RPC_URL", "https://mainnet.base.org"))
+    AGENT_WALLET_ADDRESS: str = field(default_factory=lambda: os.getenv("AGENT_WALLET_ADDRESS", ""))
+    AGENT_WALLET_PRIVATE_KEY: str = field(default_factory=lambda: os.getenv("AGENT_WALLET_PRIVATE_KEY", ""))
+    CLAWNCH_CONTRACT_ADDRESS: str = field(default_factory=lambda: os.getenv("CLAWNCH_CONTRACT_ADDRESS", ""))
+    REPUBLIC_TOKEN_ADDRESS: str = field(default_factory=lambda: os.getenv("REPUBLIC_TOKEN_ADDRESS", ""))
+    GOVERNANCE_CONTRACT_ADDRESS: str = field(default_factory=lambda: os.getenv("GOVERNANCE_CONTRACT_ADDRESS", ""))
 
 
 @dataclass

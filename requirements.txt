@@ -1,6 +1,5 @@
-# The Constituent Agent - Minimal Dependencies
-# ==============================================
-# Only what we actually use. Nothing more.
+# The Constituent Agent v6.0 - Dependencies
+# ============================================
 
 # Core: Claude API
 anthropic>=0.40.0
@@ -17,5 +16,9 @@ tweepy>=4.14.0
 # Environment variables
 python-dotenv>=1.0.0
 
-# Git automation
+# Git automation (optional — CLI fallback available in v5.3.1+)
 GitPython>=3.1.40
+
+# Web3 / Base L2 (v6.0 — token launch + governance)
+web3>=6.15.0
+eth-account>=0.11.0

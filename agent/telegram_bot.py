@@ -101,7 +101,7 @@ class TelegramBotHandler:
             await update.message.reply_text("Unauthorized.")
             return
 
-        help_text = """🤖 **The Constituent v5.2**
+        help_text = """🤖 **The Constituent v6.0**
 
 📋 **General**
 ├ /start - Welcome
@@ -132,6 +132,13 @@ class TelegramBotHandler:
 ├ /mfeed - Hot posts
 ├ /mpost <title> | <content> - Post
 └ /mregister - Register
+
+💎 **Token & DAO** (v6.0)
+├ /launch\\_token - Check launch readiness
+├ /confirm\\_launch - Deploy $REPUBLIC
+├ /token\\_status - Token metrics
+├ /proposal [title|desc] - Create/list proposals
+└ /treasury - DAO treasury status
 
 🧠 **Heartbeat Engine**
 ├ /autonomy - Budget + heartbeat stats
@@ -738,6 +745,156 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     # =========================================================================
+    # Token & Governance (v6.0)
+    # =========================================================================
+
+    async def launch_token_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v6.0: Check token launch readiness via Clawnch."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .integrations.clawnch import ClawnchLauncher
+            launcher = ClawnchLauncher()
+
+            if not launcher.is_available:
+                await update.message.reply_text(
+                    "⚠️ Clawnch not available.\n"
+                    "Install: `pip install web3 eth-account`\n"
+                    "Configure: BASE_RPC_URL, AGENT_WALLET_ADDRESS, AGENT_WALLET_PRIVATE_KEY",
+                    parse_mode='Markdown'
+                )
+                return
+
+            readiness = launcher.check_launch_readiness()
+            costs = launcher.estimate_costs()
+
+            if readiness.get("ready"):
+                lines = [
+                    "🚀 **$REPUBLIC TOKEN LAUNCH READY**\n",
+                    f"├ Wallet: `{launcher.wallet_address[:10]}...`",
+                    f"├ Balance: {readiness.get('wallet_balance_eth', '?')} ETH",
+                    f"├ Constitution: {readiness.get('constitution_articles', '?')} articles",
+                    f"├ Gas estimate: {costs.get('gas_cost_eth', '?')} ETH",
+                    f"├ Burn: {costs.get('clawnch_burn', '?')}",
+                    "└ Status: ✅ READY\n",
+                    "Reply `/confirm_launch` to deploy.",
+                ]
+            else:
+                issues = readiness.get("issues", ["Unknown"])
+                lines = [
+                    "❌ **Not ready to launch**\n",
+                    "Issues:",
+                ]
+                for issue in issues:
+                    lines.append(f"  • {issue}")
+
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def confirm_launch_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v6.0: Final confirmation to execute token launch."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        await update.message.reply_text(
+            "⚠️ Token launch execution requires manual deployment.\n\n"
+            "Use the deployment script:\n"
+            "`python scripts/deploy_token.py --network base`\n\n"
+            "After deployment, set REPUBLIC_TOKEN_ADDRESS in .env",
+            parse_mode='Markdown'
+        )
+
+    async def token_status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v6.0: Check $REPUBLIC token status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .integrations.clawnch import ClawnchLauncher
+            launcher = ClawnchLauncher()
+            status = launcher.get_token_status()
+
+            if status["status"] == "not_launched":
+                await update.message.reply_text("💎 $REPUBLIC not yet launched. Use /launch_token")
+            elif status["status"] == "launched":
+                lines = [
+                    "💎 **$REPUBLIC Token**\n",
+                    f"├ Address: `{status['token_address'][:16]}...`",
+                    f"├ Explorer: {status['explorer_url']}",
+                    f"└ Wallet: `{status.get('wallet', '?')[:16]}...`",
+                ]
+                await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+            else:
+                await update.message.reply_text(f"⚠️ {status.get('message', 'Unknown status')}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def proposal_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v6.0: Create or list governance proposals."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .governance.proposals import ProposalManager
+            pm = ProposalManager()
+
+            raw = update.message.text
+            parts = raw.split(maxsplit=1)
+            args_text = parts[1].strip() if len(parts) > 1 else ""
+
+            if not args_text or args_text == "list":
+                proposals = pm.list_proposals()
+                if not proposals:
+                    await update.message.reply_text("📋 No proposals yet. Use:\n`/proposal Title | Description`", parse_mode='Markdown')
+                    return
+                lines = ["📋 **Proposals**\n"]
+                for p in proposals[-10:]:
+                    icon = {"draft": "📝", "voting": "🗳️", "passed": "✅", "failed": "❌"}.get(p["status"], "❓")
+                    lines.append(f"{icon} #{p['id']} {p['title']} [{p['status']}]")
+                await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+            elif "|" in args_text:
+                title, description = args_text.split("|", 1)
+                result = pm.create_proposal(title.strip(), description.strip())
+                if result["status"] == "ok":
+                    p = result["proposal"]
+                    await update.message.reply_text(
+                        f"✅ Proposal #{p['id']} created: {p['title']}\n"
+                        f"Status: {p['status']}\n"
+                        f"Discussion ends: {p['discussion_ends'][:10]}"
+                    )
+                else:
+                    await update.message.reply_text(f"❌ {result['error']}")
+            else:
+                await update.message.reply_text("Usage: `/proposal Title | Description`", parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def treasury_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """v6.0: Check DAO treasury status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .governance.treasury import TreasuryManager
+            tm = TreasuryManager()
+            status = tm.get_status()
+            balances = status.get("balances", {})
+
+            lines = ["🏦 **DAO Treasury**\n"]
+            if balances:
+                for currency, amount in balances.items():
+                    lines.append(f"├ {currency}: {amount:,.2f}")
+            else:
+                lines.append("├ No transactions yet")
+            lines.append(f"└ Total txns: {status.get('total_transactions', 0)}")
+
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    # =========================================================================
     # Chat Handler
     # =========================================================================
 
@@ -831,6 +988,12 @@ Full profile: agent_profile.md"""
             # System
             ("improve", self.improve_command),
             ("execute", self.execute_command),
+            # Token & DAO (v6.0)
+            ("launch_token", self.launch_token_command),
+            ("confirm_launch", self.confirm_launch_command),
+            ("token_status", self.token_status_command),
+            ("proposal", self.proposal_command),
+            ("treasury", self.treasury_command),
         ]
 
         for cmd, handler in handlers:
