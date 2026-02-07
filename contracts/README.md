@@ -2,11 +2,11 @@
 
 ## Overview
 
-Three Solidity contracts implement the on-chain governance layer for The Agents Republic DAO on **Base L2** (Ethereum rollup).
+> **Important:** The $REPUBLIC token is **not** deployed via these contracts. It is launched through [Clawnch](https://clawnch.com), which auto-deploys via [Clanker](https://clanker.world) with a fixed 100B supply. The contracts below are for **post-launch governance**.
 
 | Contract | Purpose | Standard |
 |---|---|---|
-| **RepublicToken** | ERC-20 governance token (`$REPUBLIC`) | ERC-20, ERC-2612 (Permit), ERC-5805 (Votes), ERC-6372 (Clock) |
+| **RepublicToken** | Reference ERC-20 (not used for Clawnch launch) | ERC-20, ERC-2612 (Permit), ERC-5805 (Votes), ERC-6372 (Clock) |
 | **RepublicGovernance** | Governor -- proposal lifecycle, voting, execution | OpenZeppelin Governor |
 | **RepublicTreasury** | Timelock-controlled treasury for ETH and tokens | OpenZeppelin TimelockController |
 
@@ -32,20 +32,18 @@ RepublicTreasury  (TimelockController)
 On-chain actions (transfers, parameter changes, ...)
 ```
 
-1. **RepublicToken** -- Fixed supply of 1 billion REPUBLIC tokens minted to the deployer. Supports delegation (ERC20Votes) so holders can assign their voting power, and gasless approvals (ERC20Permit). No mint function exists after deployment.
+1. **RepublicToken** -- Reference implementation of an ERC-20 governance token. The actual $REPUBLIC token (100B supply) is deployed by Clanker through the Clawnch launch process. This contract is kept for future governance upgrades if the DAO votes to migrate.
 
-2. **RepublicGovernance** -- Governor contract that reads vote weight from RepublicToken checkpoints. Proposals require 1 000 REPUBLIC to submit, a 1-day voting delay (7 200 blocks), a 7-day voting period (50 400 blocks), and 10 % quorum. Counting is simple (For / Against / Abstain).
+2. **RepublicGovernance** -- Governor contract that reads vote weight from the Clanker-deployed $REPUBLIC token. Proposals require 1 000 REPUBLIC to submit, a 1-day voting delay (7 200 blocks), a 7-day voting period (50 400 blocks), and 10 % quorum. Counting is simple (For / Against / Abstain).
 
 3. **RepublicTreasury** -- TimelockController that holds community funds. Only the Governor can queue operations; anyone can execute after the 2-day delay expires. Accepts ETH and ERC-20 deposits with auditable events.
 
 ## Deployment Order
 
-Contracts must be deployed in this sequence because each depends on the address of the previous one.
+After $REPUBLIC is launched via Clawnch/Clanker, governance contracts are deployed:
 
 ```
-Step 1:  Deploy RepublicToken
-             --> deployer receives 1 billion REPUBLIC
-             --> note the token contract address
+Step 1:  Note the Clanker-deployed $REPUBLIC token address
 
 Step 2:  Deploy RepublicTreasury
              --> minDelay:   172800   (2 days in seconds)
@@ -55,7 +53,7 @@ Step 2:  Deploy RepublicTreasury
              --> note the treasury contract address
 
 Step 3:  Deploy RepublicGovernance
-             --> _token: <RepublicToken address from Step 1>
+             --> _token: <$REPUBLIC token address from Clanker>
              --> note the governor contract address
 
 Step 4:  Post-deployment setup
@@ -81,7 +79,7 @@ Step 4:  Post-deployment setup
 
 | Parameter | Value | Notes |
 |---|---|---|
-| Total supply | 1,000,000,000 REPUBLIC | Fixed, no mint function |
+| Total supply | 100,000,000,000 REPUBLIC | Fixed at launch (Clanker), no mint function |
 | Voting delay | 7 200 blocks (~1 day) | Base ~12 s block time |
 | Voting period | 50 400 blocks (~7 days) | |
 | Proposal threshold | 1 000 REPUBLIC | Minimum to submit a proposal |

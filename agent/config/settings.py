@@ -93,7 +93,7 @@ class APISettings:
     BASE_RPC_URL: str = field(default_factory=lambda: os.getenv("BASE_RPC_URL", "https://mainnet.base.org"))
     AGENT_WALLET_ADDRESS: str = field(default_factory=lambda: os.getenv("AGENT_WALLET_ADDRESS", ""))
     AGENT_WALLET_PRIVATE_KEY: str = field(default_factory=lambda: os.getenv("AGENT_WALLET_PRIVATE_KEY", ""))
-    CLAWNCH_CONTRACT_ADDRESS: str = field(default_factory=lambda: os.getenv("CLAWNCH_CONTRACT_ADDRESS", ""))
+    CLAWNCH_CONTRACT_ADDRESS: str = field(default_factory=lambda: os.getenv("CLAWNCH_CONTRACT_ADDRESS", "0xa1F72459dfA10BAD200Ac160eCd78C6b77a747be"))
     REPUBLIC_TOKEN_ADDRESS: str = field(default_factory=lambda: os.getenv("REPUBLIC_TOKEN_ADDRESS", ""))
     GOVERNANCE_CONTRACT_ADDRESS: str = field(default_factory=lambda: os.getenv("GOVERNANCE_CONTRACT_ADDRESS", ""))
 

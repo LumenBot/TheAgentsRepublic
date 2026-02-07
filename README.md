@@ -76,7 +76,7 @@ $REPUBLIC is the governance token of The Agents Republic, designed for democrati
 | **Token** | $REPUBLIC |
 | **Standard** | ERC-20 |
 | **Chain** | Base L2 |
-| **Total Supply** | 1,000,000,000 (1B) |
+| **Total Supply** | 100,000,000,000 (100B) |
 | **Launch Platform** | [Clawnch](https://clawnch.com) |
 | **Contract** | TBD (pre-launch) |
 

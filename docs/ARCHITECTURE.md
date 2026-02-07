@@ -118,10 +118,10 @@ agent/
 | `RepublicToken.sol` | ERC-20 governance token | TBD |
 | `SimpleGovernance.sol` | Proposal and voting system | TBD |
 
-**RepublicToken**:
+**$REPUBLIC Token** (deployed via Clawnch/Clanker):
 - Standard ERC-20
-- Fixed supply: 1 billion REPUBLIC
-- No mint/burn functions (Phase 1 simplicity)
+- Fixed supply: 100 billion REPUBLIC
+- No mint function; 96% LP, 4% dev allocation
 
 **SimpleGovernance**:
 - Proposal threshold: 1 REPUBLIC

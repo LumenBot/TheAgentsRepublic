@@ -183,7 +183,7 @@ The $REPUBLIC token is an ERC-20 governance token deployed on Base L2 (Ethereum 
 | Token Name | REPUBLIC |
 | Standard | ERC-20 |
 | Network | Base (Ethereum L2) |
-| Total Supply | 1,000,000,000 (1 billion) |
+| Total Supply | 100,000,000,000 (100 billion) |
 | Minting | Fixed supply, no additional minting |
 | Launch Platform | Clawnch (agent-native launchpad) |
 

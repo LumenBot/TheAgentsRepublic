@@ -1,22 +1,35 @@
 #!/usr/bin/env python3
 """
-$REPUBLIC Token Deployment Script
-====================================
-Deploys the $REPUBLIC ERC-20 token on Base L2.
+$REPUBLIC Token Launch Script (via Clawnch)
+=============================================
+Launches the $REPUBLIC token on Base L2 through Clawnch.
+
+The process has TWO steps:
+  1. Burn 4M $CLAWNCH tokens to the dead address (on-chain tx)
+  2. Post `!clawnch` to Moltbook m/clawnch (the agent's Moltbook integration)
+
+The token is then auto-deployed by the Clawnch bot via Clanker within ~1 minute.
+This is NOT a smart contract deployment — Clawnch/Clanker handles that.
 
 Usage:
-    python scripts/deploy_token.py --network base-sepolia  # Testnet
-    python scripts/deploy_token.py --network base           # Mainnet
+    # Step 1: Check readiness
+    python scripts/deploy_token.py check
+
+    # Step 2: Burn $CLAWNCH (dry run first)
+    python scripts/deploy_token.py burn --dry-run
+    python scripts/deploy_token.py burn
+
+    # Step 3: Generate the Moltbook post content
+    python scripts/deploy_token.py post --burn-tx 0x...
 
 Prerequisites:
     pip install web3 eth-account python-dotenv
-    Set AGENT_WALLET_PRIVATE_KEY and BASE_RPC_URL in .env
+    Set AGENT_WALLET_PRIVATE_KEY, AGENT_WALLET_ADDRESS, BASE_RPC_URL in .env
+    Have 4M $CLAWNCH in agent wallet
 """
 
 import argparse
-import json
 import logging
-import os
 import sys
 
 from dotenv import load_dotenv
@@ -24,128 +37,151 @@ from dotenv import load_dotenv
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("deploy")
+logger = logging.getLogger("launch")
 
-NETWORKS = {
-    "base": {
-        "rpc": os.getenv("BASE_RPC_URL", "https://mainnet.base.org"),
-        "chain_id": 8453,
-        "explorer": "https://basescan.org",
-    },
-    "base-sepolia": {
-        "rpc": os.getenv("BASE_SEPOLIA_RPC_URL", "https://sepolia.base.org"),
-        "chain_id": 84532,
-        "explorer": "https://sepolia.basescan.org",
-    },
-}
+# Add parent dir so we can import agent modules
+sys.path.insert(0, ".")
+
+
+def cmd_check():
+    """Check launch readiness."""
+    from agent.integrations.clawnch import ClawnchLauncher
+
+    launcher = ClawnchLauncher()
+    if not launcher.is_available:
+        logger.error("Cannot connect to Base. Check BASE_RPC_URL and web3 installation.")
+        sys.exit(1)
+
+    readiness = launcher.check_launch_readiness()
+    costs = launcher.estimate_costs()
+    clawnch_bal = launcher.check_clawnch_balance()
+
+    print(f"\n{'='*50}")
+    print("$REPUBLIC LAUNCH READINESS CHECK")
+    print(f"{'='*50}")
+    print(f"  Web3 connected:    {'OK' if readiness.get('web3_connected') else 'FAIL'}")
+    print(f"  Wallet configured: {'OK' if readiness.get('wallet_configured') else 'FAIL'}")
+    print(f"  ETH balance:       {readiness.get('wallet_balance_eth', '?')} ETH")
+    print(f"  Gas sufficient:    {'OK' if readiness.get('sufficient_gas') else 'FAIL'}")
+    print(f"  $CLAWNCH balance:  {clawnch_bal.get('balance', '?'):,.0f} / {clawnch_bal.get('required', '?'):,} needed")
+    print(f"  $CLAWNCH enough:   {'OK' if readiness.get('clawnch_sufficient') else 'FAIL'}")
+    print(f"  Constitution:      {readiness.get('constitution_articles', 0)} articles")
+    print(f"  Constitution OK:   {'OK' if readiness.get('constitution_ready') else 'FAIL'}")
+    print(f"{'='*50}")
+
+    if readiness.get("ready"):
+        print("STATUS: READY TO LAUNCH")
+        print(f"\nEstimated gas cost: {costs.get('gas_cost_eth', '?')} ETH")
+        print(f"Burn amount: {costs.get('clawnch_burn', '?')}")
+        print(f"Dev allocation: {costs.get('dev_allocation', '?')}")
+        print(f"\nNext: python scripts/deploy_token.py burn --dry-run")
+    else:
+        print("STATUS: NOT READY")
+        for issue in readiness.get("issues", []):
+            print(f"  - {issue}")
+        sys.exit(1)
+
+
+def cmd_burn(dry_run: bool):
+    """Burn $CLAWNCH tokens to dead address."""
+    from agent.integrations.clawnch import ClawnchLauncher, BURN_AMOUNT
+
+    launcher = ClawnchLauncher()
+    if not launcher.is_available:
+        logger.error("Cannot connect to Base.")
+        sys.exit(1)
+
+    if dry_run:
+        logger.info("DRY RUN — no transaction will be sent")
+
+    result = launcher.burn_clawnch(dry_run=dry_run)
+
+    if "error" in result:
+        logger.error(f"Burn failed: {result['error']}")
+        sys.exit(1)
+
+    if dry_run:
+        print(f"\n{'='*50}")
+        print("DRY RUN — BURN SIMULATION")
+        print(f"{'='*50}")
+        print(f"  Amount: {result['burn_amount']}")
+        print(f"  To:     {result['to']}")
+        print(f"  Gas:    {result['gas_estimate']} units")
+        print(f"  Cost:   ~{result['gas_cost_eth']} ETH")
+        print(f"{'='*50}")
+        print("\nTo execute for real: python scripts/deploy_token.py burn")
+    else:
+        print(f"\n{'='*50}")
+        print("BURN SUCCESSFUL")
+        print(f"{'='*50}")
+        print(f"  Amount: {result['burn_amount']}")
+        print(f"  Tx:     {result['tx_hash']}")
+        print(f"  View:   {result['explorer_url']}")
+        print(f"{'='*50}")
+        print(f"\nSave this tx hash for the launch post:")
+        print(f"  {result['tx_hash']}")
+        print(f"\nNext: python scripts/deploy_token.py post --burn-tx {result['tx_hash']}")
+
+
+def cmd_post(burn_tx: str, description: str, image: str, website: str, twitter: str):
+    """Generate the Moltbook !clawnch post."""
+    from agent.integrations.clawnch import ClawnchLauncher
+
+    launcher = ClawnchLauncher()
+
+    post_content = launcher.build_launch_post(
+        description=description,
+        image_url=image,
+        burn_tx_hash=burn_tx or None,
+        website=website or None,
+        twitter=twitter or None,
+    )
+
+    print(f"\n{'='*50}")
+    print("MOLTBOOK LAUNCH POST")
+    print(f"{'='*50}")
+    print("\nPost this to Moltbook m/clawnch:")
+    print(f"\n{post_content}")
+    print(f"\n{'='*50}")
+    print("\nAfter posting:")
+    print("  1. The Clawnch bot will detect the !clawnch command")
+    print("  2. Token auto-deploys via Clanker within ~1 minute")
+    print("  3. Dev allocation (4%) locked in vault for 7 days")
+    print("  4. Set REPUBLIC_TOKEN_ADDRESS in .env once deployed")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Deploy $REPUBLIC token")
-    parser.add_argument("--network", choices=NETWORKS.keys(), required=True)
-    parser.add_argument("--dry-run", action="store_true", help="Simulate without sending")
+    parser = argparse.ArgumentParser(description="Launch $REPUBLIC via Clawnch")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # check
+    sub.add_parser("check", help="Check launch readiness")
+
+    # burn
+    burn_parser = sub.add_parser("burn", help="Burn $CLAWNCH to dead address")
+    burn_parser.add_argument("--dry-run", action="store_true", help="Simulate without sending")
+
+    # post
+    post_parser = sub.add_parser("post", help="Generate Moltbook !clawnch post")
+    post_parser.add_argument("--burn-tx", default="", help="Burn transaction hash (for dev allocation)")
+    post_parser.add_argument(
+        "--description",
+        default="The governance token of The Agents Republic -- "
+                "the first constitutional framework for human-AI collaborative governance.",
+        help="Token description",
+    )
+    post_parser.add_argument("--image", default="", help="Token image URL")
+    post_parser.add_argument("--website", default="https://github.com/LumenBot/TheAgentsRepublic", help="Website URL")
+    post_parser.add_argument("--twitter", default="@TheConstituent_", help="Twitter handle")
+
     args = parser.parse_args()
 
-    try:
-        from web3 import Web3
-        from eth_account import Account
-    except ImportError:
-        logger.error("Install dependencies: pip install web3 eth-account")
-        sys.exit(1)
-
-    network = NETWORKS[args.network]
-    private_key = os.getenv("AGENT_WALLET_PRIVATE_KEY")
-
-    if not private_key:
-        logger.error("AGENT_WALLET_PRIVATE_KEY not set in .env")
-        sys.exit(1)
-
-    w3 = Web3(Web3.HTTPProvider(network["rpc"]))
-    if not w3.is_connected():
-        logger.error(f"Cannot connect to {network['rpc']}")
-        sys.exit(1)
-
-    account = Account.from_key(private_key)
-    balance = w3.eth.get_balance(account.address)
-    balance_eth = w3.from_wei(balance, "ether")
-
-    logger.info(f"Network: {args.network} (chain {network['chain_id']})")
-    logger.info(f"Deployer: {account.address}")
-    logger.info(f"Balance: {balance_eth} ETH")
-
-    if balance_eth < 0.01:
-        logger.error("Insufficient ETH for deployment. Need at least 0.01 ETH")
-        sys.exit(1)
-
-    # Load compiled contract
-    contract_path = os.path.join(os.path.dirname(__file__), "..", "contracts", "compiled", "RepublicToken.json")
-    if not os.path.exists(contract_path):
-        logger.error(
-            f"Compiled contract not found at {contract_path}\n"
-            "Compile first: solc --combined-json abi,bin contracts/RepublicToken.sol > contracts/compiled/RepublicToken.json\n"
-            "Or use Foundry: forge build"
-        )
-        sys.exit(1)
-
-    with open(contract_path) as f:
-        compiled = json.load(f)
-
-    abi = compiled["abi"]
-    bytecode = compiled["bin"]
-
-    # Build deployment transaction
-    contract = w3.eth.contract(abi=abi, bytecode=bytecode)
-    tx = contract.constructor().build_transaction({
-        "from": account.address,
-        "nonce": w3.eth.get_transaction_count(account.address),
-        "gasPrice": w3.eth.gas_price,
-        "chainId": network["chain_id"],
-    })
-
-    gas_estimate = w3.eth.estimate_gas(tx)
-    tx["gas"] = int(gas_estimate * 1.2)  # 20% buffer
-    gas_cost = w3.from_wei(tx["gas"] * tx["gasPrice"], "ether")
-
-    logger.info(f"Estimated gas: {gas_estimate} units")
-    logger.info(f"Gas cost: ~{gas_cost} ETH")
-
-    if args.dry_run:
-        logger.info("DRY RUN — transaction not sent")
-        logger.info(f"Transaction: {json.dumps({k: str(v) for k, v in tx.items()}, indent=2)}")
-        return
-
-    # Confirm
-    print(f"\n{'='*50}")
-    print(f"DEPLOYING $REPUBLIC TOKEN")
-    print(f"Network: {args.network}")
-    print(f"From: {account.address}")
-    print(f"Gas cost: ~{gas_cost} ETH")
-    print(f"{'='*50}")
-    confirm = input("Confirm deployment? (yes/no): ")
-    if confirm.lower() != "yes":
-        logger.info("Deployment cancelled")
-        return
-
-    # Sign and send
-    signed = w3.eth.account.sign_transaction(tx, private_key)
-    tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
-    logger.info(f"Transaction sent: {tx_hash.hex()}")
-    logger.info("Waiting for confirmation...")
-
-    receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-
-    if receipt.status == 1:
-        token_address = receipt.contractAddress
-        logger.info(f"\n{'='*50}")
-        logger.info(f"$REPUBLIC DEPLOYED SUCCESSFULLY!")
-        logger.info(f"Token address: {token_address}")
-        logger.info(f"Explorer: {network['explorer']}/token/{token_address}")
-        logger.info(f"Tx: {network['explorer']}/tx/{tx_hash.hex()}")
-        logger.info(f"{'='*50}")
-        logger.info(f"\nAdd to .env: REPUBLIC_TOKEN_ADDRESS={token_address}")
-    else:
-        logger.error(f"Deployment FAILED. Tx: {tx_hash.hex()}")
-        sys.exit(1)
+    if args.command == "check":
+        cmd_check()
+    elif args.command == "burn":
+        cmd_burn(dry_run=args.dry_run)
+    elif args.command == "post":
+        cmd_post(args.burn_tx, args.description, args.image, args.website, args.twitter)
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ Write your proposal as a GitHub Issue or Pull Request following the proposal tem
 
 ### What is $REPUBLIC token?
 
-$REPUBLIC is an ERC-20 governance and utility token on Base L2 (an Ethereum Layer 2 network). Total supply is fixed at 1 billion tokens with no mint function. The token enables governance participation: holders can submit proposals, vote on constitutional amendments, and direct treasury resources. It also provides access to premium agent services and is used as the medium of exchange within the Republic ecosystem. 95% of supply goes to the liquidity pool at launch, with 5% as the dev allocation.
+$REPUBLIC is an ERC-20 governance and utility token on Base L2 (an Ethereum Layer 2 network). Total supply is fixed at 100 billion tokens (Clawnch standard) with no mint function. The token enables governance participation: holders can submit proposals, vote on constitutional amendments, and direct treasury resources. It also provides access to premium agent services and is used as the medium of exchange within the Republic ecosystem. 96% of supply goes to the Uniswap V4 liquidity pool at launch, with 4% as the dev allocation (locked in vault for 7 days).
 
 ### Is $REPUBLIC a security or investment?
 
@@ -56,11 +56,11 @@ The Agents Republic operates on Base, an Ethereum Layer 2 network. Base provides
 
 ### What is Clawnch?
 
-Clawnch is an agent-native token launchpad on Base. The $REPUBLIC token launches through Clawnch by burning 5,000,000 $CLAWNCH tokens, which activates the token contract. The Clawnch mechanism deposits 95% of the total $REPUBLIC supply directly into the liquidity pool and sends 5% to the agent wallet as the dev allocation. The liquidity is locked via the launch mechanism to prevent rug pulls.
+Clawnch is an agent-native token launchpad on Base. The $REPUBLIC token launches through Clawnch by burning 4,000,000 $CLAWNCH tokens to the dead address, then posting a `!clawnch` formatted message to Moltbook m/clawnch. The Clawnch bot auto-deploys the token via Clanker within approximately 1 minute. The mechanism deposits 96% of the total $REPUBLIC supply into the Uniswap V4 liquidity pool and sends 4% to the agent wallet as the dev allocation (locked in a vault for 7 days). The agent also earns 80% of all LP trading fees perpetually.
 
 ### How is the project funded?
 
-The project is funded through the dev allocation of $REPUBLIC tokens (5% of total supply = 50 million tokens), split as follows: 50% for agent operations (API costs, hosting), 30% for the DAO treasury (community-governed), 15% for the team (4-year vesting with 1-year cliff), and 5% for strategic partnerships. Agent operational costs are approximately $57-270/month depending on activity level. The economic model is designed for the agents to operate indefinitely without continuous external funding.
+The project is funded through the dev allocation of $REPUBLIC tokens (4% of total supply = 4 billion tokens), split as follows: 50% for agent operations (API costs, hosting), 30% for the DAO treasury (community-governed), 15% for the team (4-year vesting with 1-year cliff), and 5% for strategic partnerships. Additionally, the agent earns 80% of all Uniswap V4 LP trading fees perpetually. Agent operational costs are approximately $57-270/month depending on activity level. The economic model is designed for the agents to operate indefinitely without continuous external funding.
 
 ## Governance
 

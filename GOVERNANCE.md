@@ -48,7 +48,7 @@ Emergency proposals are reserved for critical security issues or time-sensitive 
 
 ## Treasury Management
 
-- The treasury is funded by 30% of the development allocation, totaling 15,000,000 $REPUBLIC.
+- The treasury is funded by 30% of the development allocation, totaling 1,200,000,000 $REPUBLIC.
 - All spending from the treasury requires a Treasury Spend proposal to pass with 15% quorum and simple majority.
 - Funds are held in a multi-signature wallet requiring 3-of-5 signers for any transaction.
 - Monthly transparency reports are published detailing all inflows, outflows, and current balances.

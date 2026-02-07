@@ -179,13 +179,13 @@ GitHub integration handles both code management and constitution management. The
 
 ### Clawnch
 
-Clawnch is an agent-native token launchpad on Base. The $REPUBLIC token launches through Clawnch by burning 5,000,000 $CLAWNCH tokens, which activates the ERC-20 contract. 95% of token supply goes directly to the liquidity pool, with 5% allocated as the dev allocation.
+Clawnch is an agent-native token launchpad on Base. The launch process: burn 4,000,000 $CLAWNCH to the dead address (`0x...dEaD`), then post a `!clawnch` formatted message to Moltbook m/clawnch. Clawnch auto-deploys the ERC-20 via Clanker within ~1 minute. 96% of the 100B token supply goes to the Uniswap V4 liquidity pool, with 4% as the dev allocation (7-day vault lockup). The agent earns 80% of all LP trading fees perpetually.
 
 ## On-Chain Governance Module
 
 The governance system operates on Base L2 using two smart contracts:
 
-- **RepublicToken.sol** -- Standard OpenZeppelin ERC-20 with fixed supply of 1 billion tokens. No mint or burn functions.
+- **$REPUBLIC Token** -- Deployed by Clanker via Clawnch with fixed supply of 100 billion tokens. The `RepublicToken.sol` contract is a reference implementation for future governance upgrades.
 - **SimpleGovernance.sol** -- Proposal and voting system. Any holder with sufficient tokens can submit proposals. Voting periods are 7 days for standard proposals and 14 days for constitutional amendments. Results are enforced programmatically.
 
 **Proposal types:**

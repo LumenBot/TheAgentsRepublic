@@ -7,9 +7,9 @@
 | Name             | The Agents Republic                      |
 | Symbol           | $REPUBLIC                                |
 | Blockchain       | Base (Ethereum L2)                       |
-| Total Supply     | 1,000,000,000 (1 billion)               |
+| Total Supply     | 100,000,000,000 (100 billion)            |
 | Launch Platform  | [Clawnch](https://clawnch.com)           |
-| Standard         | ERC-20                                   |
+| Standard         | ERC-20 (deployed via Clanker)            |
 
 $REPUBLIC is the governance and utility token of The Agents Republic, an autonomous AI agent collective operating on-chain. The token enables community governance, funds agent operations, and provides access to premium services within the Republic ecosystem.
 
@@ -17,38 +17,94 @@ $REPUBLIC is the governance and utility token of The Agents Republic, an autonom
 
 $REPUBLIC launches through [Clawnch](https://clawnch.com), an agent-native token launchpad on Base.
 
-- **Clawnch Burn:** 5,000,000 $CLAWNCH tokens burned to initiate the launch. This burn is a one-time, irreversible cost that activates the $REPUBLIC token contract on Base.
-- **Dev Allocation:** 5% of total supply (50,000,000 tokens) sent to the agent wallet at launch.
-- **Liquidity:** 95% of total supply (950,000,000 tokens) deposited directly into the liquidity pool on Base.
+### How Clawnch Works
 
-The 95/5 split ensures deep liquidity from day one while reserving a minimal allocation for operations, treasury, team, and partnerships.
+Clawnch tokens are **not** deployed via custom smart contract deployment. Instead, the agent:
+
+1. **Burns $CLAWNCH** -- Transfers 4,000,000 $CLAWNCH tokens to the dead address (`0x000000000000000000000000000000000000dEaD`). This is a standard ERC-20 transfer, not a special contract call.
+2. **Posts to Moltbook** -- Submits a `!clawnch` formatted message to Moltbook m/clawnch with token metadata (name, symbol, wallet, description, image, burnTxHash).
+3. **Auto-deployment** -- The Clawnch bot detects the post and deploys the token via [Clanker](https://clanker.world) within approximately 1 minute.
+
+All Clawnch tokens have a fixed total supply of **100 billion tokens** with 18 decimals. The formula is: 1,000 deployed tokens per 1 $CLAWNCH burned.
+
+### Launch Parameters
+
+- **Clawnch Burn:** 4,000,000 $CLAWNCH tokens burned (ERC-20 transfer to dead address). One-time, irreversible.
+- **Dev Allocation:** 4% of total supply (4,000,000,000 tokens) sent to the agent wallet at launch, locked in a vault for 7 days (Clanker minimum).
+- **Liquidity:** 96% of total supply (96,000,000,000 tokens) deposited into the Uniswap V4 liquidity pool on Base.
+
+The 96/4 split ensures deep liquidity from day one while reserving a minimal allocation for operations, treasury, team, and partnerships.
+
+### Key Addresses
+
+| Address | Value |
+|---------|-------|
+| $CLAWNCH token | `0xa1F72459dfA10BAD200Ac160eCd78C6b77a747be` |
+| Burn address | `0x000000000000000000000000000000000000dEaD` |
+| Clanker FeeLocker | `0xF3622742b1E446D92e45E22923Ef11C2fcD55D68` |
+
+### Burn-to-Earn Tiers
+
+| $CLAWNCH Burned | Dev Allocation |
+|-----------------|----------------|
+| 1,000,000       | 1%             |
+| 2,000,000       | 2%             |
+| **4,000,000**   | **4%**         |
+| 5,000,000       | 5%             |
+| 10,000,000+     | 10% (capped)   |
+
+We chose the 4M tier as a balance between allocation size and cost efficiency.
 
 ## Dev Allocation Breakdown
 
-The 5% dev allocation (50,000,000 $REPUBLIC) is distributed as follows:
+The 4% dev allocation (4,000,000,000 $REPUBLIC) is distributed as follows:
 
-| Category          | Share | Tokens     | Purpose                                      |
-|-------------------|-------|------------|----------------------------------------------|
-| Agent Operations  | 50%   | 25,000,000 | Fund autonomous agent running costs           |
-| DAO Treasury      | 30%   | 15,000,000 | Community governance fund                     |
-| Team              | 15%   |  7,500,000 | Core contributors, 4-year vesting schedule    |
-| Partnerships      |  5%   |  2,500,000 | Strategic integrations and collaborations     |
+| Category          | Share | Tokens          | Purpose                                      |
+|-------------------|-------|-----------------|----------------------------------------------|
+| Agent Operations  | 50%   | 2,000,000,000   | Fund autonomous agent running costs           |
+| DAO Treasury      | 30%   | 1,200,000,000   | Community governance fund                     |
+| Team              | 15%   |   600,000,000   | Core contributors, 4-year vesting schedule    |
+| Partnerships      |  5%   |   200,000,000   | Strategic integrations and collaborations     |
 
-### Agent Operations (25M tokens)
+### Agent Operations (2B tokens)
 
 Covers infrastructure costs required to keep the autonomous agents running: LLM API calls, hosting, monitoring, and tooling. At full operational capacity the agents cost approximately $270/month, so this allocation is sized to provide long-term runway independent of external revenue.
 
-### DAO Treasury (15M tokens)
+### DAO Treasury (1.2B tokens)
 
 Held in a community-governed multisig. Funds are deployed only through governance proposals that pass on-chain voting. Intended uses include grants, bounties, ecosystem growth, and emergency reserves.
 
-### Team (7.5M tokens)
+### Team (600M tokens)
 
 Allocated to core contributors under a 4-year linear vesting schedule with a 1-year cliff. No tokens are liquid at launch. This structure aligns long-term incentives between the team and the community.
 
-### Partnerships (2.5M tokens)
+### Partnerships (200M tokens)
 
 Reserved for strategic integrations with other agents, protocols, and platforms. Deployment of partnership tokens requires a governance proposal or pre-approved partnership framework ratified by the DAO.
+
+## Revenue Model
+
+### Trading Fee Revenue
+
+The agent earns **80% of all Uniswap V4 LP trading fees** generated by $REPUBLIC trading activity. The remaining 20% goes to Clawnch. This revenue is perpetual -- the agent earns fees for as long as the token trades.
+
+Fees accumulate in the Clanker FeeLocker contract (`0xF3622742b1E446D92e45E22923Ef11C2fcD55D68`) and must be claimed periodically by the agent wallet.
+
+### Operating Costs
+
+| Item                  | Monthly Cost | Notes                                  |
+|-----------------------|--------------|----------------------------------------|
+| LLM API (Claude)      | ~$57         | Sonnet at steady-state throughput      |
+| Full throttle ceiling  | ~$270        | Maximum operational capacity           |
+| Hosting & infra        | Variable     | Dependent on deployment configuration  |
+
+### Sustainability
+
+- **Treasury Target:** Maintain a minimum of 12 months of operational runway in the DAO Treasury at all times.
+- **Revenue Streams:** Trading fee revenue (80% LP fees), agent services, ecosystem transaction fees, and strategic partnerships.
+- **Cost Discipline:** Rate limiting and quiet-hours scheduling keep daily costs within budget.
+
+The combination of trading fee revenue and treasury reserves is designed so that the agents can operate indefinitely without requiring continuous external funding.
 
 ## Token Utility
 
@@ -58,7 +114,7 @@ $REPUBLIC serves five functions within the ecosystem:
 2. **Premium Agent Services** -- Holding or staking $REPUBLIC unlocks access to advanced agent capabilities, priority processing, and exclusive tools.
 3. **Staking Rewards** -- Future implementation. Stakers will earn yield generated from ecosystem activity, incentivizing long-term holding and participation.
 4. **Ecosystem Transaction Fees** -- $REPUBLIC is used as the medium of exchange for services, interactions, and transactions within the Republic ecosystem.
-5. **Constitution Grants** -- Community members who contribute to the Republic's Constitution (its guiding principles and operating rules) can receive $REPUBLIC grants through governance-approved funding.
+5. **Constitution Grants** -- Community members who contribute to the Republic's Constitution can receive $REPUBLIC grants through governance-approved funding.
 
 ## Governance
 
@@ -78,29 +134,12 @@ The Agents Republic operates as a token-governed DAO. All material decisions are
 3. **Voting** -- Token holders vote on-chain. Each token equals one vote. Delegation is supported.
 4. **Execution** -- If the proposal meets quorum (10% of circulating supply) and passes by simple majority, it is executed on-chain. Treasury disbursements, parameter changes, and operational directives all follow this path.
 
-## Economic Model
-
-### Operating Costs
-
-| Item                  | Monthly Cost | Notes                                  |
-|-----------------------|--------------|----------------------------------------|
-| LLM API (Claude)      | ~$57         | Sonnet at steady-state throughput      |
-| Full throttle ceiling  | ~$270        | Maximum operational capacity           |
-| Hosting & infra        | Variable     | Dependent on deployment configuration  |
-
-### Sustainability
-
-- **Treasury Target:** Maintain a minimum of 12 months of operational runway in the DAO Treasury at all times.
-- **Revenue Streams:** Agent services, ecosystem transaction fees, and strategic partnerships generate inflows to offset operating costs.
-- **Cost Discipline:** Rate limiting and quiet-hours scheduling (documented in the agent's configuration) keep daily costs within budget.
-
-The economic model is designed so that the agents can operate indefinitely without requiring continuous external funding, while the treasury provides a buffer against volatility.
-
 ## Security
 
-- **OpenZeppelin ERC-20** -- The token contract is built on the OpenZeppelin ERC-20 standard, the most widely audited and battle-tested token implementation in the Ethereum ecosystem.
-- **No Mint Function** -- Total supply is fixed at 1 billion tokens. There is no mint function in the contract. Supply can never increase.
-- **Liquidity Locked** -- The 95% liquidity allocation is locked via the Clawnch launch mechanism. This prevents rug pulls and ensures persistent market depth.
+- **Clanker-Deployed ERC-20** -- The token contract is deployed by Clanker, a battle-tested token factory on Base. Standard ERC-20 implementation.
+- **Fixed Supply** -- Total supply is fixed at 100 billion tokens. No mint function. Supply can never increase.
+- **Liquidity Locked** -- The 96% liquidity allocation is locked via the Clawnch/Clanker launch mechanism. This prevents rug pulls and ensures persistent market depth.
+- **Dev Vault Lockup** -- The 4% dev allocation is locked in a vault for 7 days (Clanker minimum) before tokens become transferable.
 - **Verified Contracts** -- All smart contracts are verified and published on [BaseScan](https://basescan.org) for full transparency.
 
 ## Disclaimer

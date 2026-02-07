@@ -771,14 +771,17 @@ Full profile: agent_profile.md"""
 
             if readiness.get("ready"):
                 lines = [
-                    "🚀 **$REPUBLIC TOKEN LAUNCH READY**\n",
+                    "🚀 **$REPUBLIC LAUNCH READY** (via Clawnch)\n",
                     f"├ Wallet: `{launcher.wallet_address[:10]}...`",
-                    f"├ Balance: {readiness.get('wallet_balance_eth', '?')} ETH",
+                    f"├ ETH balance: {readiness.get('wallet_balance_eth', '?')} ETH",
+                    f"├ $CLAWNCH: {readiness.get('clawnch_balance', '?'):,.0f} (need 4M)",
                     f"├ Constitution: {readiness.get('constitution_articles', '?')} articles",
-                    f"├ Gas estimate: {costs.get('gas_cost_eth', '?')} ETH",
-                    f"├ Burn: {costs.get('clawnch_burn', '?')}",
+                    f"├ Burn gas: ~{costs.get('gas_cost_eth', '?')} ETH",
                     "└ Status: ✅ READY\n",
-                    "Reply `/confirm_launch` to deploy.",
+                    "**Launch steps:**",
+                    "1. `/confirm_launch` — burn 4M $CLAWNCH",
+                    "2. Post `!clawnch` to Moltbook m/clawnch",
+                    "3. Token auto-deploys via Clanker (~1 min)",
                 ]
             else:
                 issues = readiness.get("issues", ["Unknown"])
@@ -794,15 +797,20 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     async def confirm_launch_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """v6.0: Final confirmation to execute token launch."""
+        """v6.0: Burn $CLAWNCH and generate Moltbook launch post."""
         if not self._is_authorized(update.effective_chat.id):
             await update.message.reply_text("Unauthorized.")
             return
         await update.message.reply_text(
-            "⚠️ Token launch execution requires manual deployment.\n\n"
-            "Use the deployment script:\n"
-            "`python scripts/deploy_token.py --network base`\n\n"
-            "After deployment, set REPUBLIC_TOKEN_ADDRESS in .env",
+            "⚠️ **Token launch via Clawnch** (2-step process):\n\n"
+            "**Step 1** — Burn 4M $CLAWNCH:\n"
+            "`python scripts/deploy_token.py burn --dry-run`\n"
+            "`python scripts/deploy_token.py burn`\n\n"
+            "**Step 2** — Generate Moltbook post:\n"
+            "`python scripts/deploy_token.py post --burn-tx 0x...`\n\n"
+            "Post the output to Moltbook m/clawnch.\n"
+            "Token auto-deploys via Clanker within ~1 minute.\n\n"
+            "After launch, set `REPUBLIC_TOKEN_ADDRESS` in .env",
             parse_mode='Markdown'
         )
 
