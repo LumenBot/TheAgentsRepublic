@@ -86,39 +86,78 @@ def _clean_tokens(text: str) -> list:
 def _extract_number_words(tokens: list) -> list:
     """Extract number words from tokens, joining fragments as needed.
 
-    Tries single tokens, then pairs, then triples to match _WORD_TO_NUM.
-    Returns list of matched number word strings.
+    Handles Moltbook obfuscation:
+    1. Exact match: "twenty" in _WORD_TO_NUM → ✓
+    2. Join 2-3 adjacent tokens: "twen"+"ty" → "twenty" ✓
+    3. Substring match: "qthree" contains "three" → ✓
+       Checks if token starts or ends with a known number word.
     """
     found = []
     i = 0
     while i < len(tokens):
+        matched = False
         # Try joining 3 adjacent tokens
-        if i + 2 < len(tokens):
+        if not matched and i + 2 < len(tokens):
             tri = tokens[i] + tokens[i + 1] + tokens[i + 2]
             if tri in _WORD_TO_NUM:
                 found.append(tri)
                 i += 3
                 continue
         # Try joining 2 adjacent tokens
-        if i + 1 < len(tokens):
+        if not matched and i + 1 < len(tokens):
             pair = tokens[i] + tokens[i + 1]
             if pair in _WORD_TO_NUM:
                 found.append(pair)
                 i += 2
                 continue
-        # Try single token
+        # Try single token exact match
         if tokens[i] in _WORD_TO_NUM:
             found.append(tokens[i])
+            i += 1
+            continue
+        # Try fuzzy: token contains a number word (prefix/suffix noise)
+        hit = _fuzzy_match(tokens[i])
+        if hit:
+            found.append(hit)
+            # Also try joining with next token after stripping noise
+            i += 1
+            continue
+        # Try joining current (fuzzy) + next
+        if i + 1 < len(tokens):
+            pair = tokens[i] + tokens[i + 1]
+            hit = _fuzzy_match(pair)
+            if hit:
+                found.append(hit)
+                i += 2
+                continue
         i += 1
     return found
+
+
+def _fuzzy_match(token: str) -> str:
+    """Try to find a number word inside a noisy token.
+
+    Checks if the token ends with or starts with a known number word.
+    Longer matches preferred. E.g., "qthree" → "three", "twentyq" → "twenty".
+    """
+    # Sort by length descending to prefer longer matches
+    for word in sorted(_WORD_TO_NUM.keys(), key=len, reverse=True):
+        if len(word) < 3:
+            continue  # Skip very short words to avoid false positives
+        if token.endswith(word) or token.startswith(word):
+            return word
+        # Also check if the word is contained with at most 1 char noise on each side
+        idx = token.find(word)
+        if idx >= 0 and (len(token) - len(word)) <= 2:
+            return word
+    return ""
 
 
 def _solve_challenge(challenge_text: str) -> str:
     """Solve a Moltbook anti-spam math challenge.
 
-    Challenges look like:
-      "tW/eN tY tHrEe ~NeWtOnS + sE-vEn, WhAt Is ThE ToTaL?"
-    Answer: "30.00"  (twenty three + seven)
+    Handles both explicit operators (+ - * /) and implicit ones
+    ("accelerates by", "and adds", "what is the total/new/combined").
     """
     # Try to find explicit decimal numbers first (e.g., "35.5 + 12.3")
     digit_match = re.findall(r"(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)", challenge_text)
@@ -126,11 +165,16 @@ def _solve_challenge(challenge_text: str) -> str:
         a, op, b = float(digit_match[0][0]), digit_match[0][1], float(digit_match[0][2])
         return _calc(a, op, b)
 
-    # Find the operator in the raw text
+    # Clean the full text for keyword analysis
+    cleaned_full = re.sub(r"[^a-zA-Z0-9+\-*/. ]", " ", challenge_text).lower()
+    cleaned_full = re.sub(r"\s+", " ", cleaned_full).strip()
+
+    # Detect operator: explicit symbol first, then implicit keywords
     op_char = None
     op_pos = -1
+
+    # 1) Explicit standalone operator
     for ch in ["+", "-", "*", "/"]:
-        # Look for standalone operator (space-separated)
         pattern = rf"\s\{ch}\s"
         m = re.search(pattern, challenge_text)
         if m:
@@ -138,8 +182,47 @@ def _solve_challenge(challenge_text: str) -> str:
             op_pos = m.start()
             break
 
+    # 2) Implicit addition keywords
     if op_char is None:
-        # Fallback: any operator character
+        add_patterns = [
+            r"accelerates?\s+by", r"and\s+adds?", r"adds?",
+            r"increases?\s+by", r"gains?", r"plus",
+            r"combined\s+with", r"and\s+another",
+        ]
+        for pat in add_patterns:
+            m = re.search(pat, cleaned_full)
+            if m:
+                op_char = "+"
+                # Find position in original text (approximate)
+                op_pos = m.start()
+                break
+
+    # 3) Implicit subtraction keywords
+    if op_char is None:
+        sub_patterns = [
+            r"decelerates?\s+by", r"slows?\s+(down\s+)?by",
+            r"loses?", r"minus", r"decreases?\s+by",
+            r"subtracts?", r"less",
+        ]
+        for pat in sub_patterns:
+            m = re.search(pat, cleaned_full)
+            if m:
+                op_char = "-"
+                op_pos = m.start()
+                break
+
+    # 4) Implicit multiplication keywords
+    if op_char is None:
+        mul_patterns = [r"times", r"multiplied\s+by"]
+        for pat in mul_patterns:
+            m = re.search(pat, cleaned_full)
+            if m:
+                op_char = "*"
+                op_pos = m.start()
+                break
+
+    # 5) Fallback: any operator character in the raw text
+    if op_char is None:
         for ch in ["+", "-", "*", "/"]:
             idx = challenge_text.find(ch)
             if idx >= 0:
@@ -147,9 +230,15 @@ def _solve_challenge(challenge_text: str) -> str:
                 op_pos = idx
                 break
 
+    # Split on operator position and extract numbers from each side
     if op_char and op_pos >= 0:
-        left_text = challenge_text[:op_pos]
-        right_text = challenge_text[op_pos + 1:]
+        # For implicit operators, split on cleaned_full position
+        if op_pos < len(cleaned_full):
+            left_text = cleaned_full[:op_pos]
+            right_text = cleaned_full[op_pos:]
+        else:
+            left_text = challenge_text[:op_pos]
+            right_text = challenge_text[op_pos:]
 
         left_tokens = _clean_tokens(left_text)
         right_tokens = _clean_tokens(right_text)
@@ -162,9 +251,16 @@ def _solve_challenge(challenge_text: str) -> str:
             b = _words_to_number(right_nums)
             return _calc(a, op_char, b)
 
-    # Fallback: find all number words in the whole text and sum them
+    # Last resort: find all number words and sum them (assume addition)
     all_tokens = _clean_tokens(challenge_text)
     all_nums = _extract_number_words(all_tokens)
+    if len(all_nums) >= 2:
+        # Two groups of numbers found — assume addition
+        # Split into first group and rest
+        a = _words_to_number(all_nums[:len(all_nums)//2 + len(all_nums)%2])
+        b = _words_to_number(all_nums[len(all_nums)//2 + len(all_nums)%2:])
+        if a and b:
+            return f"{a + b:.2f}"
     if all_nums:
         return f"{_words_to_number(all_nums):.2f}"
 
