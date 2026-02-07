@@ -35,16 +35,16 @@ class RepublicTokenomics:
     TWITTER: str = "https://x.com/XTheConstituent"
 
     # Clawnch Launch Parameters
-    CLAWNCH_BURN_AMOUNT: int = 5_000_000       # 5M $CLAWNCH to burn
-    DEV_ALLOCATION_PERCENT: int = 5             # 5% to agent wallet (50M tokens)
-    INITIAL_LIQUIDITY_PERCENT: int = 95         # 95% to LP (950M tokens)
+    CLAWNCH_BURN_AMOUNT: int = 4_000_000       # 4M $CLAWNCH to burn
+    DEV_ALLOCATION_PERCENT: int = 4             # 4% dev allocation (4B tokens on 100B)
+    INITIAL_LIQUIDITY_PERCENT: int = 96         # 96% to LP
 
-    # Dev Allocation Breakdown (from 5% = 50M tokens)
+    # Dev Allocation Breakdown (from 4% = 4B tokens)
     DEV_ALLOCATION_BREAKDOWN: Dict[str, float] = field(default_factory=lambda: {
-        "agent_operations": 0.50,    # 25M — Fund autonomous agent running costs
-        "treasury_dao": 0.30,        # 15M — DAO governance treasury
-        "team_vested": 0.15,         # 7.5M — Team (4-year vesting)
-        "partnerships": 0.05,        # 2.5M — Strategic partnerships
+        "agent_operations": 0.50,    # 2B — Fund autonomous agent running costs
+        "treasury_dao": 0.30,        # 1.2B — DAO governance treasury
+        "team_vested": 0.15,         # 600M — Team (4-year vesting)
+        "partnerships": 0.05,        # 200M — Strategic partnerships
     })
 
     # Governance Parameters
