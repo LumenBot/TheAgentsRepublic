@@ -38,7 +38,16 @@ def _moltbook_post(title: str, content: str, submolt: str = "") -> str:
         post_id = result.get("post_id", "?")
         url = result.get("url", f"https://www.moltbook.com/post/{post_id}")
         return f"Posted on Moltbook: id={post_id} url={url}"
-    return f"Post failed: {result.get('error', 'unknown')}"
+    # Surface full error details for debugging
+    error = result.get("error", "unknown") if result else "no result"
+    status = result.get("status_code", "?") if result else "?"
+    response = result.get("response", "") if result else ""
+    if isinstance(response, dict):
+        response = response.get("message", response.get("error", ""))
+    detail = f"Post failed (HTTP {status}): {error}"
+    if response and str(response) not in str(error):
+        detail += f" | response: {str(response)[:200]}"
+    return detail
 
 
 def _moltbook_comment(post_id: str, content: str) -> str:

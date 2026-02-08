@@ -608,7 +608,10 @@ class MoltbookOperations:
                 logger.warning(f"Post rate limited by server. Retry in {retry_min}min")
 
             else:
-                logger.error(f"Post failed: {r.status_code} {r.text[:200]}")
+                error_text = r.text[:200] if r.text else "no response body"
+                result["error"] = f"HTTP {r.status_code}: {error_text}"
+                result["success"] = False
+                logger.error(f"Post failed: {r.status_code} {error_text}")
 
             return result
 
