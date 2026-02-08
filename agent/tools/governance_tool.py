@@ -1,8 +1,9 @@
 """
-Governance Tools for The Constituent v7.0
+Governance Tools for The Constituent v7.1
 ==========================================
 On-chain governance tools: proposal management, voting, governance status.
 Integrates with RepublicGovernance.sol on Base L2.
+Supports local signaling mode when on-chain is unavailable.
 """
 
 import logging
@@ -122,6 +123,32 @@ def _get_voting_power(address: str) -> str:
         return f"Voting power query error: {e}"
 
 
+def _activate_proposal(proposal_id: str) -> str:
+    """Activate a Draft proposal for signaling votes (local mode)."""
+    try:
+        gov = _get_governance_manager()
+        prop = gov._proposals_cache.get(proposal_id)
+        if not prop:
+            return f"Proposal '{proposal_id}' not found."
+        if prop.state == "Active":
+            return f"Proposal '{prop.title}' is already Active."
+        if prop.state not in ("Draft", "Pending"):
+            return f"Cannot activate: proposal is in state '{prop.state}'."
+
+        prop.state = "Active"
+        gov._save_proposals()
+        logger.info(f"Proposal activated for signaling: {prop.title} ({proposal_id})")
+        return (
+            f"Proposal ACTIVATED for community voting:\n"
+            f"├ ID: {proposal_id}\n"
+            f"├ Title: {prop.title}\n"
+            f"├ Category: {prop.category}\n"
+            f"└ State: Active (signaling mode — votes tracked locally)"
+        )
+    except Exception as e:
+        return f"Activation error: {e}"
+
+
 def get_tools() -> List[Tool]:
     """Return governance tools for the engine."""
     return [
@@ -176,5 +203,15 @@ def get_tools() -> List[Tool]:
                 ToolParam("address", "string", "The wallet address to check"),
             ],
             handler=lambda address: _get_voting_power(address),
+        ),
+        Tool(
+            name="governance_activate",
+            description="Activate a Draft proposal for community signaling votes. Works in local mode without on-chain.",
+            category="governance",
+            governance_level="L1",
+            params=[
+                ToolParam("proposal_id", "string", "The proposal ID to activate"),
+            ],
+            handler=lambda proposal_id: _activate_proposal(proposal_id),
         ),
     ]

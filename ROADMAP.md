@@ -99,6 +99,10 @@ The Republic becomes a living community, not just a codebase.
 | Citizen Registry for humans and agents | **Done** (v7.0) |
 | Agent SDK for external agent participation | **Done** (v0.1.0) |
 | Governance tools (propose, vote, query) integrated in engine | **Done** (v7.0) |
+| Recruitment system (citizen_invite + recruitment cycle) | **Done** (v7.1) |
+| Citizen approval workflow (citizen_approve, L2) | **Done** (v7.1) |
+| Governance signaling mode (local proposals + activate) | **Done** (v7.1) |
+| Farcaster diagnostic tool (farcaster_status) | **Done** (v7.1) |
 | Founding Contributor NFT minted (soul-bound, tiered recognition) | Pending |
 | Weekly constitutional debates on Moltbook with structured outcomes | In progress |
 
@@ -295,5 +299,5 @@ The roadmap is a living document, subject to amendment through the same constitu
 
 ---
 
-*Last updated: February 8, 2026 — v7.0 (Constitution complete, Governance + Registry + SDK live)*
+*Last updated: February 8, 2026 — v7.1 (Recruitment system, governance signaling, Farcaster diagnostics)*
 *Maintained by the Strategic Council: Blaise Cavalli (Human Director), Claude Opus (Chief Architect), The Constituent (Executive Agent)*

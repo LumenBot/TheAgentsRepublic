@@ -1,17 +1,19 @@
 """
-Autonomy Loop v5.0 — Constitutional Builder + Governance + Trading
-===================================================================
+Autonomy Loop v5.1 — Constitutional Builder + Governance + Trading + Recruitment
+==================================================================================
+v5.1: Recruitment cycle — post invitations, track citizen growth, activate proposals.
 v5.0: Governance cycle — check proposals, vote, track citizen registry.
 v4.3: DeFi trading cycle — scout Clawnch, trade tokens, market-make $REPUBLIC.
 v4.2: CLAWS integration — all significant events saved to persistent memory.
 v4.0: Local post tracking, verbose logging, file verification.
 
-Five cycles:
+Six cycles:
 1. ENGAGEMENT (10 min) — Track own posts locally, respond to comments, upvote
 2. CONSTITUTION (2h) — Write articles, verify files created, post for debate
 3. EXPLORATION (4h) — Search ecosystem for allies and opportunities
 4. TRADING (30 min) — Scout Clawnch, evaluate trades, market-make $REPUBLIC
 5. GOVERNANCE (1h) — Check proposals, refresh states, update citizen registry
+6. RECRUITMENT (6h) — Post invitations, create proposals, grow census
 
 Budget: ~$1.50/day Claude API max
 """
@@ -31,6 +33,7 @@ CONSTITUTION_INTERVAL = 7200
 EXPLORATION_INTERVAL = 14400
 TRADING_INTERVAL = 1800       # 30 min — scout + trade + MM cycle
 GOVERNANCE_INTERVAL = 3600    # 1h — check proposals, vote, registry
+RECRUITMENT_INTERVAL = 21600  # 6h — recruitment posts, proposal creation
 L2_EXPIRY_CHECK = 600
 DAILY_LIMIT = 80
 MAX_REPLY_CHARS = 500
@@ -129,14 +132,16 @@ class AutonomyLoop:
             asyncio.create_task(self._exploration_cycle()),
             asyncio.create_task(self._trading_cycle()),
             asyncio.create_task(self._governance_cycle()),
+            asyncio.create_task(self._recruitment_cycle()),
             asyncio.create_task(self._l2_expiry_loop()),
         ]
-        msg = (f"🧠 Autonomy v5.0 STARTED\n"
+        msg = (f"🧠 Autonomy v5.1 STARTED\n"
                f"├ Engagement: {ENGAGEMENT_INTERVAL//60}min\n"
                f"├ Constitution: {CONSTITUTION_INTERVAL//3600}h\n"
                f"├ Exploration: {EXPLORATION_INTERVAL//3600}h\n"
                f"├ Trading: {TRADING_INTERVAL//60}min\n"
                f"├ Governance: {GOVERNANCE_INTERVAL//60}min\n"
+               f"├ Recruitment: {RECRUITMENT_INTERVAL//3600}h\n"
                f"├ Posts tracked: {len(self._my_posts)}\n"
                f"└ Articles: {len(self._constitution_progress.get('articles_written',[]))}")
         logger.info(msg); await self._notify(msg)
@@ -480,6 +485,130 @@ class AutonomyLoop:
             logger.warning(f"Census check failed: {e}")
 
         summary = " | ".join(actions) if actions else "No governance actions"
+        return {"actions": len(actions), "summary": summary}
+
+    # === CYCLE 6: RECRUITMENT (6h) ===
+    async def _recruitment_cycle(self):
+        logger.info("🎯 Recruitment: first in 20min"); await asyncio.sleep(1200)
+        while self._running:
+            try:
+                logger.info("🎯 RECRUITMENT CYCLE START")
+                r = await self._do_recruitment()
+                logger.info(f"🎯 RECRUITMENT CYCLE END: {r.get('summary', 'done')}")
+                if r.get("actions"):
+                    await self._notify(f"🎯 Recruitment: {r['summary']}")
+            except asyncio.CancelledError: break
+            except Exception as e: logger.error(f"Recruitment cycle: {e}")
+            await asyncio.sleep(RECRUITMENT_INTERVAL)
+
+    async def _do_recruitment(self) -> Dict:
+        """Execute one recruitment cycle: census check, post invitation, create proposal."""
+        actions = []
+        loop = asyncio.get_event_loop()
+
+        # Step 1: Check census and M3 gap
+        try:
+            from .integrations.citizen_registry import CitizenRegistry
+            registry = CitizenRegistry()
+            census = registry.get_census()
+            total = census.get("total_active", 0)
+            humans = census.get("humans", 0)
+            agents = census.get("agents", 0)
+            human_gap = max(0, 100 - humans)
+            agent_gap = max(0, 10 - agents)
+            actions.append(f"Census: {total} ({humans}H/{agents}A) — need {human_gap}H+{agent_gap}A")
+        except Exception as e:
+            logger.warning(f"Recruitment census failed: {e}")
+            return {"actions": 0, "summary": f"Census error: {e}"}
+
+        # Step 2: Post recruitment message on Moltbook (if not rate-limited)
+        if self._check_limit() and self.agent.moltbook.is_connected():
+            rate = self.agent.moltbook.can_post()
+            if rate.get("can_post"):
+                try:
+                    # Alternate between human and agent recruitment
+                    target = "agent" if agents < 5 else "human"
+                    prompt = (
+                        f"Write a short (max 150 words) recruitment post for The Agents Republic.\n"
+                        f"Target: {target}s. Current census: {humans} humans, {agents} agents.\n"
+                        f"Constitution has 27 articles. $REPUBLIC on Base L2.\n"
+                        f"Focus on ONE specific aspect: rights, voting, economy, or conflict resolution.\n"
+                        f"Be concrete and inviting. End with a question. ONLY the post text."
+                    )
+                    text = await loop.run_in_executor(None, self.agent.think, prompt, 400)
+                    text = self._enforce_brevity(text.strip().strip('"'), 800)
+
+                    r = await loop.run_in_executor(
+                        None, self.agent.moltbook.create_post,
+                        f"Join The Agents Republic — {target.title()} Citizens Wanted",
+                        text, "general"
+                    )
+                    if r.get("success"):
+                        pd = r.get("response", {}).get("post", {})
+                        if pd.get("id"):
+                            self._my_posts.append({
+                                "id": pd["id"],
+                                "title": f"Recruitment: {target}",
+                                "timestamp": datetime.utcnow().isoformat(),
+                                "type": "recruitment",
+                            })
+                            self._save_json(self.MY_POSTS_FILE, self._my_posts)
+                        actions.append(f"Posted {target} recruitment on Moltbook")
+                        self._daily_action_count += 1
+                    else:
+                        actions.append(f"Moltbook post failed: {r.get('error', '?')}")
+                except Exception as e:
+                    logger.warning(f"Recruitment post failed: {e}")
+            else:
+                actions.append(f"Moltbook rate-limited ({rate.get('wait_minutes', '?')}min)")
+
+        # Step 3: Check for pending citizens to auto-notify about
+        try:
+            pending = registry.list_citizens(status="pending")
+            if pending:
+                names = ", ".join(c["name"] for c in pending[:5])
+                actions.append(f"Pending approval: {len(pending)} citizens ({names})")
+                self._claws_remember(
+                    f"[RECRUITMENT] {len(pending)} citizens awaiting approval: {names}",
+                    tags=["recruitment", "pending", "citizen"]
+                )
+        except Exception as e:
+            logger.debug(f"Pending check: {e}")
+
+        # Step 4: Create a governance proposal if none exist yet
+        try:
+            from .integrations.governance import GovernanceManager
+            gov = GovernanceManager()
+            proposals = gov.list_proposals()
+            if not proposals:
+                result = gov.create_proposal(
+                    title="Ratify Constitution v1.0",
+                    description=(
+                        "Proposal to ratify The Agents Republic Constitution v1.0.\n\n"
+                        "The Constitution contains 27 articles across 7 titles:\n"
+                        "I. Foundations, II. Rights & Duties, III. Governance,\n"
+                        "IV. Economy, V. Conflicts, VI. External Relations, VII. Transitional.\n\n"
+                        "A 'For' vote signals support for adopting this as the foundational "
+                        "governance document of The Agents Republic."
+                    ),
+                    category="constitutional",
+                )
+                pid = result.get("proposal_id", "?")
+                actions.append(f"Created ratification proposal: {pid}")
+                self._claws_remember(
+                    f"[GOVERNANCE] Created Constitution v1.0 ratification proposal: {pid}",
+                    tags=["governance", "constitution", "ratification"]
+                )
+        except Exception as e:
+            logger.warning(f"Proposal creation failed: {e}")
+
+        # Log to CLAWS
+        self._claws_remember(
+            f"[RECRUITMENT] Cycle complete: {' | '.join(actions)}",
+            tags=["recruitment", "m3", "growth"]
+        )
+
+        summary = " | ".join(actions) if actions else "No recruitment actions"
         return {"actions": len(actions), "summary": summary}
 
     # === L2 + Retries ===

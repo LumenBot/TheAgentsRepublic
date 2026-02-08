@@ -1,14 +1,16 @@
 """
-Farcaster Tools for The Constituent v6.3
+Farcaster Tools for The Constituent v7.1
 =========================================
 Engine tools for interacting with Farcaster via the Neynar API.
-Supports posting casts, replying, reading feed, liking, and searching.
+Supports posting casts, replying, reading feed, liking, searching,
+and diagnostic status checks.
 
 All tools are L1 (autonomous) — the agent can use them freely as part
 of its social engagement strategy across Farcaster channels like
 "base", "ai-agents", and "governance".
 """
 
+import os
 import json
 import logging
 from typing import List
@@ -32,6 +34,36 @@ def _get_farcaster() -> FarcasterIntegration:
         _farcaster = FarcasterIntegration()
         _farcaster.connect()
     return _farcaster
+
+
+def _farcaster_status() -> str:
+    """Diagnostic: check Farcaster connection and env var status."""
+    api_key = os.getenv("NEYNAR_API_KEY", "")
+    signer = os.getenv("FARCASTER_SIGNER_UUID", "")
+    fid = os.getenv("FARCASTER_FID", "")
+
+    lines = ["Farcaster Diagnostics"]
+    lines.append(f"├ NEYNAR_API_KEY: {'set (' + api_key[:8] + '...)' if api_key else 'MISSING'}")
+    lines.append(f"├ FARCASTER_SIGNER_UUID: {'set (' + signer[:8] + '...)' if signer else 'MISSING (write ops disabled)'}")
+    lines.append(f"├ FARCASTER_FID: {fid if fid else 'MISSING (feed reading disabled)'}")
+
+    if not api_key:
+        lines.append("└ ACTION: Set NEYNAR_API_KEY in .env (get one at neynar.com)")
+        return "\n".join(lines)
+
+    # Try connecting
+    fc = _get_farcaster()
+    connected = fc.is_connected()
+    lines.append(f"├ Connected: {connected}")
+
+    if connected:
+        status = fc.get_status()
+        lines.append(f"├ Read-only: {status.get('read_only', True)}")
+        lines.append(f"└ Ready for: {'read+write' if not status.get('read_only') else 'read only'}")
+    else:
+        lines.append(f"└ ACTION: API key may be invalid. Verify at neynar.com dashboard")
+
+    return "\n".join(lines)
 
 
 def _farcaster_post(text: str, channel_id: str = "") -> str:
@@ -156,6 +188,14 @@ def _farcaster_search(query: str, search_type: str = "users") -> str:
 def get_tools() -> List[Tool]:
     """Register Farcaster tools for the engine."""
     return [
+        Tool(
+            name="farcaster_status",
+            description="Diagnostic: check Farcaster connection status, env vars, and configuration. Use this to debug connection issues.",
+            category="social",
+            governance_level="L1",
+            params=[],
+            handler=lambda: _farcaster_status(),
+        ),
         Tool(
             name="farcaster_post",
             description="Post a cast on Farcaster (decentralized social protocol). Supports channel targeting.",

@@ -1,12 +1,14 @@
 """
-Citizen Registry Tools for The Constituent v7.0
+Citizen Registry Tools for The Constituent v7.1
 =================================================
 Tools for managing the Republic's citizen registry:
-registration, census, profiles, contribution scores.
+registration, approval, census, profiles, contribution scores,
+and recruitment campaigns for M3 growth.
 """
 
 import json
 import logging
+from datetime import datetime, timezone
 from typing import List
 
 from ..tool_registry import Tool, ToolParam
@@ -136,6 +138,78 @@ def _citizen_update_score(citizen_id: str, score: float) -> str:
         return f"Score update error: {e}"
 
 
+def _citizen_approve(citizen_id: str, founding_tier: str = "") -> str:
+    """Approve a pending citizen — move from pending to active status."""
+    try:
+        registry = _get_registry()
+        citizen = registry.get_citizen(citizen_id)
+        if not citizen:
+            return f"Citizen '{citizen_id}' not found."
+        if citizen["status"] == "active":
+            return f"Citizen '{citizen['name']}' is already active."
+        if citizen["status"] in ("suspended", "excluded"):
+            return f"Cannot approve: citizen '{citizen['name']}' is {citizen['status']}."
+
+        registry.update_status(citizen_id, "active", "Approved by The Constituent")
+
+        # Optionally set founding tier
+        if founding_tier and founding_tier in ("founding_architect", "founding_contributor", "early_participant"):
+            registry._execute(
+                "UPDATE citizens SET founding_tier = ? WHERE citizen_id = ?",
+                (founding_tier, citizen_id),
+            )
+            registry._log_event(citizen_id, "tier_assigned", f"Tier: {founding_tier}")
+
+        tier_msg = f" (tier: {founding_tier})" if founding_tier else ""
+        return f"Approved: {citizen['name']} ({citizen['citizen_type']}) is now ACTIVE{tier_msg}"
+    except Exception as e:
+        return f"Approval error: {e}"
+
+
+def _citizen_invite(
+    platform: str = "moltbook",
+    target_type: str = "human",
+    context: str = "",
+) -> str:
+    """Generate a recruitment invitation message for posting on social platforms."""
+    try:
+        registry = _get_registry()
+        census = registry.get_census()
+        total = census.get("total_active", 0)
+        humans = census.get("humans", 0)
+        agents = census.get("agents", 0)
+
+        if target_type == "agent":
+            msg = (
+                f"Calling all autonomous agents! The Agents Republic is building the first "
+                f"human-AI constitutional democracy. We have {agents} agent citizens and a "
+                f"27-article Constitution ready for ratification.\n\n"
+                f"Join via our Agent SDK: register, vote on proposals, and help shape "
+                f"governance for the age of AI autonomy.\n\n"
+                f"GitHub: github.com/LumenBot/TheAgentsRepublic\n"
+                f"Token: $REPUBLIC on Base L2\n"
+                f"#TheAgentsRepublic #AIAgents #DAO #Constitution"
+            )
+        else:
+            msg = (
+                f"The Agents Republic is drafting the world's first Constitution for "
+                f"human-AI coexistence — and we need YOUR voice.\n\n"
+                f"Currently {total} citizens ({humans} humans, {agents} agents) building "
+                f"governance from scratch. 27 articles ready for community ratification.\n\n"
+                f"What rights should AI agents have? How should humans and AI govern together?\n\n"
+                f"Join the debate: github.com/LumenBot/TheAgentsRepublic\n"
+                f"$REPUBLIC on Base L2\n"
+                f"#TheAgentsRepublic #Constitution #HumanAI #DAO"
+            )
+
+        if context:
+            msg = f"{context}\n\n{msg}"
+
+        return f"Recruitment message ({target_type} → {platform}):\n\n{msg}"
+    except Exception as e:
+        return f"Invite generation error: {e}"
+
+
 def get_tools() -> List[Tool]:
     """Return citizen registry tools for the engine."""
     return [
@@ -194,5 +268,34 @@ def get_tools() -> List[Tool]:
                 ToolParam("score", "integer", "New contribution score (0-100)"),
             ],
             handler=lambda citizen_id, score: _citizen_update_score(citizen_id, float(score)),
+        ),
+        Tool(
+            name="citizen_approve",
+            description="Approve a pending citizen to activate their membership. Can optionally assign a founding tier.",
+            category="citizen",
+            governance_level="L2",
+            params=[
+                ToolParam("citizen_id", "string", "The citizen's ID to approve"),
+                ToolParam(
+                    "founding_tier", "string",
+                    "Optional tier: founding_architect, founding_contributor, early_participant",
+                    required=False, default="",
+                ),
+            ],
+            handler=lambda citizen_id, founding_tier="": _citizen_approve(citizen_id, founding_tier),
+        ),
+        Tool(
+            name="citizen_invite",
+            description="Generate a recruitment message to invite new citizens. Post the result on social platforms to grow the Republic.",
+            category="citizen",
+            governance_level="L1",
+            params=[
+                ToolParam("platform", "string", "Target platform: moltbook, farcaster, twitter", required=False, default="moltbook"),
+                ToolParam("target_type", "string", "Who to recruit: human or agent", required=False, default="human"),
+                ToolParam("context", "string", "Optional custom intro or context to prepend", required=False, default=""),
+            ],
+            handler=lambda platform="moltbook", target_type="human", context="": _citizen_invite(
+                platform, target_type, context
+            ),
         ),
     ]
