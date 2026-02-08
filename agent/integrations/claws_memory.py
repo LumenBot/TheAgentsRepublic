@@ -12,6 +12,7 @@ import os
 import json
 import logging
 import time
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 import requests
@@ -28,11 +29,36 @@ class ClawsMemory:
     def __init__(self, agent_id: str = None, api_key: str = None):
         self.agent_id = agent_id or os.environ.get(
             "CLAWS_AGENT_ID",
-            os.environ.get("MOLTBOOK_AGENT_ID", "the-constituent"),
+            os.environ.get("MOLTBOOK_AGENT_ID", ""),
         )
+        # Fallback: read agent_id from Moltbook credentials file (UUID format)
+        if not self.agent_id:
+            self.agent_id = self._load_agent_id_from_moltbook()
+        if not self.agent_id:
+            self.agent_id = "the-constituent"
+            logger.warning(
+                "CLAWS agent_id defaulted to 'the-constituent'. "
+                "Set CLAWS_AGENT_ID env var to your Moltbook agent UUID."
+            )
         self.api_key = api_key or os.environ.get("CLAWS_API_KEY", "")
         self._connected = False
         self._last_error = None
+        logger.info(f"CLAWS initialized with agent_id={self.agent_id[:16]}...")
+
+    @staticmethod
+    def _load_agent_id_from_moltbook() -> str:
+        """Try to read agent_id from Moltbook credentials file."""
+        creds_path = Path(__file__).parent.parent.parent / "data" / "moltbook_credentials.json"
+        if creds_path.exists():
+            try:
+                data = json.loads(creds_path.read_text(encoding="utf-8"))
+                agent_id = data.get("agent_id", "")
+                if agent_id:
+                    logger.info(f"CLAWS agent_id loaded from Moltbook credentials: {agent_id[:12]}...")
+                    return agent_id
+            except Exception as e:
+                logger.debug(f"Could not read Moltbook credentials for CLAWS: {e}")
+        return ""
 
     # ------------------------------------------------------------------
     # Low-level API

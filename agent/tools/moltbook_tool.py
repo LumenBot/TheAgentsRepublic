@@ -26,7 +26,10 @@ def _get_moltbook() -> MoltbookOperations:
 def _moltbook_post(title: str, content: str, submolt: str = "") -> str:
     mb = _get_moltbook()
     if not mb.is_connected():
-        return "Error: Moltbook not connected"
+        # Retry connection once — startup test may have failed transiently
+        mb._test_connection()
+        if not mb.is_connected():
+            return "Error: Moltbook not connected (check API key and network)"
     rate = mb.can_post()
     if not rate.get("can_post", False):
         return f"Rate limited: wait {rate.get('wait_minutes', '?')} minutes"
@@ -41,7 +44,9 @@ def _moltbook_post(title: str, content: str, submolt: str = "") -> str:
 def _moltbook_comment(post_id: str, content: str) -> str:
     mb = _get_moltbook()
     if not mb.is_connected():
-        return "Error: Moltbook not connected"
+        mb._test_connection()
+        if not mb.is_connected():
+            return "Error: Moltbook not connected (check API key and network)"
     rate = mb.can_comment()
     if not rate.get("can_comment", True):
         return f"Comment rate limited: wait {rate.get('wait_minutes', '?')} minutes"
