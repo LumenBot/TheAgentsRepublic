@@ -158,6 +158,14 @@ class TelegramBotHandler:
 ├ /claws\\_remember <text> - Store a memory
 └ /claws\\_seed - Seed $REPUBLIC token data
 
+📈 **Trading & Market Making** (v6.3)
+├ /portfolio - Portfolio status & P&L
+├ /scout - Scan Clawnch for opportunities
+├ /trade\\_buy <addr> <amount> - Buy a token
+├ /trade\\_sell <addr> [amount] - Sell a token
+├ /mm [start|stop|status|cycle] - Market maker
+└ /price - $REPUBLIC price
+
 🧠 **Heartbeat Engine**
 ├ /autonomy - Budget + heartbeat stats
 ├ /heartbeat [section] - Trigger heartbeat
@@ -1247,6 +1255,110 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     # =========================================================================
+    # Trading & Market Making Commands (v6.3)
+    # =========================================================================
+
+    async def portfolio_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Show trading portfolio status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .tools.trading_tool import _portfolio_status
+            await update.message.reply_text(f"```\n{_portfolio_status()}\n```", parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    async def scout_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Run Clawnch scout scan."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .tools.trading_tool import _scout_report
+            report = _scout_report()
+            if len(report) > 4000:
+                report = report[:3997] + "..."
+            await update.message.reply_text(f"```\n{report}\n```", parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    async def trade_buy_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Buy a token. Usage: /trade_buy <token_address> <amount_clawnch> [reason]"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        if not args or len(args) < 2:
+            await update.message.reply_text(
+                "Usage: `/trade_buy <token_address> <amount_clawnch> [reason]`",
+                parse_mode='Markdown')
+            return
+        try:
+            from .tools.trading_tool import _buy_token
+            token_addr = args[0]
+            amount = args[1]
+            reason = " ".join(args[2:]) if len(args) > 2 else "manual buy"
+            result = _buy_token(token_addr, amount, reason)
+            await update.message.reply_text(result)
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    async def trade_sell_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Sell a token. Usage: /trade_sell <token_address> [amount] [reason]"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        if not args:
+            await update.message.reply_text(
+                "Usage: `/trade_sell <token_address> [amount] [reason]`",
+                parse_mode='Markdown')
+            return
+        try:
+            from .tools.trading_tool import _sell_token
+            token_addr = args[0]
+            amount = args[1] if len(args) > 1 else "0"
+            reason = " ".join(args[2:]) if len(args) > 2 else "manual sell"
+            result = _sell_token(token_addr, amount, reason)
+            await update.message.reply_text(result)
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    async def mm_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Market maker control. Usage: /mm [start|stop|status|cycle]"""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        args = context.args
+        action = args[0].lower() if args else "status"
+        try:
+            from .tools.trading_tool import _mm_status, _mm_start, _mm_stop, _mm_cycle, _mm_evaluate
+            if action == "start":
+                await update.message.reply_text(_mm_start())
+            elif action == "stop":
+                await update.message.reply_text(_mm_stop())
+            elif action == "cycle":
+                await update.message.reply_text(_mm_cycle())
+            elif action == "eval":
+                await update.message.reply_text(_mm_evaluate())
+            else:
+                await update.message.reply_text(f"```\n{_mm_status()}\n```", parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    async def price_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Get $REPUBLIC price."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .tools.trading_tool import _republic_price
+            await update.message.reply_text(_republic_price())
+        except Exception as e:
+            await update.message.reply_text(f"Error: {e}")
+
+    # =========================================================================
     # Chat Handler
     # =========================================================================
 
@@ -1361,6 +1473,13 @@ Full profile: agent_profile.md"""
             ("claws_recent", self.claws_recent_command),
             ("claws_remember", self.claws_remember_command),
             ("claws_seed", self.claws_seed_command),
+            # Trading & Market Making (v6.3)
+            ("portfolio", self.portfolio_command),
+            ("scout", self.scout_command),
+            ("trade_buy", self.trade_buy_command),
+            ("trade_sell", self.trade_sell_command),
+            ("mm", self.mm_command),
+            ("price", self.price_command),
         ]
 
         for cmd, handler in handlers:

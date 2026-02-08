@@ -245,6 +245,13 @@ class Engine:
         except ImportError as e:
             logger.warning(f"farcaster_tool not available: {e}")
 
+        # DeFi trading tools (v6.3)
+        try:
+            from .tools.trading_tool import get_tools as trading_tools
+            self.registry.register_many(trading_tools())
+        except ImportError as e:
+            logger.warning(f"trading_tool not available: {e}")
+
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 
     # =================================================================

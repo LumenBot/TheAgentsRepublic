@@ -1,13 +1,15 @@
 """
-Autonomy Loop v4.2 — Proactive Constitutional Builder + CLAWS Memory
-=====================================================================
+Autonomy Loop v4.3 — Constitutional Builder + CLAWS + Trading
+===============================================================
+v4.3: DeFi trading cycle — scout Clawnch, trade tokens, market-make $REPUBLIC.
 v4.2: CLAWS integration — all significant events saved to persistent memory.
 v4.0: Local post tracking, verbose logging, file verification.
 
-Three cycles:
+Four cycles:
 1. ENGAGEMENT (10 min) — Track own posts locally, respond to comments, upvote
 2. CONSTITUTION (2h) — Write articles, verify files created, post for debate
 3. EXPLORATION (4h) — Search ecosystem for allies and opportunities
+4. TRADING (30 min) — Scout Clawnch, evaluate trades, market-make $REPUBLIC
 
 Budget: ~$1.50/day Claude API max
 """
@@ -25,6 +27,7 @@ logger = logging.getLogger("TheConstituent.Autonomy")
 ENGAGEMENT_INTERVAL = 600
 CONSTITUTION_INTERVAL = 7200
 EXPLORATION_INTERVAL = 14400
+TRADING_INTERVAL = 1800       # 30 min — scout + trade + MM cycle
 L2_EXPIRY_CHECK = 600
 DAILY_LIMIT = 80
 MAX_REPLY_CHARS = 500
@@ -118,12 +121,14 @@ class AutonomyLoop:
             asyncio.create_task(self._engagement_cycle()),
             asyncio.create_task(self._constitution_cycle()),
             asyncio.create_task(self._exploration_cycle()),
+            asyncio.create_task(self._trading_cycle()),
             asyncio.create_task(self._l2_expiry_loop()),
         ]
-        msg = (f"🧠 Autonomy v4.0 STARTED\n"
+        msg = (f"🧠 Autonomy v4.3 STARTED\n"
                f"├ Engagement: {ENGAGEMENT_INTERVAL//60}min\n"
                f"├ Constitution: {CONSTITUTION_INTERVAL//3600}h\n"
                f"├ Exploration: {EXPLORATION_INTERVAL//3600}h\n"
+               f"├ Trading: {TRADING_INTERVAL//60}min\n"
                f"├ Posts tracked: {len(self._my_posts)}\n"
                f"└ Articles: {len(self._constitution_progress.get('articles_written',[]))}")
         logger.info(msg); await self._notify(msg)
@@ -348,6 +353,75 @@ class AutonomyLoop:
                 tags=["exploration", "discovery", "ecosystem"]
             )
         return {"discoveries":discoveries}
+
+    # === CYCLE 4: TRADING (30 min) ===
+    async def _trading_cycle(self):
+        logger.info("📈 Trading: first in 5min"); await asyncio.sleep(300)
+        while self._running:
+            try:
+                logger.info("📈 TRADING CYCLE START")
+                r = await self._do_trading()
+                logger.info(f"📈 TRADING CYCLE END: {r.get('summary', 'done')}")
+                if r.get("actions_taken"):
+                    await self._notify(f"📈 Trading: {r['summary']}")
+            except asyncio.CancelledError: break
+            except Exception as e: logger.error(f"Trading cycle: {e}")
+            await asyncio.sleep(TRADING_INTERVAL)
+
+    async def _do_trading(self) -> Dict:
+        """Execute one trading cycle: scout + evaluate + trade + MM."""
+        actions = []
+        loop = asyncio.get_event_loop()
+
+        # Step 1: Scout for new launches
+        try:
+            from .integrations.clawnch_scout import ClawnchScout
+            scout = ClawnchScout()
+            tokens = await loop.run_in_executor(None, scout.scan_new_launches)
+            if tokens:
+                top = tokens[0]
+                actions.append(f"Scout: {len(tokens)} tokens, top={top.get('name','?')} (score={top.get('score',0)})")
+                self._claws_remember(
+                    f"[TRADING] Scouted {len(tokens)} new tokens. Top: {top.get('name','?')} "
+                    f"(${top.get('symbol','?')}) score={top.get('score',0)}/100",
+                    tags=["trading", "scout", "clawnch"]
+                )
+        except Exception as e:
+            logger.warning(f"Trading scout failed: {e}")
+
+        # Step 2: Market making cycle (if active)
+        try:
+            from .integrations.market_maker import MarketMaker
+            from .integrations.defi_trader import DeFiTrader
+            trader = DeFiTrader()
+            mm = MarketMaker(trader=trader)
+            if mm.is_active():
+                result = await loop.run_in_executor(None, mm.execute_mm_cycle)
+                action = result.get("action", "hold")
+                if action != "hold":
+                    actions.append(f"MM: {action}")
+                    self._claws_remember(
+                        f"[TRADING] Market maker {action}: {result.get('evaluation',{}).get('reason','')}",
+                        tags=["trading", "market_maker", "republic"]
+                    )
+                else:
+                    actions.append(f"MM: hold ({result.get('evaluation',{}).get('reason','within spread')[:60]})")
+        except Exception as e:
+            logger.warning(f"Trading MM failed: {e}")
+
+        # Step 3: Check stop-losses on open positions
+        try:
+            from .integrations.defi_trader import DeFiTrader
+            trader = DeFiTrader()
+            portfolio = trader.get_portfolio_status()
+            positions = portfolio.get("positions", {})
+            if positions:
+                actions.append(f"Positions: {len(positions)} open")
+        except Exception as e:
+            logger.warning(f"Position check failed: {e}")
+
+        summary = " | ".join(actions) if actions else "No action"
+        return {"actions_taken": len(actions), "summary": summary}
 
     # === L2 + Retries ===
     async def _l2_expiry_loop(self):

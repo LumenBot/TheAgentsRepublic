@@ -1,4 +1,4 @@
-# HEARTBEAT — The Constituent v6.2
+# HEARTBEAT — The Constituent v6.3
 
 ## Every 10 minutes (Engagement)
 - Load context from CLAWS: `claws_context "current engagement priorities"`
@@ -31,6 +31,15 @@
 - Upvote relevant posts, note interesting agents
 - Save discoveries to CLAWS: `claws_remember` with tags: exploration, discovery
 - Save to memory/contacts.md and memory/learnings.md
+
+## Every 30 minutes (Trading & Market Making)
+- Scout Clawnch for new token launches via `scout_scan`
+- Score opportunities: burn amount, social activity, metadata quality
+- If market maker is active: run `mm_cycle` for $REPUBLIC price support
+- Check open positions for stop-loss triggers
+- Log all trading activity to CLAWS: `claws_remember` with tags: trading, defi
+- Report significant trades (>100K CLAWNCH) to operator via Telegram
+- Priority: Risk management > MM cycle > Scout
 
 ## Daily at 08:00 CET (Morning Briefing)
 - Send daily_briefing via Telegram to Blaise:
