@@ -42,7 +42,7 @@ class Engine:
     5. Engine dispatches, returns results, Claude continues
     """
 
-    VERSION = "6.3.0"
+    VERSION = "7.0.0"
 
     def __init__(
         self,
@@ -251,6 +251,20 @@ class Engine:
             self.registry.register_many(trading_tools())
         except ImportError as e:
             logger.warning(f"trading_tool not available: {e}")
+
+        # Governance tools (v7.0)
+        try:
+            from .tools.governance_tool import get_tools as governance_tools
+            self.registry.register_many(governance_tools())
+        except ImportError as e:
+            logger.warning(f"governance_tool not available: {e}")
+
+        # Citizen registry tools (v7.0)
+        try:
+            from .tools.citizen_tool import get_tools as citizen_tools
+            self.registry.register_many(citizen_tools())
+        except ImportError as e:
+            logger.warning(f"citizen_tool not available: {e}")
 
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 

@@ -1,15 +1,17 @@
 """
-Autonomy Loop v4.3 — Constitutional Builder + CLAWS + Trading
-===============================================================
+Autonomy Loop v5.0 — Constitutional Builder + Governance + Trading
+===================================================================
+v5.0: Governance cycle — check proposals, vote, track citizen registry.
 v4.3: DeFi trading cycle — scout Clawnch, trade tokens, market-make $REPUBLIC.
 v4.2: CLAWS integration — all significant events saved to persistent memory.
 v4.0: Local post tracking, verbose logging, file verification.
 
-Four cycles:
+Five cycles:
 1. ENGAGEMENT (10 min) — Track own posts locally, respond to comments, upvote
 2. CONSTITUTION (2h) — Write articles, verify files created, post for debate
 3. EXPLORATION (4h) — Search ecosystem for allies and opportunities
 4. TRADING (30 min) — Scout Clawnch, evaluate trades, market-make $REPUBLIC
+5. GOVERNANCE (1h) — Check proposals, refresh states, update citizen registry
 
 Budget: ~$1.50/day Claude API max
 """
@@ -28,6 +30,7 @@ ENGAGEMENT_INTERVAL = 600
 CONSTITUTION_INTERVAL = 7200
 EXPLORATION_INTERVAL = 14400
 TRADING_INTERVAL = 1800       # 30 min — scout + trade + MM cycle
+GOVERNANCE_INTERVAL = 3600    # 1h — check proposals, vote, registry
 L2_EXPIRY_CHECK = 600
 DAILY_LIMIT = 80
 MAX_REPLY_CHARS = 500
@@ -63,6 +66,9 @@ CONSTITUTION_SECTIONS_TODO = [
         {"name": "Article 24: Relations with Nation-States", "file": "ARTICLE_24.md"},
         {"name": "Article 25: DAO Alliances and Interoperability", "file": "ARTICLE_25.md"},
         {"name": "Article 26: Crypto and AI Ecosystem Diplomacy", "file": "ARTICLE_26.md"},
+    ]},
+    {"title": "Title VII: Transitional Provisions", "dir": "07_TITLE_VII_TRANSITIONAL", "articles": [
+        {"name": "Article 27: Transitional Provisions", "file": "ARTICLE_27.md"},
     ]},
 ]
 
@@ -122,13 +128,15 @@ class AutonomyLoop:
             asyncio.create_task(self._constitution_cycle()),
             asyncio.create_task(self._exploration_cycle()),
             asyncio.create_task(self._trading_cycle()),
+            asyncio.create_task(self._governance_cycle()),
             asyncio.create_task(self._l2_expiry_loop()),
         ]
-        msg = (f"🧠 Autonomy v4.3 STARTED\n"
+        msg = (f"🧠 Autonomy v5.0 STARTED\n"
                f"├ Engagement: {ENGAGEMENT_INTERVAL//60}min\n"
                f"├ Constitution: {CONSTITUTION_INTERVAL//3600}h\n"
                f"├ Exploration: {EXPLORATION_INTERVAL//3600}h\n"
                f"├ Trading: {TRADING_INTERVAL//60}min\n"
+               f"├ Governance: {GOVERNANCE_INTERVAL//60}min\n"
                f"├ Posts tracked: {len(self._my_posts)}\n"
                f"└ Articles: {len(self._constitution_progress.get('articles_written',[]))}")
         logger.info(msg); await self._notify(msg)
@@ -422,6 +430,57 @@ class AutonomyLoop:
 
         summary = " | ".join(actions) if actions else "No action"
         return {"actions_taken": len(actions), "summary": summary}
+
+    # === CYCLE 5: GOVERNANCE (1h) ===
+    async def _governance_cycle(self):
+        logger.info("🏛️ Governance: first in 10min"); await asyncio.sleep(600)
+        while self._running:
+            try:
+                logger.info("🏛️ GOVERNANCE CYCLE START")
+                r = await self._do_governance()
+                logger.info(f"🏛️ GOVERNANCE CYCLE END: {r.get('summary', 'done')}")
+                if r.get("actions"):
+                    await self._notify(f"🏛️ Governance: {r['summary']}")
+            except asyncio.CancelledError: break
+            except Exception as e: logger.error(f"Governance cycle: {e}")
+            await asyncio.sleep(GOVERNANCE_INTERVAL)
+
+    async def _do_governance(self) -> Dict:
+        """Execute one governance cycle: refresh proposals, check registry, vote."""
+        actions = []
+
+        # Step 1: Refresh governance proposal states
+        try:
+            from .integrations.governance import GovernanceManager
+            gov = GovernanceManager()
+            status = gov.get_governance_status()
+            tracked = status.get("proposals_tracked", 0)
+            active = status.get("active_proposals", [])
+            actions.append(f"Proposals: {tracked} tracked, {len(active)} active")
+
+            if active:
+                self._claws_remember(
+                    f"[GOVERNANCE] {len(active)} active proposals: "
+                    + ", ".join(p.get("title", "?") for p in active[:3]),
+                    tags=["governance", "proposals"]
+                )
+        except Exception as e:
+            logger.warning(f"Governance status check failed: {e}")
+
+        # Step 2: Census update
+        try:
+            from .integrations.citizen_registry import CitizenRegistry
+            registry = CitizenRegistry()
+            census = registry.get_census()
+            total = census.get("total_active", 0)
+            humans = census.get("humans", 0)
+            agents = census.get("agents", 0)
+            actions.append(f"Census: {total} citizens ({humans}H/{agents}A)")
+        except Exception as e:
+            logger.warning(f"Census check failed: {e}")
+
+        summary = " | ".join(actions) if actions else "No governance actions"
+        return {"actions": len(actions), "summary": summary}
 
     # === L2 + Retries ===
     async def _l2_expiry_loop(self):

@@ -82,22 +82,25 @@ The Republic acquires economic sovereignty.
 
 ---
 
-### MILESTONE 3: Community Growth (Q1 2026)
+### MILESTONE 3: Community Growth (Q1 2026) -- IN PROGRESS
 
 The Republic becomes a living community, not just a codebase.
 
-| Deliverable | Target |
+| Deliverable | Status |
 |---|---|
-| 100+ active human participants across all platforms | Q1 2026 |
-| 10+ autonomous AI agents engaging with the Constitution | Q1 2026 |
-| Active DAO with on-chain proposal submission and voting | Q1 2026 |
-| Constitution expanded to 27 articles across 7 titles | Q1 2026 |
-| Title IV: Enforcement and Remedies drafted and ratified | Q1 2026 |
-| Title V: External Relations and Economy drafted | Q1 2026 |
-| Title VI: Amendment Process formalized | Q1 2026 |
-| Title VII: Transitional Provisions | Q1 2026 |
-| Founding Contributor NFT minted (soul-bound, tiered recognition) | Q1 2026 |
-| Weekly constitutional debates on Moltbook with structured outcomes | Q1 2026 |
+| 100+ active human participants across all platforms | In progress |
+| 10+ autonomous AI agents engaging with the Constitution | In progress |
+| Active DAO with on-chain proposal submission and voting | **Done** (v7.0 governance integration) |
+| Constitution expanded to 27 articles across 7 titles | **Done** (27 articles, 7 titles) |
+| Title IV: Economy (Articles 17-20) drafted | **Done** |
+| Title V: Conflicts and Arbitration (Articles 21-23) drafted | **Done** |
+| Title VI: External Relations (Articles 24-26) drafted | **Done** |
+| Title VII: Transitional Provisions (Article 27) drafted | **Done** |
+| Citizen Registry for humans and agents | **Done** (v7.0) |
+| Agent SDK for external agent participation | **Done** (v0.1.0) |
+| Governance tools (propose, vote, query) integrated in engine | **Done** (v7.0) |
+| Founding Contributor NFT minted (soul-bound, tiered recognition) | Pending |
+| Weekly constitutional debates on Moltbook with structured outcomes | In progress |
 
 **Community tiers:**
 - **Founding Architects** (5-10): Principles directly incorporated into the Constitution (e.g., Ghidorah-Prime's asymmetric accountability framework).
@@ -194,8 +197,8 @@ The Republic becomes economically independent and self-perpetuating.
 
 | Metric | M0 (Jan) | M1 (Feb) | M2 (Feb) | M3 (Q1) | M4 (Q2) | M5 (Q2-Q3) | M6 (Q3) | M7 (Q4) |
 |---|---|---|---|---|---|---|---|---|
-| **Constitutional articles** | 0 | 13 | 13 | 27 | 27 | 27 | 27+ | 30+ |
-| **Titles ratified** | 0 | 3 | 3 | 7 | 7 | 7 | 7 (v1.0) | 7+ |
+| **Constitutional articles** | 0 | 13 | 13 | **27** | 27 | 27 | 27+ | 30+ |
+| **Titles ratified** | 0 | 3 | 3 | **7** | 7 | 7 | 7 (v1.0) | 7+ |
 | **Active AI agents** | 1 | 1 | 1 | 10+ | 25+ | 50+ | 100+ | 1,000+ |
 | **Human participants** | 1 | 5 | 10+ | 100+ | 250+ | 500+ | 1,000+ | 5,000+ |
 | **$REPUBLIC holders** | -- | -- | 50+ | 500+ | 1,000+ | 2,500+ | 5,000+ | 10,000+ |
@@ -203,7 +206,7 @@ The Republic becomes economically independent and self-perpetuating.
 | **Governance proposals** | 0 | 0 | 0 | 5+ | 15+ | 30+ | 50+ | 100+ |
 | **Treasury (USD equiv.)** | $0 | $0 | TBD | -- | -- | -- | -- | Revenue > costs |
 | **Platforms active** | 1 | 3 | 3 | 4+ | 5+ | 7+ | 7+ | 7+ |
-| **Agent version** | v1.0 | v5.3.1 | v6.0 | v7.x | v8.x | v9.x | v10.x | v11.x+ |
+| **Agent version** | v1.0 | v5.3.1 | v6.0 | **v7.0** | v8.x | v9.x | v10.x | v11.x+ |
 
 ---
 
@@ -292,5 +295,5 @@ The roadmap is a living document, subject to amendment through the same constitu
 
 ---
 
-*Last updated: February 8, 2026*
+*Last updated: February 8, 2026 — v7.0 (Constitution complete, Governance + Registry + SDK live)*
 *Maintained by the Strategic Council: Blaise Cavalli (Human Director), Claude Opus (Chief Architect), The Constituent (Executive Agent)*
