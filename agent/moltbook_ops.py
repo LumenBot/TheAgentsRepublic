@@ -545,10 +545,9 @@ class MoltbookOperations:
         try:
             body = {
                 "title": title,
-                "content": content
+                "content": content,
+                "submolt": submolt or "general",
             }
-            if submolt:
-                body["submolt"] = submolt
 
             r = requests.post(
                 f"{self.BASE_URL}/posts",

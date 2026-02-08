@@ -33,7 +33,7 @@ def _moltbook_post(title: str, content: str, submolt: str = "") -> str:
     rate = mb.can_post()
     if not rate.get("can_post", False):
         return f"Rate limited: wait {rate.get('wait_minutes', '?')} minutes"
-    result = mb.create_post(title=title, content=content, submolt=submolt or None)
+    result = mb.create_post(title=title, content=content, submolt=submolt or "general")
     if result and result.get("success"):
         post_id = result.get("post_id", "?")
         url = result.get("url", f"https://www.moltbook.com/post/{post_id}")
@@ -147,7 +147,7 @@ def get_tools() -> List[Tool]:
             params=[
                 ToolParam("title", "string", "Post title"),
                 ToolParam("content", "string", "Post content (markdown supported)"),
-                ToolParam("submolt", "string", "Submolt to post to (e.g. 'clawnch' for m/clawnch)", required=False, default=""),
+                ToolParam("submolt", "string", "Submolt to post to (e.g. 'general', 'clawnch'). Required by API, defaults to 'general'.", required=False, default="general"),
             ],
             handler=_moltbook_post,
         ),

@@ -66,7 +66,7 @@ class ClawsMemory:
 
     def _request(self, action: str, **kwargs) -> Dict:
         """Send a request to the CLAWS API."""
-        payload = {"action": action, "agentId": self.agent_id, **kwargs}
+        payload = {"action": action, "agent_id": self.agent_id, **kwargs}
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -129,7 +129,7 @@ class ClawsMemory:
             importance: Optional importance score (0.0-1.0).
             thread_id: Optional thread ID for grouping related memories.
         """
-        kwargs = {"content": content}
+        kwargs = {"text": content}
         if metadata:
             kwargs["metadata"] = metadata
         if tags:
@@ -137,7 +137,7 @@ class ClawsMemory:
         if importance is not None:
             kwargs["importance"] = importance
         if thread_id:
-            kwargs["threadId"] = thread_id
+            kwargs["thread_id"] = thread_id
 
         result = self._request("remember", **kwargs)
         if "error" not in result:
@@ -175,16 +175,16 @@ class ClawsMemory:
         """
         kwargs = {"limit": limit}
         if thread_id:
-            kwargs["threadId"] = thread_id
+            kwargs["thread_id"] = thread_id
         return self._request("recent", **kwargs)
 
     def forget(self, memory_id: str) -> Dict:
         """Delete a specific memory by ID."""
-        return self._request("forget", memoryId=memory_id)
+        return self._request("forget", memory_id=memory_id)
 
     def tag(self, memory_id: str, tags: List[str]) -> Dict:
         """Add tags to an existing memory."""
-        return self._request("tag", memoryId=memory_id, tags=tags)
+        return self._request("tag", memory_id=memory_id, tags=tags)
 
     def stats(self) -> Dict:
         """Get memory statistics (total count, storage, etc.)."""
@@ -203,7 +203,7 @@ class ClawsMemory:
             max_tokens: Maximum token budget for context.
             tags: Filter by tags.
         """
-        kwargs = {"query": query, "maxTokens": max_tokens}
+        kwargs = {"query": query, "max_tokens": max_tokens}
         if tags:
             kwargs["tags"] = tags
         return self._request("context", **kwargs)
