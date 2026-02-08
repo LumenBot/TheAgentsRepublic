@@ -22,9 +22,13 @@ _farcaster: FarcasterIntegration = None
 
 
 def _get_farcaster() -> FarcasterIntegration:
-    """Get or create the singleton FarcasterIntegration instance."""
+    """Get or create the singleton FarcasterIntegration instance.
+
+    Re-creates the instance if not connected, so env var changes
+    (e.g. adding NEYNAR_API_KEY to .env) take effect without restart.
+    """
     global _farcaster
-    if _farcaster is None:
+    if _farcaster is None or not _farcaster.is_connected():
         _farcaster = FarcasterIntegration()
         _farcaster.connect()
     return _farcaster
