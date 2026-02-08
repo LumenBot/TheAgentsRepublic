@@ -95,8 +95,9 @@ class MarketMaker:
 
     def get_republic_price(self) -> Dict:
         """
-        Get current $REPUBLIC price via DexScreener (free, no auth).
-        Also gets $CLAWNCH price for relative pricing.
+        Get current $REPUBLIC price via multi-source fallback:
+        1. DexScreener / GeckoTerminal / Odos / Clawnch API
+        2. Also fetches $CLAWNCH price for relative pricing.
         """
         from .dex_oracle import get_token_price
 
@@ -112,25 +113,27 @@ class MarketMaker:
         else:
             price_per_republic = 0
 
-        # Update EMA
-        alpha = 0.2  # Smoothing factor
-        if self._state.get("ema_price", 0) > 0:
-            self._state["ema_price"] = alpha * price_per_republic + (1 - alpha) * self._state["ema_price"]
-        else:
-            self._state["ema_price"] = price_per_republic
+        # Update EMA (only when we have real price data)
+        if price_per_republic > 0:
+            alpha = 0.2  # Smoothing factor
+            if self._state.get("ema_price", 0) > 0:
+                self._state["ema_price"] = alpha * price_per_republic + (1 - alpha) * self._state["ema_price"]
+            else:
+                self._state["ema_price"] = price_per_republic
+            self._state["mid_price"] = price_per_republic
+            self._save_state()
 
-        self._state["mid_price"] = price_per_republic
-        self._save_state()
-
+        source = republic_data.get("source", "dexscreener")
         return {
             "price_per_republic": price_per_republic,
             "price_usd": republic_usd,
             "clawnch_price_usd": clawnch_usd,
-            "ema_price": self._state["ema_price"],
+            "ema_price": self._state.get("ema_price", 0),
             "liquidity_usd": republic_data.get("liquidity_usd", 0),
             "volume_24h": republic_data.get("volume_24h", 0),
             "price_change_24h": republic_data.get("price_change_24h", 0),
-            "source": "dexscreener",
+            "market_cap": republic_data.get("market_cap", 0),
+            "source": source,
         }
 
     # =================================================================

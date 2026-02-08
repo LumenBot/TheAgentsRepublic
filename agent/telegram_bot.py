@@ -210,11 +210,12 @@ class TelegramBotHandler:
         ratio = self.agent.metrics.get_today_ratio()
         sprint = self.agent.metrics.get_sprint_summary()
 
-        # Constitution progress — count local files
+        # Constitution progress — count article files recursively
         const_count = 0
+        const_total = 26  # Articles 1-26 planned
         try:
             from pathlib import Path
-            const_files = list(Path("constitution").glob("*.md"))
+            const_files = list(Path("constitution").glob("**/ARTICLE_*.md"))
             const_count = len(const_files)
         except Exception:
             pass
@@ -233,7 +234,7 @@ class TelegramBotHandler:
 📊 **Budget:** {budget.get('api_calls_this_hour', '?')}/{budget.get('max_per_hour', '?')} hourly, {budget.get('api_calls_today', '?')}/{budget.get('max_per_day', '?')} daily
 📊 **Ratio:** {ratio.get('ratio', 0)} {'✅' if ratio.get('on_target') else '❌'} (exec: {ratio.get('execution_count', 0)} / phil: {ratio.get('philosophy_count', 0)})
 
-📜 Constitution: {const_count}/27 articles
+📜 Constitution: {const_count}/{const_total} articles
 🐦 Drafts: {1 if draft else 0} | Posted: {tweet_counts.get('posted', 0)}
 🕐 Last: {last_act}
 

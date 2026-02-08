@@ -124,14 +124,34 @@ def _republic_price() -> str:
     if "error" in price:
         return f"Price error: {price['error']}"
 
-    return (f"$REPUBLIC Price:\n"
-            f"  USD: ${price.get('price_usd', 0):.8f}\n"
-            f"  CLAWNCH: {price.get('price_per_republic', 0):.8f} per token\n"
-            f"  EMA: {price.get('ema_price', 0):.8f} CLAWNCH\n"
-            f"  Liquidity: ${price.get('liquidity_usd', 0):,.0f}\n"
-            f"  Volume 24h: ${price.get('volume_24h', 0):,.0f}\n"
-            f"  24h Change: {price.get('price_change_24h', 0):+.1f}%\n"
-            f"  Source: {price.get('source', '?')}")
+    price_usd = price.get('price_usd', 0)
+    source = price.get('source', '?')
+
+    if price_usd <= 0:
+        return (f"$REPUBLIC Price: Not available\n"
+                f"  Token may not be on a standard DEX yet.\n"
+                f"  If on Clawnch bonding curve, price will appear once indexed.\n"
+                f"  Sources checked: DexScreener, GeckoTerminal, Odos, Clawnch API")
+
+    lines = [
+        f"$REPUBLIC Price:",
+        f"  USD: ${price_usd:.8f}",
+    ]
+    if price.get('price_per_republic', 0) > 0:
+        lines.append(f"  CLAWNCH: {price['price_per_republic']:.8f} per token")
+    if price.get('ema_price', 0) > 0:
+        lines.append(f"  EMA: {price['ema_price']:.8f} CLAWNCH")
+    if price.get('liquidity_usd', 0) > 0:
+        lines.append(f"  Liquidity: ${price['liquidity_usd']:,.0f}")
+    if price.get('volume_24h', 0) > 0:
+        lines.append(f"  Volume 24h: ${price['volume_24h']:,.0f}")
+    if price.get('market_cap', 0) > 0:
+        lines.append(f"  Market cap: ${price['market_cap']:,.0f}")
+    change = price.get('price_change_24h', 0)
+    if change != 0:
+        lines.append(f"  24h Change: {change:+.1f}%")
+    lines.append(f"  Source: {source}")
+    return "\n".join(lines)
 
 
 # =================================================================

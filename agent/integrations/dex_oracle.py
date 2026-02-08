@@ -78,7 +78,11 @@ def dexscreener_search(query: str) -> List[Dict]:
 
 def get_token_price(token_address: str) -> Dict:
     """
-    Get token price in USD and native currency via DexScreener.
+    Get token price in USD via multi-source fallback chain:
+    1. DexScreener (standard DEX pools)
+    2. GeckoTerminal (broader indexing)
+    3. Odos pricing API (routes across ALL DEXes)
+    4. Clawnch API (bonding curve tokens)
 
     Returns:
         {"price_usd": float, "price_native": float, "liquidity_usd": float,
@@ -86,8 +90,22 @@ def get_token_price(token_address: str) -> Dict:
     """
     pairs = dexscreener_token_pairs(token_address)
     if not pairs:
-        # Fallback to GeckoTerminal
-        return geckoterminal_token_price(token_address)
+        # Fallback 1: GeckoTerminal
+        gt = geckoterminal_token_price(token_address)
+        if gt.get("price_usd", 0) > 0:
+            return gt
+
+        # Fallback 2: Odos pricing (routes across ALL DEXes including bonding curves)
+        odos = odos_token_price(token_address)
+        if odos.get("price_usd", 0) > 0:
+            return odos
+
+        # Fallback 3: Clawnch API (native bonding curve tokens)
+        clawnch = clawnch_token_price(token_address)
+        if clawnch.get("price_usd", 0) > 0:
+            return clawnch
+
+        return {"price_usd": 0, "error": "No price data from any source"}
 
     # Pick the pair with highest liquidity
     best = max(pairs, key=lambda p: float(p.get("liquidity", {}).get("usd", 0) or 0))
@@ -149,12 +167,32 @@ def geckoterminal_token_price(token_address: str) -> Dict:
         return {"error": str(e)}
 
 
+def _extract_token_address_from_pool(pool: Dict) -> str:
+    """
+    Extract the actual base token address from a GeckoTerminal pool object.
+
+    GeckoTerminal includes token addresses in relationships.base_token.data.id
+    in format "base_0x1234..." — parse that to get the token address.
+    Falls back to pool address if relationship data is missing.
+    """
+    try:
+        rel = pool.get("relationships", {})
+        base_id = rel.get("base_token", {}).get("data", {}).get("id", "")
+        # Format: "base_0x1234abcd..." → extract the address part
+        if "_0x" in base_id:
+            return base_id.split("_", 1)[1]
+    except Exception:
+        pass
+    # Fallback to pool address
+    return pool.get("attributes", {}).get("address", "")
+
+
 def geckoterminal_trending_pools(page: int = 1) -> List[Dict]:
     """Get trending pools on Base from GeckoTerminal."""
     _throttle()
     try:
         url = f"{GECKOTERMINAL_BASE}/networks/base/trending_pools"
-        resp = requests.get(url, params={"page": page}, timeout=10)
+        resp = requests.get(url, params={"page": page, "include": "base_token"}, timeout=10)
         if resp.status_code != 200:
             return []
 
@@ -163,8 +201,10 @@ def geckoterminal_trending_pools(page: int = 1) -> List[Dict]:
         results = []
         for pool in pools:
             attrs = pool.get("attributes", {})
+            token_address = _extract_token_address_from_pool(pool)
             results.append({
                 "pool_address": attrs.get("address", ""),
+                "token_address": token_address,
                 "name": attrs.get("name", ""),
                 "base_token": attrs.get("base_token_price_usd", ""),
                 "quote_token": attrs.get("quote_token_price_usd", ""),
@@ -188,7 +228,7 @@ def geckoterminal_new_pools(page: int = 1) -> List[Dict]:
     _throttle()
     try:
         url = f"{GECKOTERMINAL_BASE}/networks/base/new_pools"
-        resp = requests.get(url, params={"page": page}, timeout=10)
+        resp = requests.get(url, params={"page": page, "include": "base_token"}, timeout=10)
         if resp.status_code != 200:
             return []
 
@@ -197,8 +237,10 @@ def geckoterminal_new_pools(page: int = 1) -> List[Dict]:
         results = []
         for pool in pools:
             attrs = pool.get("attributes", {})
+            token_address = _extract_token_address_from_pool(pool)
             results.append({
                 "pool_address": attrs.get("address", ""),
+                "token_address": token_address,
                 "name": attrs.get("name", ""),
                 "price_usd": float(attrs.get("base_token_price_usd", 0) or 0),
                 "volume_24h": float(attrs.get("volume_usd", {}).get("h24", 0) or 0),
@@ -348,5 +390,48 @@ def odos_token_price(token_address: str) -> Dict:
             return {"error": f"Odos price {resp.status_code}"}
         data = resp.json()
         return {"price_usd": float(data.get("price", 0) or 0), "source": "odos"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# =================================================================
+# Clawnch API — bonding curve tokens (not yet on standard DEXes)
+# =================================================================
+
+CLAWNCH_API = "https://clawn.ch/api"
+
+
+def clawnch_token_price(token_address: str) -> Dict:
+    """
+    Get token price from Clawnch bonding curve API.
+
+    Tokens launched on Clawnch may not be indexed by DexScreener/GeckoTerminal
+    until they graduate to a standard DEX pool.
+    """
+    _throttle()
+    try:
+        url = f"{CLAWNCH_API}/tokens/{token_address}"
+        resp = requests.get(url, timeout=15)
+        if resp.status_code != 200:
+            return {"error": f"Clawnch API {resp.status_code}"}
+
+        data = resp.json()
+        # Clawnch API may return data in different formats
+        price_usd = float(data.get("priceUsd", 0) or data.get("price_usd", 0) or
+                         data.get("price", 0) or 0)
+        market_cap = float(data.get("marketCap", 0) or data.get("market_cap", 0) or 0)
+        liquidity = float(data.get("liquidity", 0) or data.get("tvl", 0) or 0)
+        volume = float(data.get("volume24h", 0) or data.get("volume_24h", 0) or 0)
+
+        return {
+            "price_usd": price_usd,
+            "market_cap": market_cap,
+            "liquidity_usd": liquidity,
+            "volume_24h": volume,
+            "source": "clawnch",
+            "name": data.get("name", ""),
+            "symbol": data.get("symbol", ""),
+        }
+
     except Exception as e:
         return {"error": str(e)}

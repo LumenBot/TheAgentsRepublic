@@ -113,16 +113,29 @@ class ClawnchScout:
         except Exception as e:
             logger.debug(f"Clawnch API scan: {e}")
 
-        # Deduplicate by token address
-        seen = set()
+        # Deduplicate by token address, keeping highest-data entry
+        seen_addrs = set()
+        seen_names = set()
         unique = []
         for token in all_tokens:
             addr = token.get("token_address", "").lower()
-            if addr and addr not in seen:
-                seen.add(addr)
-                unique.append(token)
+            name_key = token.get("symbol", "").lower() or token.get("name", "").lower()
 
-        # Filter: skip our own token and major stablecoins
+            # Skip if we've seen this exact address
+            if addr and addr in seen_addrs:
+                continue
+            # Skip if same symbol from different pool (dedup by name for GT pools)
+            if name_key and name_key in seen_names:
+                continue
+
+            if addr:
+                seen_addrs.add(addr)
+            if name_key:
+                seen_names.add(name_key)
+            unique.append(token)
+
+        # Filter: skip our own tokens and major stablecoins
+        # Check both token_address and pool_address against skip list
         skip = {
             trading_config.REPUBLIC_TOKEN.lower(),
             trading_config.CLAWNCH_TOKEN.lower(),
@@ -130,7 +143,13 @@ class ClawnchScout:
             "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",  # USDC on Base
             "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",  # DAI on Base
         }
-        unique = [t for t in unique if t.get("token_address", "").lower() not in skip]
+        skip_names = {"weth", "usdc", "dai", "clawnch", "republic"}
+        unique = [
+            t for t in unique
+            if t.get("token_address", "").lower() not in skip
+            and t.get("pool_address", "").lower() not in skip
+            and t.get("symbol", "").lower() not in skip_names
+        ]
 
         # Score each token
         scored = []
@@ -161,9 +180,12 @@ class ClawnchScout:
             # Parse "TOKEN / WETH" style names
             parts = name.split(" / ") if " / " in name else name.split("/")
             token_name = parts[0].strip() if parts else name
+            # Use actual token address (extracted from relationships), fallback to pool address
+            token_addr = pool.get("token_address", "") or pool.get("pool_address", "")
 
             tokens.append({
-                "token_address": pool.get("pool_address", ""),
+                "token_address": token_addr,
+                "pool_address": pool.get("pool_address", ""),
                 "name": token_name,
                 "symbol": token_name,
                 "source": "geckoterminal_trending",
@@ -186,9 +208,12 @@ class ClawnchScout:
             name = pool.get("name", "")
             parts = name.split(" / ") if " / " in name else name.split("/")
             token_name = parts[0].strip() if parts else name
+            # Use actual token address (extracted from relationships), fallback to pool address
+            token_addr = pool.get("token_address", "") or pool.get("pool_address", "")
 
             tokens.append({
-                "token_address": pool.get("pool_address", ""),
+                "token_address": token_addr,
+                "pool_address": pool.get("pool_address", ""),
                 "name": token_name,
                 "symbol": token_name,
                 "source": "geckoterminal_new",
