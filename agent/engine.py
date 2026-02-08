@@ -238,6 +238,13 @@ class Engine:
         except ImportError as e:
             logger.warning(f"briefing_tool not available: {e}")
 
+        # Farcaster tools (v6.3)
+        try:
+            from .tools.farcaster_tool import get_tools as farcaster_tools
+            self.registry.register_many(farcaster_tools())
+        except ImportError as e:
+            logger.warning(f"farcaster_tool not available: {e}")
+
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 
     # =================================================================

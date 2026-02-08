@@ -89,6 +89,12 @@ class APISettings:
     # Web Search
     BRAVE_SEARCH_API_KEY: str = field(default_factory=lambda: os.getenv("BRAVE_SEARCH_API_KEY", ""))
 
+    # Farcaster / Neynar (v6.3)
+    NEYNAR_API_KEY: str = field(default_factory=lambda: os.getenv("NEYNAR_API_KEY", ""))
+    FARCASTER_SIGNER_UUID: str = field(default_factory=lambda: os.getenv("FARCASTER_SIGNER_UUID", ""))
+    FARCASTER_FID: str = field(default_factory=lambda: os.getenv("FARCASTER_FID", ""))
+    FARCASTER_ENABLED: bool = field(default_factory=lambda: os.getenv("FARCASTER_ENABLED", "false").lower() == "true")
+
     # Web3 / Base L2 (v6.0)
     BASE_RPC_URL: str = field(default_factory=lambda: os.getenv("BASE_RPC_URL", "https://mainnet.base.org"))
     AGENT_WALLET_ADDRESS: str = field(default_factory=lambda: os.getenv("AGENT_WALLET_ADDRESS", ""))
