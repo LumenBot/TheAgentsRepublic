@@ -314,19 +314,20 @@ class DeFiTrader:
         return result
 
     # =================================================================
-    # Price Quotes
+    # Price Quotes (via DexScreener + Odos)
     # =================================================================
 
     def get_quote(self, token_in: str, token_out: str, amount_in: float,
                   fee: int = 3000) -> Dict:
         """
-        Get a price quote from Uniswap V3 on Base.
+        Get a swap quote via Odos (routes across ALL Base DEXes).
+        Falls back to DexScreener price data if Odos fails.
 
         Args:
             token_in: Address of input token
             token_out: Address of output token
             amount_in: Amount of input token (human-readable)
-            fee: Pool fee tier (500=0.05%, 3000=0.3%, 10000=1%)
+            fee: Ignored (Odos finds best route automatically)
 
         Returns:
             {"amount_out": float, "price": float, ...}
@@ -335,6 +336,8 @@ class DeFiTrader:
             return {"error": "Not connected to Base"}
 
         try:
+            from .dex_oracle import odos_quote, get_token_price
+
             # Get decimals for input token
             in_contract = self.w3.eth.contract(
                 address=Web3.to_checksum_address(token_in), abi=ERC20_ABI)
@@ -346,31 +349,47 @@ class DeFiTrader:
                 address=Web3.to_checksum_address(token_out), abi=ERC20_ABI)
             out_decimals = out_contract.functions.decimals().call()
 
-            # Quote via Uniswap V3 Quoter
-            quoter = self.w3.eth.contract(
-                address=Web3.to_checksum_address(trading_config.UNISWAP_V3_QUOTER),
-                abi=QUOTER_ABI,
+            # Try Odos quote first (routes across all DEXes)
+            quote = odos_quote(
+                token_in, token_out, amount_in_raw,
+                self.account.address if self.account else "0x0000000000000000000000000000000000000000",
             )
 
-            amount_out_raw = quoter.functions.quoteExactInputSingle(
-                Web3.to_checksum_address(token_in),
-                Web3.to_checksum_address(token_out),
-                fee,
-                amount_in_raw,
-                0,  # sqrtPriceLimitX96 = 0 means no limit
-            ).call()
+            if "error" not in quote and quote.get("amount_out", 0) > 0:
+                amount_out = quote["amount_out"] / (10 ** out_decimals)
+                price = amount_out / amount_in if amount_in > 0 else 0
+                return {
+                    "token_in": token_in,
+                    "token_out": token_out,
+                    "amount_in": amount_in,
+                    "amount_out": amount_out,
+                    "price": price,
+                    "path_id": quote.get("path_id", ""),
+                    "price_impact": quote.get("price_impact", 0),
+                    "source": "odos",
+                }
 
-            amount_out = amount_out_raw / (10 ** out_decimals)
-            price = amount_out / amount_in if amount_in > 0 else 0
+            # Fallback: use DexScreener prices to estimate
+            in_price = get_token_price(token_in)
+            out_price = get_token_price(token_out)
 
-            return {
-                "token_in": token_in,
-                "token_out": token_out,
-                "amount_in": amount_in,
-                "amount_out": amount_out,
-                "price": price,
-                "fee_tier": fee,
-            }
+            if in_price.get("price_usd", 0) > 0 and out_price.get("price_usd", 0) > 0:
+                value_usd = amount_in * in_price["price_usd"]
+                amount_out = value_usd / out_price["price_usd"]
+                price = amount_out / amount_in if amount_in > 0 else 0
+                return {
+                    "token_in": token_in,
+                    "token_out": token_out,
+                    "amount_in": amount_in,
+                    "amount_out": amount_out,
+                    "price": price,
+                    "source": "dexscreener_estimate",
+                    "note": "Estimated from USD prices, actual swap may differ",
+                }
+
+            return {"error": f"No quote available. Odos: {quote.get('error', '?')}",
+                    "token_in": token_in, "token_out": token_out}
+
         except Exception as e:
             return {"error": str(e), "token_in": token_in, "token_out": token_out}
 
@@ -486,14 +505,14 @@ class DeFiTrader:
         slippage_bps: int = None,
     ) -> Dict:
         """
-        Execute a token swap on Uniswap V3 (Base L2).
+        Execute a token swap via Odos (routes across ALL Base DEXes).
 
         Args:
             token_in: Input token address
             token_out: Output token address
             amount_in: Amount of input token (human-readable)
             reason: Why this trade is being made (for logging)
-            fee: Uniswap V3 fee tier (3000 = 0.3%)
+            fee: Ignored (Odos finds best route)
             slippage_bps: Slippage tolerance in basis points
 
         Returns:
@@ -504,17 +523,10 @@ class DeFiTrader:
         if not self.account:
             return {"error": "Wallet not configured"}
 
+        from .dex_oracle import odos_quote, odos_assemble, ODOS_ROUTER_V2
+
         slippage_bps = slippage_bps or trading_config.DEFAULT_SLIPPAGE_BPS
-        if slippage_bps > trading_config.MAX_SLIPPAGE_BPS:
-            return {"error": f"Slippage too high ({slippage_bps} bps > {trading_config.MAX_SLIPPAGE_BPS} max)"}
-
-        # Get quote first
-        quote = self.get_quote(token_in, token_out, amount_in, fee)
-        if "error" in quote:
-            return {"error": f"Quote failed: {quote['error']}"}
-
-        expected_out = quote["amount_out"]
-        min_out = expected_out * (1 - slippage_bps / 10000)
+        slippage_pct = slippage_bps / 100  # Odos uses percent
 
         # Get input token info
         in_contract = self.w3.eth.contract(
@@ -525,54 +537,51 @@ class DeFiTrader:
 
         out_contract = self.w3.eth.contract(
             address=Web3.to_checksum_address(token_out), abi=ERC20_ABI)
-        out_decimals = out_contract.functions.decimals().call()
         out_symbol = out_contract.functions.symbol().call()
-        min_out_raw = int(min_out * (10 ** out_decimals))
 
         # Check balance
         balance = in_contract.functions.balanceOf(self.account.address).call()
         if balance < amount_in_raw:
-            return {"error": f"Insufficient {in_symbol} balance. Have {balance / 10**in_decimals:.2f}, need {amount_in:.2f}"}
+            return {"error": f"Insufficient {in_symbol}. Have {balance / 10**in_decimals:.2f}, need {amount_in:.2f}"}
 
-        # Approve router
-        router_address = trading_config.UNISWAP_V3_ROUTER
-        approval = self._approve_token(token_in, router_address, amount_in_raw)
+        # Get Odos quote
+        quote = odos_quote(token_in, token_out, amount_in_raw,
+                           self.account.address, slippage_pct)
+        if "error" in quote:
+            return {"error": f"Quote failed: {quote['error']}"}
+
+        path_id = quote.get("path_id")
+        if not path_id:
+            return {"error": "No valid route found by Odos"}
+
+        expected_out = quote.get("amount_out", 0)
+        out_decimals = out_contract.functions.decimals().call()
+        expected_out_human = expected_out / (10 ** out_decimals) if expected_out > 0 else 0
+
+        # Approve Odos router
+        approval = self._approve_token(token_in, ODOS_ROUTER_V2, amount_in_raw)
         if "error" in approval:
             return approval
 
-        # Build swap tx
+        # Assemble swap transaction
+        assembled = odos_assemble(path_id, self.account.address)
+        if "error" in assembled:
+            return {"error": f"Assemble failed: {assembled['error']}"}
+
+        # Execute the swap
         try:
-            router = self.w3.eth.contract(
-                address=Web3.to_checksum_address(router_address),
-                abi=UNISWAP_V3_SWAP_ABI,
-            )
-
-            deadline = int(time.time()) + 300  # 5 min deadline
-
-            swap_params = (
-                Web3.to_checksum_address(token_in),
-                Web3.to_checksum_address(token_out),
-                fee,
-                self.account.address,
-                deadline,
-                amount_in_raw,
-                min_out_raw,
-                0,  # sqrtPriceLimitX96
-            )
-
             nonce = self.w3.eth.get_transaction_count(self.account.address, "pending")
-            tx = router.functions.exactInputSingle(swap_params).build_transaction({
+            tx = {
                 "from": self.account.address,
+                "to": Web3.to_checksum_address(assembled["to"]),
+                "data": assembled["data"],
+                "value": assembled.get("value", 0),
                 "nonce": nonce,
                 "gasPrice": self.w3.eth.gas_price,
+                "gas": assembled.get("gas_limit", 500000),
                 "chainId": 8453,
-                "value": 0,
-            })
+            }
 
-            gas = self.w3.eth.estimate_gas(tx)
-            tx["gas"] = int(gas * 1.3)
-
-            # Sign and send
             private_key = os.getenv("AGENT_WALLET_PRIVATE_KEY", "")
             signed = self.w3.eth.account.sign_transaction(tx, private_key)
             tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -591,35 +600,34 @@ class DeFiTrader:
                     "amount_in": amount_in, "reason": reason,
                     "tx_hash": tx_hex, "error": "Transaction reverted",
                 })
-                return {"error": "Swap transaction reverted", "tx_hash": tx_hex}
+                return {"error": "Swap reverted", "tx_hash": tx_hex,
+                        "explorer_url": f"https://basescan.org/tx/{tx_hex}"}
 
-            # Get actual output amount from balance change
-            new_balance = out_contract.functions.balanceOf(self.account.address).call()
-            # Log the trade
             trade = {
                 "action": "swap",
                 "token_in": token_in, "symbol_in": in_symbol,
                 "token_out": token_out, "symbol_out": out_symbol,
                 "amount_in": amount_in,
-                "expected_out": expected_out,
-                "min_out": min_out,
+                "expected_out": expected_out_human,
                 "reason": reason,
                 "tx_hash": tx_hex,
                 "gas_used": receipt.gasUsed,
                 "block": receipt.blockNumber,
+                "router": "odos",
             }
             self._log_trade(trade)
 
-            logger.info(f"Swap executed: {amount_in} {in_symbol} -> {out_symbol} | tx={tx_hex[:16]}...")
+            logger.info(f"Swap via Odos: {amount_in} {in_symbol} -> {out_symbol} | tx={tx_hex[:16]}...")
 
             return {
                 "status": "ok",
                 "tx_hash": tx_hex,
                 "amount_in": amount_in,
                 "symbol_in": in_symbol,
-                "expected_out": expected_out,
+                "expected_out": expected_out_human,
                 "symbol_out": out_symbol,
                 "gas_used": receipt.gasUsed,
+                "price_impact": quote.get("price_impact", 0),
                 "explorer_url": f"https://basescan.org/tx/{tx_hex}",
             }
 
@@ -641,7 +649,7 @@ class DeFiTrader:
                   reason: str = "scout buy") -> Dict:
         """
         Buy a token using $CLAWNCH.
-        Routes: CLAWNCH -> WETH -> target token (via Uniswap V3)
+        Odos handles routing automatically (finds best path across all DEXes).
 
         Args:
             token_address: Token to buy
@@ -658,29 +666,15 @@ class DeFiTrader:
         if not risk["ok"]:
             return {"error": f"Risk check failed: {risk['reason']}"}
 
-        # Step 1: CLAWNCH -> WETH
-        step1 = self.execute_swap(
+        # Direct swap: CLAWNCH -> target token (Odos finds best route)
+        result = self.execute_swap(
             trading_config.CLAWNCH_TOKEN,
-            trading_config.WETH,
-            clawnch_amount,
-            reason=f"Step 1/2: {reason}",
-            fee=10000,  # 1% fee for less liquid pairs
-        )
-        if "error" in step1:
-            return {"error": f"CLAWNCH->WETH failed: {step1['error']}"}
-
-        weth_received = step1.get("expected_out", 0)
-
-        # Step 2: WETH -> target token
-        step2 = self.execute_swap(
-            trading_config.WETH,
             token_address,
-            weth_received,
-            reason=f"Step 2/2: {reason}",
-            fee=3000,
+            clawnch_amount,
+            reason=reason,
         )
-        if "error" in step2:
-            return {"error": f"WETH->target failed: {step2['error']}. WETH stuck in wallet."}
+        if "error" in result:
+            return {"error": f"Buy failed: {result['error']}"}
 
         # Record position
         positions = self._portfolio.setdefault("positions", {})
@@ -688,7 +682,7 @@ class DeFiTrader:
             "entry_amount_clawnch": clawnch_amount,
             "entry_time": datetime.now(timezone.utc).isoformat(),
             "reason": reason,
-            "tx_buy": step2.get("tx_hash", ""),
+            "tx_buy": result.get("tx_hash", ""),
         }
         self._portfolio["total_invested"] = self._portfolio.get("total_invested", 0) + clawnch_amount
         self._save_portfolio()
@@ -698,16 +692,16 @@ class DeFiTrader:
             "action": "buy",
             "token": token_address,
             "clawnch_spent": clawnch_amount,
-            "weth_intermediate": weth_received,
-            "tx_hash": step2.get("tx_hash", ""),
-            "explorer_url": step2.get("explorer_url", ""),
+            "expected_out": result.get("expected_out", 0),
+            "tx_hash": result.get("tx_hash", ""),
+            "explorer_url": result.get("explorer_url", ""),
         }
 
     def sell_token(self, token_address: str, amount: float = 0,
                    reason: str = "take profit") -> Dict:
         """
         Sell a token back to $CLAWNCH.
-        Routes: target token -> WETH -> CLAWNCH
+        Odos handles routing automatically.
 
         Args:
             token_address: Token to sell
@@ -723,31 +717,17 @@ class DeFiTrader:
         if sell_amount <= 0:
             return {"error": "Nothing to sell"}
 
-        # Step 1: token -> WETH
-        step1 = self.execute_swap(
+        # Direct swap: target token -> CLAWNCH (Odos finds best route)
+        result = self.execute_swap(
             token_address,
-            trading_config.WETH,
-            sell_amount,
-            reason=f"Step 1/2: {reason}",
-            fee=3000,
-        )
-        if "error" in step1:
-            return {"error": f"token->WETH failed: {step1['error']}"}
-
-        weth_received = step1.get("expected_out", 0)
-
-        # Step 2: WETH -> CLAWNCH
-        step2 = self.execute_swap(
-            trading_config.WETH,
             trading_config.CLAWNCH_TOKEN,
-            weth_received,
-            reason=f"Step 2/2: {reason}",
-            fee=10000,
+            sell_amount,
+            reason=reason,
         )
-        if "error" in step2:
-            return {"error": f"WETH->CLAWNCH failed: {step2['error']}. WETH stuck in wallet."}
+        if "error" in result:
+            return {"error": f"Sell failed: {result['error']}"}
 
-        clawnch_received = step2.get("expected_out", 0)
+        clawnch_received = result.get("expected_out", 0)
 
         # Update position
         positions = self._portfolio.get("positions", {})
@@ -767,8 +747,8 @@ class DeFiTrader:
             "clawnch_received": clawnch_received,
             "pnl": pnl,
             "pnl_pct": (pnl / entry_cost * 100) if entry_cost > 0 else 0,
-            "tx_hash": step2.get("tx_hash", ""),
-            "explorer_url": step2.get("explorer_url", ""),
+            "tx_hash": result.get("tx_hash", ""),
+            "explorer_url": result.get("explorer_url", ""),
         }
 
     def buy_republic(self, clawnch_amount: float, reason: str = "market making") -> Dict:

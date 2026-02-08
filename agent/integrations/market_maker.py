@@ -95,37 +95,20 @@ class MarketMaker:
 
     def get_republic_price(self) -> Dict:
         """
-        Get current $REPUBLIC price in $CLAWNCH terms.
-        Routes: REPUBLIC -> WETH -> CLAWNCH for price discovery.
+        Get current $REPUBLIC price via DexScreener (free, no auth).
+        Also gets $CLAWNCH price for relative pricing.
         """
-        if not self._trader:
-            return {"error": "No trader configured"}
+        from .dex_oracle import get_token_price
 
-        # Get REPUBLIC/WETH price
-        republic_weth = self._trader.get_quote(
-            trading_config.REPUBLIC_TOKEN,
-            trading_config.WETH,
-            1000.0,  # Price per 1000 REPUBLIC
-            fee=3000,
-        )
-        if "error" in republic_weth:
-            return {"error": f"REPUBLIC/WETH quote failed: {republic_weth['error']}"}
+        republic_data = get_token_price(trading_config.REPUBLIC_TOKEN)
+        clawnch_data = get_token_price(trading_config.CLAWNCH_TOKEN)
 
-        weth_per_1000 = republic_weth.get("amount_out", 0)
+        republic_usd = republic_data.get("price_usd", 0)
+        clawnch_usd = clawnch_data.get("price_usd", 0)
 
-        # Get WETH/CLAWNCH price
-        if weth_per_1000 > 0:
-            weth_clawnch = self._trader.get_quote(
-                trading_config.WETH,
-                trading_config.CLAWNCH_TOKEN,
-                weth_per_1000,
-                fee=10000,
-            )
-            if "error" in weth_clawnch:
-                return {"error": f"WETH/CLAWNCH quote failed: {weth_clawnch['error']}"}
-
-            clawnch_per_1000 = weth_clawnch.get("amount_out", 0)
-            price_per_republic = clawnch_per_1000 / 1000 if clawnch_per_1000 > 0 else 0
+        # Calculate REPUBLIC price in CLAWNCH terms
+        if clawnch_usd > 0 and republic_usd > 0:
+            price_per_republic = republic_usd / clawnch_usd
         else:
             price_per_republic = 0
 
@@ -141,9 +124,13 @@ class MarketMaker:
 
         return {
             "price_per_republic": price_per_republic,
-            "price_per_1000": clawnch_per_1000 if weth_per_1000 > 0 else 0,
+            "price_usd": republic_usd,
+            "clawnch_price_usd": clawnch_usd,
             "ema_price": self._state["ema_price"],
-            "weth_per_1000_republic": weth_per_1000,
+            "liquidity_usd": republic_data.get("liquidity_usd", 0),
+            "volume_24h": republic_data.get("volume_24h", 0),
+            "price_change_24h": republic_data.get("price_change_24h", 0),
+            "source": "dexscreener",
         }
 
     # =================================================================

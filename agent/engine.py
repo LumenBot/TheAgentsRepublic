@@ -42,7 +42,7 @@ class Engine:
     5. Engine dispatches, returns results, Claude continues
     """
 
-    VERSION = "6.0.0"
+    VERSION = "6.3.0"
 
     def __init__(
         self,

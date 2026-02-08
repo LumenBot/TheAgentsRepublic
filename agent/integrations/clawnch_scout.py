@@ -1,22 +1,19 @@
 """
-Clawnch Scout — New Token Launch Monitor
-==========================================
-Monitors the Clawnch ecosystem for new token launches on Base L2.
-Scores opportunities based on burn amount, social activity, and token metrics.
+Clawnch Scout — Token Launch Monitor & Opportunity Finder
+==========================================================
+Monitors Base L2 ecosystem for trading opportunities:
+1. GeckoTerminal trending/new pools (high-quality data)
+2. DexScreener token discovery
+3. Clawnch API for new launches
+4. Moltbook feed for !clawnch posts
 
-v6.3: Initial scout for DeFi trading opportunities.
-
-Strategy:
-1. Scan Moltbook feed for !clawnch posts (new launches)
-2. Score each launch on multiple factors
-3. Flag high-potential tokens for the trading engine
-4. Track graduated tokens (bonding curve -> DEX)
+v6.3.1: Multi-source scanning with real metrics (volume, liquidity, price change).
 """
 
 import json
 import logging
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -29,14 +26,14 @@ logger = logging.getLogger("TheConstituent.ClawnchScout")
 
 class ClawnchScout:
     """
-    Monitors Clawnch for new token launches and scores opportunities.
+    Multi-source token opportunity scanner for Base L2.
 
-    Scoring factors:
-    - Burn amount (higher = more committed)
-    - Agent social activity (posts, replies, engagement)
-    - Token description quality
-    - Time since launch (fresher = better)
-    - Existing holder count (if available)
+    Scoring factors (v6.3.1 — based on real on-chain data):
+    - Liquidity (0-25): Higher TVL = safer to trade
+    - Volume (0-25): Active trading = real interest
+    - Price momentum (0-20): Rising price + healthy ratio
+    - Freshness (0-15): New tokens with early traction
+    - Social signals (0-15): Website, Moltbook activity, etc.
     """
 
     CLAWNCH_API = "https://clawn.ch/api"
@@ -49,7 +46,6 @@ class ClawnchScout:
         self._load_cache()
 
     def _load_cache(self):
-        """Load cached scout data from disk."""
         path = Path(trading_config.SCOUT_CACHE_FILE)
         if path.exists():
             try:
@@ -60,113 +56,180 @@ class ClawnchScout:
                 logger.error(f"Failed to load scout cache: {e}")
 
     def _save_cache(self):
-        """Save cache to disk."""
         path = Path(trading_config.SCOUT_CACHE_FILE)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({
-            "tokens": self._cache[-100:],  # Keep last 100
-            "scored": self._scored,
+            "tokens": self._cache[-200:],
+            "scored": {k: v for k, v in sorted(
+                self._scored.items(), key=lambda x: x[1].get("score", 0), reverse=True
+            )[:100]},
             "last_scan": self._last_scan,
         }, indent=2, default=str), encoding="utf-8")
 
     # =================================================================
-    # Scanning
+    # Scanning — Multi-Source
     # =================================================================
 
     def scan_new_launches(self) -> List[Dict]:
         """
-        Scan for new token launches on Clawnch.
+        Scan multiple sources for trading opportunities on Base L2.
 
-        Approaches:
-        1. Check Moltbook feed for !clawnch posts
-        2. Check Clawnch API for recent launches (if available)
-
-        Returns list of new token launches found.
+        Sources (in order of data quality):
+        1. GeckoTerminal trending pools
+        2. GeckoTerminal new pools
+        3. DexScreener search for Base tokens
+        4. Clawnch API
         """
-        new_tokens = []
+        all_tokens = []
 
-        # Approach 1: Moltbook feed scan
+        # Source 1: GeckoTerminal trending pools on Base (best data)
         try:
-            moltbook_tokens = self._scan_moltbook()
-            new_tokens.extend(moltbook_tokens)
+            trending = self._scan_geckoterminal_trending()
+            all_tokens.extend(trending)
+            logger.info(f"GeckoTerminal trending: {len(trending)} pools")
         except Exception as e:
-            logger.error(f"Moltbook scan failed: {e}")
+            logger.warning(f"GeckoTerminal trending scan failed: {e}")
 
-        # Approach 2: Clawnch API (if endpoint exists)
+        # Source 2: GeckoTerminal new pools (fresh launches)
         try:
-            api_tokens = self._scan_clawnch_api()
-            new_tokens.extend(api_tokens)
+            new_pools = self._scan_geckoterminal_new()
+            all_tokens.extend(new_pools)
+            logger.info(f"GeckoTerminal new: {len(new_pools)} pools")
+        except Exception as e:
+            logger.warning(f"GeckoTerminal new scan failed: {e}")
+
+        # Source 3: DexScreener search for hot Base tokens
+        try:
+            dex_tokens = self._scan_dexscreener()
+            all_tokens.extend(dex_tokens)
+            logger.info(f"DexScreener: {len(dex_tokens)} tokens")
+        except Exception as e:
+            logger.warning(f"DexScreener scan failed: {e}")
+
+        # Source 4: Clawnch API (limited data but native to our ecosystem)
+        try:
+            clawnch = self._scan_clawnch_api()
+            all_tokens.extend(clawnch)
         except Exception as e:
             logger.debug(f"Clawnch API scan: {e}")
 
         # Deduplicate by token address
         seen = set()
-        unique_tokens = []
-        for token in new_tokens:
+        unique = []
+        for token in all_tokens:
             addr = token.get("token_address", "").lower()
             if addr and addr not in seen:
                 seen.add(addr)
-                unique_tokens.append(token)
+                unique.append(token)
+
+        # Filter: skip our own token and major stablecoins
+        skip = {
+            trading_config.REPUBLIC_TOKEN.lower(),
+            trading_config.CLAWNCH_TOKEN.lower(),
+            trading_config.WETH.lower(),
+            "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",  # USDC on Base
+            "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",  # DAI on Base
+        }
+        unique = [t for t in unique if t.get("token_address", "").lower() not in skip]
 
         # Score each token
         scored = []
-        for token in unique_tokens:
+        for token in unique:
             score = self._score_token(token)
             token["score"] = score
             scored.append(token)
             self._scored[token.get("token_address", "")] = token
 
-        # Sort by score (highest first)
         scored.sort(key=lambda t: t.get("score", 0), reverse=True)
 
-        self._cache.extend(scored)
+        self._cache = scored[:200]
         self._last_scan = time.time()
         self._save_cache()
 
-        logger.info(f"Scout scan: {len(scored)} new tokens found, "
+        logger.info(f"Scout scan complete: {len(scored)} tokens, "
                      f"top score: {scored[0]['score'] if scored else 0}")
 
         return scored
 
-    def _scan_moltbook(self) -> List[Dict]:
-        """Scan Moltbook feed for !clawnch posts."""
+    def _scan_geckoterminal_trending(self) -> List[Dict]:
+        """Get trending pools on Base from GeckoTerminal."""
+        from .dex_oracle import geckoterminal_trending_pools
+        pools = geckoterminal_trending_pools()
         tokens = []
+        for pool in pools:
+            name = pool.get("name", "")
+            # Parse "TOKEN / WETH" style names
+            parts = name.split(" / ") if " / " in name else name.split("/")
+            token_name = parts[0].strip() if parts else name
 
-        try:
-            resp = requests.get(
-                f"{self.MOLTBOOK_API}/posts",
-                params={"sort": "recent", "limit": 50},
-                headers={"Content-Type": "application/json"},
-                timeout=15,
-            )
-            if resp.status_code != 200:
-                return tokens
+            tokens.append({
+                "token_address": pool.get("pool_address", ""),
+                "name": token_name,
+                "symbol": token_name,
+                "source": "geckoterminal_trending",
+                "price_usd": pool.get("price_usd", 0),
+                "volume_24h": pool.get("volume_24h", 0),
+                "price_change_24h": pool.get("price_change_24h", 0),
+                "liquidity_usd": pool.get("reserve_usd", 0),
+                "fdv_usd": pool.get("fdv_usd", 0),
+                "pool_created_at": pool.get("pool_created_at", ""),
+                "transactions_24h": pool.get("transactions_24h", {}),
+            })
+        return tokens
 
-            posts = resp.json() if isinstance(resp.json(), list) else resp.json().get("posts", [])
+    def _scan_geckoterminal_new(self) -> List[Dict]:
+        """Get newly created pools on Base from GeckoTerminal."""
+        from .dex_oracle import geckoterminal_new_pools
+        pools = geckoterminal_new_pools()
+        tokens = []
+        for pool in pools:
+            name = pool.get("name", "")
+            parts = name.split(" / ") if " / " in name else name.split("/")
+            token_name = parts[0].strip() if parts else name
 
-            for post in posts:
-                content = post.get("content", "") or post.get("body", "")
-                if "!clawnch" not in content.lower():
+            tokens.append({
+                "token_address": pool.get("pool_address", ""),
+                "name": token_name,
+                "symbol": token_name,
+                "source": "geckoterminal_new",
+                "price_usd": pool.get("price_usd", 0),
+                "volume_24h": pool.get("volume_24h", 0),
+                "price_change_24h": pool.get("price_change_24h", 0),
+                "liquidity_usd": pool.get("reserve_usd", 0),
+                "fdv_usd": pool.get("fdv_usd", 0),
+                "pool_created_at": pool.get("pool_created_at", ""),
+            })
+        return tokens
+
+    def _scan_dexscreener(self) -> List[Dict]:
+        """Search DexScreener for active Base tokens."""
+        from .dex_oracle import dexscreener_search
+        tokens = []
+        queries = ["base new token", "base agent", "clawnch"]
+        for q in queries:
+            pairs = dexscreener_search(q)
+            for pair in pairs[:20]:
+                if pair.get("chainId") != "base":
                     continue
-
-                # Parse token info from !clawnch post
-                token_info = self._parse_clawnch_post(content)
-                if token_info:
-                    token_info["source"] = "moltbook"
-                    token_info["post_id"] = post.get("id", "")
-                    token_info["author"] = post.get("author", {}).get("name", "")
-                    token_info["post_time"] = post.get("createdAt", "")
-                    token_info["likes"] = post.get("likes", 0)
-                    token_info["comments"] = post.get("comments", 0)
-                    tokens.append(token_info)
-
-        except Exception as e:
-            logger.error(f"Moltbook scan error: {e}")
-
+                base_token = pair.get("baseToken", {})
+                tokens.append({
+                    "token_address": base_token.get("address", ""),
+                    "name": base_token.get("name", ""),
+                    "symbol": base_token.get("symbol", ""),
+                    "source": "dexscreener",
+                    "price_usd": float(pair.get("priceUsd", 0) or 0),
+                    "volume_24h": float(pair.get("volume", {}).get("h24", 0) or 0),
+                    "price_change_24h": float(pair.get("priceChange", {}).get("h24", 0) or 0),
+                    "liquidity_usd": float(pair.get("liquidity", {}).get("usd", 0) or 0),
+                    "fdv_usd": float(pair.get("fdv", 0) or 0),
+                    "dex": pair.get("dexId", ""),
+                    "pair_address": pair.get("pairAddress", ""),
+                })
+            time.sleep(0.5)  # Rate limiting
         return tokens
 
     def _scan_clawnch_api(self) -> List[Dict]:
-        """Try to get recent launches from Clawnch API."""
+        """Check Clawnch API for recent launches."""
         tokens = []
         try:
             resp = requests.get(
@@ -178,158 +241,130 @@ class ClawnchScout:
                 return tokens
 
             data = resp.json()
-            for token in (data if isinstance(data, list) else data.get("tokens", [])):
+            items = data if isinstance(data, list) else data.get("tokens", [])
+            for token in items[:20]:
+                addr = token.get("address", token.get("tokenAddress", ""))
+                if not addr:
+                    continue
                 tokens.append({
-                    "token_address": token.get("address", ""),
+                    "token_address": addr,
                     "name": token.get("name", ""),
                     "symbol": token.get("symbol", ""),
+                    "source": "clawnch",
                     "burn_amount": token.get("burnAmount", 0),
                     "created_at": token.get("createdAt", ""),
-                    "source": "clawnch_api",
-                    "market_cap": token.get("marketCap", 0),
-                    "holders": token.get("holders", 0),
-                    "graduated": token.get("graduated", False),
+                    "market_cap": float(token.get("marketCap", 0) or 0),
+                    "holders": int(token.get("holders", 0) or 0),
                 })
         except Exception as e:
-            logger.debug(f"Clawnch API not available: {e}")
-
+            logger.debug(f"Clawnch API: {e}")
         return tokens
 
-    def _parse_clawnch_post(self, content: str) -> Optional[Dict]:
-        """Parse a !clawnch post to extract token metadata."""
-        lines = content.strip().split("\n")
-        data = {}
-
-        for line in lines:
-            line = line.strip()
-            if ":" not in line:
-                continue
-            key, _, value = line.partition(":")
-            key = key.strip().lower()
-            value = value.strip()
-
-            if key == "name":
-                data["name"] = value
-            elif key == "symbol":
-                data["symbol"] = value
-            elif key == "wallet":
-                data["wallet"] = value
-            elif key == "description":
-                data["description"] = value
-            elif key == "burntxhash":
-                data["burn_tx_hash"] = value
-            elif key == "website":
-                data["website"] = value
-            elif key == "twitter":
-                data["twitter"] = value
-            elif key == "image":
-                data["image"] = value
-
-        if not data.get("name") or not data.get("symbol"):
-            return None
-
-        return data
-
     # =================================================================
-    # Scoring
+    # Scoring (v6.3.1 — based on real on-chain metrics)
     # =================================================================
 
     def _score_token(self, token: Dict) -> float:
         """
-        Score a token launch opportunity (0-100).
+        Score a token opportunity (0-100) using real metrics.
 
         Factors:
-        - Burn amount (0-25 points): Higher burn = more commitment
-        - Social activity (0-25 points): Posts, engagement, website
-        - Freshness (0-20 points): Newer = better
-        - Metadata quality (0-15 points): Description, image, website
-        - Engagement (0-15 points): Likes, comments on launch post
+        - Liquidity (0-25): Higher TVL = safer to trade
+        - Volume (0-25): Active trading = real interest
+        - Price momentum (0-20): Rising price with healthy volume
+        - Freshness (0-15): New pools with early traction
+        - Social/metadata (0-15): Source quality, name, etc.
         """
         score = 0.0
 
-        # Burn amount (0-25)
-        burn = token.get("burn_amount", 0)
-        if isinstance(burn, str):
-            try:
-                burn = float(burn.replace(",", ""))
-            except ValueError:
-                burn = 0
-        if burn >= 4_000_000:
-            score += 25  # Max burn (same as $REPUBLIC)
-        elif burn >= 2_000_000:
+        # === Liquidity (0-25) ===
+        liq = float(token.get("liquidity_usd", 0) or 0)
+        if liq >= 100_000:
+            score += 25
+        elif liq >= 50_000:
             score += 20
-        elif burn >= 1_000_000:
+        elif liq >= 10_000:
             score += 15
-        elif burn >= 500_000:
+        elif liq >= 5_000:
             score += 10
-        elif burn >= 100_000:
+        elif liq >= 1_000:
             score += 5
 
-        # Social activity (0-25)
-        has_twitter = bool(token.get("twitter"))
-        has_website = bool(token.get("website"))
-        has_author = bool(token.get("author"))
-        social = 0
-        if has_twitter:
-            social += 8
-        if has_website:
-            social += 8
-        if has_author:
-            social += 5
-        # Agent with posts = more legitimate
-        if token.get("comments", 0) > 0:
-            social += min(4, token["comments"])
-        score += min(25, social)
+        # === Volume (0-25) ===
+        vol = float(token.get("volume_24h", 0) or 0)
+        if vol >= 500_000:
+            score += 25
+        elif vol >= 100_000:
+            score += 20
+        elif vol >= 50_000:
+            score += 15
+        elif vol >= 10_000:
+            score += 10
+        elif vol >= 1_000:
+            score += 5
 
-        # Freshness (0-20) - newer is better
-        created = token.get("post_time") or token.get("created_at")
+        # === Price momentum (0-20) ===
+        change = float(token.get("price_change_24h", 0) or 0)
+        if 10 <= change <= 100:
+            score += 20  # Healthy growth (not pump-and-dump)
+        elif 5 <= change <= 200:
+            score += 15
+        elif 0 < change < 500:
+            score += 10
+        elif change > 500:
+            score += 5  # Probably a pump, risky
+        # Negative change = no momentum points
+
+        # === Freshness (0-15) ===
+        created = token.get("pool_created_at") or token.get("created_at", "")
         if created:
             try:
-                if isinstance(created, str):
-                    # Handle various date formats
-                    for fmt in ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%dT%H:%M:%SZ",
-                                "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S"]:
-                        try:
-                            dt = datetime.strptime(created, fmt)
-                            if dt.tzinfo is None:
-                                dt = dt.replace(tzinfo=timezone.utc)
-                            break
-                        except ValueError:
-                            continue
-                    else:
-                        dt = None
+                for fmt in ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%dT%H:%M:%SZ",
+                            "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S"]:
+                    try:
+                        dt = datetime.strptime(created, fmt)
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        break
+                    except ValueError:
+                        continue
+                else:
+                    dt = None
 
-                    if dt:
-                        age_hours = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
-                        if age_hours < 1:
-                            score += 20
-                        elif age_hours < 4:
-                            score += 15
-                        elif age_hours < 12:
-                            score += 10
-                        elif age_hours < 24:
-                            score += 5
+                if dt:
+                    age_hours = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
+                    if age_hours < 2:
+                        score += 15
+                    elif age_hours < 6:
+                        score += 12
+                    elif age_hours < 24:
+                        score += 8
+                    elif age_hours < 72:
+                        score += 4
             except Exception:
                 pass
 
-        # Metadata quality (0-15)
-        desc = token.get("description", "")
-        if len(desc) > 100:
-            score += 8
-        elif len(desc) > 30:
-            score += 4
-        if token.get("image"):
-            score += 4
+        # === Source quality / metadata (0-15) ===
+        source = token.get("source", "")
+        if source == "geckoterminal_trending":
+            score += 10  # Already curated as trending
+        elif source == "geckoterminal_new":
+            score += 5
+        elif source == "dexscreener":
+            score += 5
+        elif source == "clawnch":
+            score += 3  # Native ecosystem
+
+        # Bonus for having a name and symbol
         if token.get("name") and token.get("symbol"):
             score += 3
 
-        # Engagement on launch post (0-15)
-        likes = token.get("likes", 0)
-        comments = token.get("comments", 0)
-        engagement = likes * 2 + comments * 3
-        score += min(15, engagement)
+        # Bonus for FDV in sweet spot ($100K - $10M)
+        fdv = float(token.get("fdv_usd", 0) or 0)
+        if 100_000 <= fdv <= 10_000_000:
+            score += 2
 
-        return round(score, 1)
+        return round(min(100, score), 1)
 
     # =================================================================
     # Opportunity Filtering
@@ -344,8 +379,6 @@ class ClawnchScout:
             t for t in self._scored.values()
             if t.get("score", 0) >= min_score
         ]
-
-        # Sort by score
         opportunities.sort(key=lambda t: t.get("score", 0), reverse=True)
         return opportunities
 
@@ -357,43 +390,47 @@ class ClawnchScout:
     def get_scout_report(self) -> str:
         """Generate human-readable scout report."""
         opps = self.get_opportunities(min_score=20.0)
-        if not opps:
-            return "Clawnch Scout: No opportunities found. Last scan: " + (
-                datetime.fromtimestamp(self._last_scan, tz=timezone.utc).strftime("%H:%M UTC")
-                if self._last_scan else "never"
-            )
+        all_tokens = list(self._scored.values())
+        all_tokens.sort(key=lambda t: t.get("score", 0), reverse=True)
+
+        last = (datetime.fromtimestamp(self._last_scan, tz=timezone.utc).strftime("%H:%M UTC")
+                if self._last_scan else "never")
 
         lines = [
-            f"Clawnch Scout Report",
-            f"{'=' * 40}",
-            f"Tokens scanned: {len(self._cache)}",
+            "Clawnch Scout Report",
+            "=" * 40,
+            f"Tokens scanned: {len(all_tokens)}",
             f"Opportunities (score >= 20): {len(opps)}",
-            f"Last scan: {datetime.fromtimestamp(self._last_scan, tz=timezone.utc).strftime('%H:%M UTC') if self._last_scan else 'never'}",
+            f"Last scan: {last}",
             "",
         ]
 
-        for i, token in enumerate(opps[:10], 1):
-            name = token.get("name", "?")
-            symbol = token.get("symbol", "?")
+        display = all_tokens[:10]
+        if not display:
+            lines.append("No tokens found. Check API connectivity.")
+            return "\n".join(lines)
+
+        for i, token in enumerate(display, 1):
+            name = token.get("name", "?")[:20]
+            symbol = token.get("symbol", "?")[:10]
             score = token.get("score", 0)
-            burn = token.get("burn_amount", 0)
-            author = token.get("author", "?")
+            vol = token.get("volume_24h", 0)
+            liq = token.get("liquidity_usd", 0)
+            change = token.get("price_change_24h", 0)
             source = token.get("source", "?")
-            addr = token.get("token_address", "?")
 
             indicator = "🔥" if score >= 60 else "⚡" if score >= 40 else "📊"
             lines.append(f"{indicator} #{i} {name} (${symbol}) — Score: {score}/100")
-            lines.append(f"   Author: {author} | Source: {source}")
-            if addr and addr != "?":
-                lines.append(f"   Address: {addr[:16]}...")
-            if burn:
-                lines.append(f"   Burn: {burn:,.0f} CLAWNCH")
+            lines.append(f"   Vol: ${vol:,.0f} | Liq: ${liq:,.0f} | 24h: {change:+.1f}%")
+            lines.append(f"   Source: {source}")
+            addr = token.get("token_address", "")
+            if addr:
+                lines.append(f"   {addr[:20]}...")
             lines.append("")
 
         return "\n".join(lines)
 
     def get_status(self) -> Dict:
-        """Scout status."""
         return {
             "tokens_tracked": len(self._cache),
             "scored_tokens": len(self._scored),

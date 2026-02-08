@@ -125,10 +125,13 @@ def _republic_price() -> str:
         return f"Price error: {price['error']}"
 
     return (f"$REPUBLIC Price:\n"
-            f"  Per token: {price.get('price_per_republic', 0):.8f} CLAWNCH\n"
-            f"  Per 1000: {price.get('price_per_1000', 0):,.4f} CLAWNCH\n"
+            f"  USD: ${price.get('price_usd', 0):.8f}\n"
+            f"  CLAWNCH: {price.get('price_per_republic', 0):.8f} per token\n"
             f"  EMA: {price.get('ema_price', 0):.8f} CLAWNCH\n"
-            f"  WETH/1000: {price.get('weth_per_1000_republic', 0):.10f}")
+            f"  Liquidity: ${price.get('liquidity_usd', 0):,.0f}\n"
+            f"  Volume 24h: ${price.get('volume_24h', 0):,.0f}\n"
+            f"  24h Change: {price.get('price_change_24h', 0):+.1f}%\n"
+            f"  Source: {price.get('source', '?')}")
 
 
 # =================================================================
