@@ -1,6 +1,9 @@
 """
 The Constituent — Main Entry Point v4.0
 =========================================
+DEPRECATED: This module is deprecated. Use main_v5.py instead.
+    python -m agent  (which uses main_v5.py)
+
 Builder mode. Constitution + Audience + Ecosystem.
 
 Orchestrates:
@@ -13,6 +16,14 @@ Orchestrates:
 
 Usage: python -m agent
 """
+
+import warnings
+warnings.warn(
+    "main_v3 is deprecated and will be removed in a future release. "
+    "Use main_v5 instead: python -m agent",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 import asyncio
 import logging

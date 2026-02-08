@@ -1,6 +1,9 @@
 """
 The Constituent — Main Entry Point v2.3
 =========================================
+DEPRECATED: This module is deprecated. Use main_v5.py instead.
+    python -m agent  (which uses main_v5.py)
+
 Phase 2B: Autonomous agent with background intelligence.
 
 Orchestrates:
@@ -13,6 +16,14 @@ Orchestrates:
 Usage:
     python -m agent.main_v2
 """
+
+import warnings
+warnings.warn(
+    "main_v2 is deprecated and will be removed in a future release. "
+    "Use main_v5 instead: python -m agent",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 import asyncio
 import logging

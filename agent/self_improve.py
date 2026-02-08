@@ -63,6 +63,7 @@ class SelfImprover:
 
         # Clean up the generated code
         code = self._extract_code(generated_code)
+        logger.info(f"Generated {len(code)} chars of code for: {capability_description}")
 
         # Generate filename
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
@@ -87,6 +88,7 @@ class SelfImprover:
             "generated_at": datetime.utcnow().isoformat(),
             "status": "pending_review"
         })
+        logger.info(f"Improvement #{len(self._improvements)} queued for review: {capability_description}")
 
         logger.info(f"Capability saved to {filepath}")
 
@@ -209,7 +211,9 @@ def new_capability(self, param: str) -> str:
         if 0 < index <= len(self._improvements):
             self._improvements[index - 1]["status"] = "integrated"
             self._improvements[index - 1]["integrated_at"] = datetime.utcnow().isoformat()
+            logger.info(f"Improvement #{index} marked as integrated: {self._improvements[index - 1]['description']}")
             return f"✅ Improvement #{index} marked as integrated"
+        logger.warning(f"Improvement #{index} not found (total: {len(self._improvements)})")
         return f"❌ Improvement #{index} not found"
 
     def suggest_improvements(self, think_fn: Callable[[str], str]) -> str:
@@ -222,6 +226,8 @@ def new_capability(self, param: str) -> str:
         Returns:
             Suggestions from Claude
         """
+        logger.info("Generating improvement suggestions via Claude")
+
         prompt = """Based on The Constituent's current capabilities:
 - Chat with users
 - Read/write Constitution on GitHub
@@ -241,4 +247,6 @@ For each suggestion, provide:
 
 Focus on practical, achievable improvements."""
 
-        return think_fn(prompt)
+        suggestions = think_fn(prompt)
+        logger.info(f"Generated {len(suggestions)} chars of improvement suggestions")
+        return suggestions

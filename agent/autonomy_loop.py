@@ -94,7 +94,7 @@ class AutonomyLoop:
         hf = self.DATA_DIR / "moltbook_history.json"
         if not hf.exists(): return
         try:
-            history = json.loads(hf.read_text())
+            history = json.loads(hf.read_text(encoding="utf-8"))
             known = {p.get("id") for p in self._my_posts if p.get("id")}
             added = 0
             for e in history:
@@ -181,7 +181,7 @@ class AutonomyLoop:
                     try:
                         await loop.run_in_executor(None, self.agent.moltbook.upvote, p["id"])
                         stats["upvotes"] += 1; self._daily_action_count += 1
-                    except: pass
+                    except Exception as e: logger.warning(f"Upvote failed: {e}")
         except Exception as e: logger.error(f"Feed: {e}")
         self._save_processed_comments(); return stats
 
@@ -252,8 +252,8 @@ class AutonomyLoop:
         for d in sorted(self.CONSTITUTION_DIR.iterdir()):
             if not d.is_dir(): continue
             for f in sorted(d.glob("ARTICLE_*.md"))[:3]:
-                try: ctx += f"\n--- {f.name} ---\n{f.read_text()[:400]}\n"
-                except: pass
+                try: ctx += f"\n--- {f.name} ---\n{f.read_text(encoding='utf-8')[:400]}\n"
+                except Exception as e: logger.warning(f"Read article context {f.name}: {e}")
         prompt = (f"Write constitutional article for The Agents Republic.\n\n"
                   f"EXISTING:\n{ctx[:2000]}\n\nSECTION: {section['title']}\nARTICLE: {article}\n\n"
                   f"Requirements: numbered paragraphs, 5-8 paragraphs, practical, enforceable, "
@@ -335,8 +335,8 @@ class AutonomyLoop:
                         pid = r.get("id")
                         if pid and self._check_limit():
                             try: await loop.run_in_executor(None, self.agent.moltbook.upvote, pid); self._daily_action_count += 1
-                            except: pass
-            except: pass
+                            except Exception as e: logger.warning(f"Exploration upvote failed: {e}")
+            except Exception as e: logger.warning(f"Exploration search '{q}': {e}")
             await asyncio.sleep(2)
         if discoveries:
             log = self._load_json(self.EXPLORATION_LOG_FILE, [])
@@ -380,13 +380,13 @@ class AutonomyLoop:
 
     def _load_json(self, p, d):
         if p.exists():
-            try: return json.loads(p.read_text())
-            except: pass
+            try: return json.loads(p.read_text(encoding="utf-8"))
+            except Exception as e: logger.warning(f"Load JSON {p}: {e}")
         return d
 
     def _save_json(self, p, d):
-        try: p.write_text(json.dumps(d, indent=2))
-        except: pass
+        try: p.write_text(json.dumps(d, indent=2), encoding="utf-8")
+        except Exception as e: logger.warning(f"Save JSON {p}: {e}")
 
     def _save_processed_comments(self):
         self._save_json(self.PROCESSED_COMMENTS_FILE, {"ids":list(self._processed_comments),"count":len(self._processed_comments)})
