@@ -147,6 +147,10 @@ class TelegramBotHandler:
 ├ /clawnch\\_check <tx> - Verify tx
 └ /clawnch\\_launch <tx> - Launch with burn tx
 
+📋 **Briefing & Token** (v6.2)
+├ /briefing - Daily status briefing
+└ /republic - $REPUBLIC on-chain status
+
 🧠 **CLAWS Memory** (v6.2)
 ├ /claws\\_status - Memory connection status
 ├ /claws\\_recall <query> - Search memories
@@ -1061,6 +1065,54 @@ Full profile: agent_profile.md"""
             await update.message.reply_text(f"❌ {e}")
 
     # =========================================================================
+    # Briefing & Token Commands (v6.2)
+    # =========================================================================
+
+    async def briefing_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Generate and send daily briefing."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .tools.briefing_tool import _daily_briefing
+            briefing = _daily_briefing()
+            if len(briefing) > 4000:
+                for chunk in [briefing[i:i+4000] for i in range(0, len(briefing), 4000)]:
+                    await update.message.reply_text(chunk)
+            else:
+                await update.message.reply_text(briefing)
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    async def token_info_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Get $REPUBLIC token on-chain status."""
+        if not self._is_authorized(update.effective_chat.id):
+            await update.message.reply_text("Unauthorized.")
+            return
+        try:
+            from .integrations.basescan import BaseScanTracker
+            tracker = BaseScanTracker()
+            await update.message.reply_text("🔍 Fetching on-chain data...")
+            status = tracker.get_full_status()
+            lines = [
+                "💎 **$REPUBLIC On-Chain Status**\n",
+                f"├ Address: `{status.get('address', '?')[:20]}...`",
+                f"├ Chain: {status.get('chain', 'Base')}",
+            ]
+            if "total_supply" in status:
+                lines.append(f"├ Supply: {status['total_supply']:,.0f}")
+            lines.append(f"├ Holders: {status.get('holders', '?')}")
+            lines.append(f"├ Recent transfers: {status.get('recent_transfers', '?')}")
+            if "agent_balance" in status:
+                lines.append(f"├ Agent balance: {status['agent_balance']:,.0f}")
+            if "agent_eth" in status:
+                lines.append(f"├ Agent gas: {status['agent_eth']:.6f} ETH")
+            lines.append(f"└ Explorer: {status.get('explorer', '?')}")
+            await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
+        except Exception as e:
+            await update.message.reply_text(f"❌ {e}")
+
+    # =========================================================================
     # CLAWS Memory Commands (v6.2)
     # =========================================================================
 
@@ -1300,6 +1352,9 @@ Full profile: agent_profile.md"""
             ("clawnch_check", self.clawnch_check_command),
             ("clawnch_status", self.clawnch_status_command),
             ("clawnch_launch", self.clawnch_launch_command),
+            # Briefing & Token (v6.2)
+            ("briefing", self.briefing_command),
+            ("republic", self.token_info_command),
             # CLAWS memory commands (v6.2)
             ("claws_status", self.claws_status_command),
             ("claws_recall", self.claws_recall_command),

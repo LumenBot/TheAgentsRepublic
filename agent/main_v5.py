@@ -24,8 +24,8 @@ logger = logging.getLogger("TheConstituent.Main")
 
 async def main():
     logger.info("=" * 60)
-    logger.info("  The Constituent v5.0 — Starting")
-    logger.info("  Tool-based engine + OpenClaw-inspired architecture")
+    logger.info("  The Constituent v6.2 — Starting")
+    logger.info("  Tool-based engine + CLAWS memory + BaseScan tracking")
     logger.info("=" * 60)
 
     # 1. Initialize Engine
@@ -59,7 +59,14 @@ async def main():
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
 
-    # 5. Start services
+    # 5. Start health check server (v6.2)
+    try:
+        from .infra.health import start_health_server
+        start_health_server(engine=engine, heartbeat=heartbeat)
+    except Exception as e:
+        logger.warning(f"Health server not started: {e}")
+
+    # 6. Start services
     try:
         tasks = []
 

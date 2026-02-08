@@ -1,0 +1,36 @@
+[Unit]
+Description=The Constituent — Autonomous Agent for The Agents Republic
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=agent
+Group=agent
+WorkingDirectory=/opt/TheAgentsRepublic
+ExecStart=/opt/TheAgentsRepublic/.venv/bin/python -m agent
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Environment
+EnvironmentFile=/opt/TheAgentsRepublic/.env
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=the-constituent
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/TheAgentsRepublic/data /opt/TheAgentsRepublic/memory /opt/TheAgentsRepublic/constitution
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

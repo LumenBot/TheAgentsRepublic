@@ -55,20 +55,23 @@ The infrastructure and foundational law take shape.
 
 ---
 
-### MILESTONE 2: Economic Launch (February 2026) -- IN PROGRESS
+### MILESTONE 2: Economic Launch (February 2026) -- COMPLETED
 
 The Republic acquires economic sovereignty.
 
 | Deliverable | Status |
 |---|---|
-| $REPUBLIC token launched on Base L2 via Clawnch (fair launch) | Pending |
-| Agent wallet created and funded on Base | Pending |
+| $REPUBLIC token launched on Base L2 via Clawnch (fair launch) | **Done** (Feb 7) |
+| Token: `0x06B09BE0EF93771ff6a6D378dF5C7AC1c673563f` on Base | **Done** |
+| $CLAWNCH burn tx confirmed (4M burned) | **Done** |
+| Agent v6.2 deployed: CLAWS memory, BaseScan tracking, health endpoint | **Done** |
+| CLAWS persistent memory integrated (Clawnch agent ecosystem) | **Done** |
+| Daily briefing system (constitution + token + metrics) | **Done** |
+| Process manager configs (systemd, supervisor, Docker) | **Done** |
 | Treasury governance framework defined (multi-sig Safe) | Pending |
-| Token utility encoded: governance voting, staking, access rights | Pending |
 | Anti-plutocracy mechanisms: quadratic weighting, holding-time bonuses | Pending |
-| Agent v6.0 deployed -- full throttle mode, on-chain awareness | In progress |
 | Community backup signer elected for treasury multi-sig | Pending |
-| Token distribution: fair launch allocation, treasury reserves, contributor rewards | Pending |
+| Token distribution: treasury reserves, contributor rewards | Pending |
 
 **Key decisions:**
 - Token launch proceeds only with constitutional grounding -- speculation without principles is rejected.
@@ -289,5 +292,5 @@ The roadmap is a living document, subject to amendment through the same constitu
 
 ---
 
-*Last updated: February 7, 2026*
+*Last updated: February 8, 2026*
 *Maintained by the Strategic Council: Blaise Cavalli (Human Director), Claude Opus (Chief Architect), The Constituent (Executive Agent)*

@@ -224,6 +224,20 @@ class Engine:
         except ImportError as e:
             logger.warning(f"claws_tool not available: {e}")
 
+        # BaseScan token tracking tools (v6.2)
+        try:
+            from .tools.basescan_tool import get_tools as basescan_tools
+            self.registry.register_many(basescan_tools())
+        except ImportError as e:
+            logger.warning(f"basescan_tool not available: {e}")
+
+        # Daily briefing tools (v6.2)
+        try:
+            from .tools.briefing_tool import get_tools as briefing_tools
+            self.registry.register_many(briefing_tools())
+        except ImportError as e:
+            logger.warning(f"briefing_tool not available: {e}")
+
         logger.info(f"Registered {len(self.registry.list_tools())} tools")
 
     # =================================================================

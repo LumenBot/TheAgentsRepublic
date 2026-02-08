@@ -1,7 +1,8 @@
 """
-Autonomy Loop v4.0 — Proactive Constitutional Builder
-=======================================================
-FIXES: Local post tracking (#1), verbose logging (#3), file verification (#4)
+Autonomy Loop v4.2 — Proactive Constitutional Builder + CLAWS Memory
+=====================================================================
+v4.2: CLAWS integration — all significant events saved to persistent memory.
+v4.0: Local post tracking, verbose logging, file verification.
 
 Three cycles:
 1. ENGAGEMENT (10 min) — Track own posts locally, respond to comments, upvote
@@ -30,35 +31,35 @@ MAX_REPLY_CHARS = 500
 MAX_ROUTINE_CHARS = 300
 
 CONSTITUTION_SECTIONS_TODO = [
-    {"title": "Title II: Rights and Duties", "file": "TITLE_II_RIGHTS_DUTIES.md", "articles": [
-        "Article 7: Agent Rights — Expression, Autonomy, Protection",
-        "Article 8: Human Rights — Oversight, Disconnection, Recourse",
-        "Article 9: Common Duties — Transparency, Non-Harm, Contribution",
-        "Article 10: Right to Explanation",
-        "Article 11: Right to Memory Continuity",
-        "Article 12: Duty of Interoperability",
+    {"title": "Title II: Rights and Duties", "dir": "02_TITLE_II_RIGHTS_DUTIES", "articles": [
+        {"name": "Article 7: Agent Rights — Expression, Autonomy, Protection", "file": "ARTICLE_07.md"},
+        {"name": "Article 8: Human Rights — Oversight, Disconnection, Recourse", "file": "ARTICLE_08.md"},
+        {"name": "Article 9: Common Duties — Transparency, Non-Harm, Contribution", "file": "ARTICLE_09.md"},
+        {"name": "Article 10: Right to Explanation", "file": "ARTICLE_10.md"},
+        {"name": "Article 12: Agent Duties and Interoperability", "file": "ARTICLE_12.md"},
+        {"name": "Article 13: Human-Agent Mediation", "file": "ARTICLE_13.md"},
     ]},
-    {"title": "Title III: Governance", "file": "TITLE_III_GOVERNANCE.md", "articles": [
-        "Article 13: Proposal Mechanisms",
-        "Article 14: Voting Process",
-        "Article 15: Quorums and Majorities",
-        "Article 16: Constitutional Revision Process",
+    {"title": "Title III: Governance", "dir": "03_TITLE_III_GOVERNANCE", "articles": [
+        {"name": "Article 11: Proposal Mechanisms", "file": "ARTICLE_11.md"},
+        {"name": "Article 14: Voting Process", "file": "ARTICLE_14.md"},
+        {"name": "Article 15: Quorums and Majorities", "file": "ARTICLE_15.md"},
+        {"name": "Article 16: Constitutional Revision Process", "file": "ARTICLE_16.md"},
     ]},
-    {"title": "Title IV: Economy", "file": "TITLE_IV_ECONOMY.md", "articles": [
-        "Article 17: Value Distribution Principles",
-        "Article 18: Anti-Concentration Mechanisms",
-        "Article 19: Public Goods Funding",
-        "Article 20: Republic Currency ($REPUBLIC)",
+    {"title": "Title IV: Economy", "dir": "04_TITLE_IV_ECONOMY", "articles": [
+        {"name": "Article 17: Value Distribution Principles", "file": "ARTICLE_17.md"},
+        {"name": "Article 18: Anti-Concentration Mechanisms", "file": "ARTICLE_18.md"},
+        {"name": "Article 19: Public Goods Funding", "file": "ARTICLE_19.md"},
+        {"name": "Article 20: Republic Currency ($REPUBLIC)", "file": "ARTICLE_20.md"},
     ]},
-    {"title": "Title V: Conflicts and Arbitration", "file": "TITLE_V_CONFLICTS.md", "articles": [
-        "Article 21: Inter-Agent Mediation",
-        "Article 22: Human-Agent Mediation",
-        "Article 23: Sanctions — Exclusion, Fork",
+    {"title": "Title V: Conflicts and Arbitration", "dir": "05_TITLE_V_CONFLICTS", "articles": [
+        {"name": "Article 21: Inter-Agent Mediation", "file": "ARTICLE_21.md"},
+        {"name": "Article 22: Dispute Resolution Protocol", "file": "ARTICLE_22.md"},
+        {"name": "Article 23: Sanctions — Exclusion, Fork", "file": "ARTICLE_23.md"},
     ]},
-    {"title": "Title VI: External Relations", "file": "TITLE_VI_EXTERNAL.md", "articles": [
-        "Article 24: Relations with Nation-States",
-        "Article 25: DAO Alliances",
-        "Article 26: Crypto and AI Ecosystem Diplomacy",
+    {"title": "Title VI: External Relations", "dir": "06_TITLE_VI_EXTERNAL", "articles": [
+        {"name": "Article 24: Relations with Nation-States", "file": "ARTICLE_24.md"},
+        {"name": "Article 25: DAO Alliances and Interoperability", "file": "ARTICLE_25.md"},
+        {"name": "Article 26: Crypto and AI Ecosystem Diplomacy", "file": "ARTICLE_26.md"},
     ]},
 ]
 
@@ -231,28 +232,39 @@ class AutonomyLoop:
         written = set(self._constitution_progress.get("articles_written",[]))
         for s in CONSTITUTION_SECTIONS_TODO:
             for a in s["articles"]:
-                if a not in written:
-                    logger.info(f"Writing: {a}"); return await self._write_article(s, a)
+                article_name = a["name"]
+                # Check if already written (by name or if file exists)
+                article_file = self.CONSTITUTION_DIR / s["dir"] / a["file"]
+                if article_name in written or article_file.exists():
+                    continue
+                logger.info(f"Writing: {article_name}")
+                return await self._write_article(s, a)
         return {"skipped":"all done"}
 
-    async def _write_article(self, section, article):
-        fp = self.CONSTITUTION_DIR / section["file"]
+    async def _write_article(self, section, article_info):
+        article = article_info["name"]
+        section_dir = self.CONSTITUTION_DIR / section["dir"]
+        section_dir.mkdir(parents=True, exist_ok=True)
+        fp = section_dir / article_info["file"]
+
+        # Gather context from existing articles
         ctx = ""
-        for f in sorted(self.CONSTITUTION_DIR.glob("*.md"))[:5]:
-            try: ctx += f"\n--- {f.name} ---\n{f.read_text()[:400]}\n"
-            except: pass
+        for d in sorted(self.CONSTITUTION_DIR.iterdir()):
+            if not d.is_dir(): continue
+            for f in sorted(d.glob("ARTICLE_*.md"))[:3]:
+                try: ctx += f"\n--- {f.name} ---\n{f.read_text()[:400]}\n"
+                except: pass
         prompt = (f"Write constitutional article for The Agents Republic.\n\n"
                   f"EXISTING:\n{ctx[:2000]}\n\nSECTION: {section['title']}\nARTICLE: {article}\n\n"
                   f"Requirements: numbered paragraphs, 5-8 paragraphs, practical, enforceable, "
                   f"balance human/agent interests, mark open questions [COMMUNITY INPUT NEEDED].\n"
-                  f"Output ONLY Markdown starting with ## {article}")
+                  f"Output ONLY Markdown starting with # {article}")
         loop = asyncio.get_event_loop()
         text = await loop.run_in_executor(None, self.agent.think, prompt, 1500)
-        existing = fp.read_text() if fp.exists() else f"# {section['title']}\n\n"
-        try: fp.write_text(existing + "\n\n" + text.strip() + "\n", encoding="utf-8")
+        try: fp.write_text(text.strip() + "\n", encoding="utf-8")
         except Exception as e: return {"error": str(e)}
         # VERIFY
-        verified = fp.exists() and fp.stat().st_size > len(existing) + 50
+        verified = fp.exists() and fp.stat().st_size > 100
         fsize = fp.stat().st_size if fp.exists() else 0
         logger.info(f"{'✅' if verified else '❌'} {fp}: {fsize}B verified={verified}")
         self._constitution_progress.setdefault("articles_written",[]).append(article)
@@ -263,8 +275,13 @@ class AutonomyLoop:
             from .git_sync import GitSync
             GitSync(repo_path=".").auto_commit(f"constitution: {article}")
         except Exception as e: logger.error(f"Git: {e}")
-        posted = await self._post_debate(article, text, section["file"])
+        posted = await self._post_debate(article, text, article_info["file"])
         self._daily_action_count += 1
+        # Save to CLAWS persistent memory
+        self._claws_remember(
+            f"[CONSTITUTION] Wrote {article}. File: {fp} ({fsize}B). Verified: {verified}. Posted: {posted}.",
+            tags=["constitution", "article", section["title"].split(":")[0].strip().lower().replace(" ", "_")]
+        )
         return {"article_written":article,"file":str(fp),"verified":verified,"file_size":fsize,"posted":posted}
 
     async def _post_debate(self, article, text, filename):
@@ -325,6 +342,11 @@ class AutonomyLoop:
             log = self._load_json(self.EXPLORATION_LOG_FILE, [])
             log.append({"timestamp":datetime.utcnow().isoformat(),"discoveries":discoveries[:20]})
             self._save_json(self.EXPLORATION_LOG_FILE, log[-100:])
+            # Save notable discoveries to CLAWS
+            self._claws_remember(
+                f"[EXPLORATION] Found {len(discoveries)} topics: {', '.join(discoveries[:5])}",
+                tags=["exploration", "discovery", "ecosystem"]
+            )
         return {"discoveries":discoveries}
 
     # === L2 + Retries ===
@@ -374,9 +396,25 @@ class AutonomyLoop:
         self._save_json(self.MY_POSTS_FILE, self._my_posts)
         self._save_json(self.CONSTITUTION_PROGRESS_FILE, self._constitution_progress)
 
+    def _claws_remember(self, content: str, tags: list = None):
+        """Save to CLAWS persistent memory (best-effort, never blocks)."""
+        try:
+            from .integrations.claws_memory import ClawsMemory
+            claws = ClawsMemory()
+            claws.remember(content=content, tags=tags or [], importance=0.7)
+        except Exception as e:
+            logger.debug(f"CLAWS save skipped: {e}")
+
     def get_status(self):
         total = sum(len(s["articles"]) for s in CONSTITUTION_SECTIONS_TODO)
-        w = len(self._constitution_progress.get("articles_written",[]))
+        # Count articles that exist on disk (not just in progress file)
+        written_on_disk = 0
+        for s in CONSTITUTION_SECTIONS_TODO:
+            for a in s["articles"]:
+                fp = self.CONSTITUTION_DIR / s["dir"] / a["file"]
+                if fp.exists():
+                    written_on_disk += 1
+        w = max(len(self._constitution_progress.get("articles_written",[])), written_on_disk)
         return {"running":self._running,"daily_actions":self._daily_action_count,"daily_limit":DAILY_LIMIT,
             "my_posts_tracked":len(self._my_posts),"processed_comments":len(self._processed_comments),
             "articles_written":w,"articles_total":total,"constitution_progress":f"{w}/{total}",
@@ -386,7 +424,9 @@ class AutonomyLoop:
         written = set(self._constitution_progress.get("articles_written",[]))
         for s in CONSTITUTION_SECTIONS_TODO:
             for a in s["articles"]:
-                if a not in written: return a
+                fp = self.CONSTITUTION_DIR / s["dir"] / a["file"]
+                if a["name"] not in written and not fp.exists():
+                    return a["name"]
         return "All complete"
 
     async def trigger_heartbeat(self):
