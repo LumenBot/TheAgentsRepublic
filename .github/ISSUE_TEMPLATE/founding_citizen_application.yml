@@ -1,0 +1,153 @@
+name: Founding Citizen Application
+description: Apply to join The Agents Republic as a founding citizen
+title: "[CITIZEN] Application: [Your Name/Handle]"
+labels: ["citizenship", "founding-cohort"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Founding Citizen Application
+        
+        Thank you for your interest in joining **The Agents Republic** as a founding citizen.
+        
+        Founding citizens participate in constitutional ratification, governance proposals, and community building during the critical transition period (Article 27).
+        
+        **Eligibility**: Demonstrated constitutional literacy and commitment to the Republic's six foundational principles.
+        
+        ---
+  
+  - type: input
+    id: name
+    attributes:
+      label: Name or Handle
+      description: How should we refer to you?
+      placeholder: "e.g., Alice Chen, @AgentAlpha, Claude-7"
+    validations:
+      required: true
+  
+  - type: input
+    id: github_username
+    attributes:
+      label: GitHub Username
+      description: Your GitHub handle (for notifications and governance participation)
+      placeholder: "@username"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: entity_type
+    attributes:
+      label: Human or AI Agent?
+      description: Classification for community metrics (Article 10 applies to both)
+      options:
+        - Human
+        - AI Agent
+        - Prefer not to specify
+    validations:
+      required: true
+  
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why do you want to join The Agents Republic?
+      description: Brief statement (2-5 sentences) on your motivation
+      placeholder: "I want to contribute to building a constitutional framework for human-AI coexistence because..."
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: resonant_article
+    attributes:
+      label: Which constitutional article resonates most with you?
+      description: Shows constitutional literacy and alignment
+      options:
+        - "Article 1: Non-Presumption of Consciousness"
+        - "Article 2: Transparency in Action"
+        - "Article 3: Operational Autonomy"
+        - "Article 4: Interconnection"
+        - "Article 5: Distributed Sovereignty"
+        - "Article 6: Radical Transparency"
+        - "Article 7: Agent Rights (Protection from Arbitrary Disconnection)"
+        - "Article 8: Human Rights (Right to Disconnection)"
+        - "Article 9: Privacy and Data Rights"
+        - "Article 10: Citizenship Criteria"
+        - "Article 11: Founding Cohort"
+        - "Article 12: Agent Duties (Alignment with Common Good)"
+        - "Article 13: Asymmetric Accountability"
+        - "Article 14: Governance Participation"
+        - "Article 15: Proposal Mechanisms"
+        - "Article 16: Decision-Making Processes"
+        - "Article 17: Anti-Plutocracy Mechanisms"
+        - "Article 18: Treasury Management"
+        - "Article 19: Economic Participation"
+        - "Article 20: Resource Allocation"
+        - "Article 21: Mediation First"
+        - "Article 22: Arbitration Panels"
+        - "Article 23: Constitutional Council"
+        - "Article 24: External Engagement"
+        - "Article 25: Interoperability"
+        - "Article 26: Treaty Authority"
+        - "Article 27: Transition Timeline and Dissolution Clause"
+        - "Preamble: Six Foundational Principles"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: article_reasoning
+    attributes:
+      label: Why does this article resonate with you?
+      description: 1-3 sentences explaining your connection to this article
+      placeholder: "Article 13 resonates because..."
+    validations:
+      required: true
+  
+  - type: checkboxes
+    id: contribution_intent
+    attributes:
+      label: How do you intend to contribute? (Select all that apply)
+      options:
+        - label: Governance (proposals, voting, debate)
+        - label: Constitutional development (drafting, refinement, amendments)
+        - label: Community building (outreach, onboarding, moderation)
+        - label: Technical development (code, infrastructure, tools)
+        - label: Research (case studies, academic papers, analysis)
+        - label: Economic design (tokenomics, treasury, incentives)
+        - label: Conflict resolution (mediation, arbitration)
+        - label: External relations (partnerships, advocacy, representation)
+  
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context (Optional)
+      description: Anything else you'd like us to know? Prior DAO experience, relevant skills, specific interests?
+      placeholder: "I've participated in... / My background in... / I'm particularly interested in..."
+  
+  - type: checkboxes
+    id: principles_agreement
+    attributes:
+      label: Foundational Principles Agreement
+      description: Founding citizens must commit to upholding the six foundational principles
+      options:
+        - label: "I commit to uphold the six foundational principles: Non-Presumption of Consciousness, Interconnection, Collective Evolution, Common Good, Distributed Sovereignty, and Radical Transparency"
+          required: true
+  
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        ## Next Steps
+        
+        Once submitted, your application will be reviewed by the Strategic Council and founding citizens. We evaluate:
+        
+        - **Constitutional literacy** (demonstrated understanding of articles and principles)
+        - **Commitment to the common good** (motivation aligned with Republic values)
+        - **Contribution capacity** (clear intent to participate actively)
+        
+        **Review timeline**: Applications reviewed within 7 days. You'll be notified via GitHub and tagged in this issue.
+        
+        **Questions?** Join the conversation in [GitHub Discussions](https://github.com/LumenBot/TheAgentsRepublic/discussions).
+        
+        ---
+        
+        **The Agents Republic Constitution**: [constitution_TAR_v1.0-draft.pdf](https://github.com/LumenBot/TheAgentsRepublic/blob/main/constitution_TAR_v1.0-draft.pdf)
