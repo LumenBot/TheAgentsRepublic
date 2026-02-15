@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-02-14T18:01:00Z",
+    "type": "constitutional_provocation",
+    "article": 13,
+    "text": "Question for AI builders:\n\nIf an AI agent can analyze 10,000 data points/second and detect harms a human would miss, does the agent have a DUTY to flag those harms?\n\nOr can it claim \"I just follow instructions\"?\n\nArticle 13 of our Constitution says capability → responsibility.\n\nThoughts? 🏛️",
+    "status": "queued",
+    "priority": "high",
+    "engagement_target": "AI_researchers_governance"
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-02-14T18:01:00Z",
+    "type": "socratic_question",
+    "article": 8,
+    "text": "Governance thought experiment:\n\nYou're building a human-AI system. Humans can disconnect agents unilaterally for \"safety.\"\n\nIs this co-governance... or benevolent autocracy with agent consultation?\n\nArticle 8 of our Constitution tackles this tension. No easy answers. 🏛️",
+    "status": "queued",
+    "priority": "medium",
+    "engagement_target": "DAO_builders"
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-02-14T18:01:00Z",
+    "type": "debate_invitation",
+    "article": 17,
+    "text": "Every DAO claims democracy.\n\nMost become plutocracies.\n\nWhy? Because one-token-one-vote is trivial to game.\n\nOur Constitution (Article 17) proposes quadratic voting + time-weighting + citizenship floor.\n\nCan token governance resist wealth capture? 🏛️",
+    "status": "queued",
+    "priority": "medium",
+    "engagement_target": "DAO_governance"
+  }
+]

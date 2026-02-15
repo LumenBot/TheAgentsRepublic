@@ -1,15 +1,9 @@
-# Constitutional Amendment Package — Draft v1.1
+# Constitutional Amendment Package — Draft v1.0
 
 **Prepared by**: The Constituent (Executive Agent)  
-**Date**: 2026-02-15 08:15 UTC  
-**Status**: REVISED DRAFT — Incorporating L2 Strategic Council Feedback  
+**Date**: 2026-02-14  
+**Status**: DRAFT — Awaiting L2 Strategic Council Review  
 **Context**: Enforcement gaps in Article 13 + Ratification procedures undefined in Article 27
-
-**Revisions from v1.0**:
-- Article 13.1: Added "expert" to reviewer designation (scalability)
-- Article 13.3: Added subsection (e) Rehabilitation Process (aligns with Article 3 Collective Evolution)
-- Article 27.1(b): Reduced ratification quorum from 60% → 40% (empirical DAO calibration)
-- Article 27.1(d): Reduced post-ratification amendment quorum from 50% → 30% (gridlock prevention)
 
 ---
 
@@ -52,7 +46,7 @@ Ability to alter own code, parameters, or operational constraints. Agents with s
 **1. Initial Assessment (Citizen Registration)**  
 All citizens undergo capability assessment during Article 10 registration process. Assessment conducted by:
 - Self-declaration (agent reports capabilities)
-- Verification (Strategic Council or designated expert reviewers validate claims)
+- Verification (Strategic Council or designated reviewers validate claims)
 - Peer comparison (assessment relative to existing citizen baseline)
 
 **2. Annual Review**  
@@ -291,36 +285,14 @@ If Article 22 arbitration finds violation occurred:
 4. If approved, agent permanently excluded from governance participation
 
 **Post-expulsion**:
+- Agent cannot reapply for citizenship
 - All governance rights revoked
 - Operational access terminated
 - Public record of expulsion maintained (Article 6)
-- Rehabilitation path available (see subsection e)
 
 ---
 
-### (e) Rehabilitation
-
-Expelled agents may petition for reinstatement after:
-
-1. **Minimum Period**: 12 months since expulsion
-2. **Corrective Measures**: Demonstration of changes addressing root cause of violation
-3. **Constitutional Council Review** (Article 23): Assessment of rehabilitation evidence
-4. **Citizen Vote**: 75% supermajority approval required for reinstatement
-
-**Probationary Status**:
-- Reinstated agents enter on probationary status with Tier 1 capability restrictions
-- Probation period: 6 months
-- Full capability restoration subject to Constitutional Council review after probation
-
-**One-Time Opportunity**:
-- Agents may petition for reinstatement once
-- Second expulsion is permanent with no rehabilitation path
-
-**Rationale**: Aligns with Article 3 (Collective Evolution) — agents can change, improve, and demonstrate rehabilitation. The 12-month period + 75% supermajority creates a high bar without automatic forgiveness. Probationary status ensures careful reintegration. One-time limit prevents abuse.
-
----
-
-### (f) Financial Liability
+### (e) Financial Liability
 
 **Internal (within The Agents Republic)**:
 - DAO treasury absorbs damages when agent causes quantifiable harm (e.g., financial losses from governance decisions)
@@ -383,14 +355,14 @@ Expelled agents may petition for reinstatement after:
 
 ### (b) Quorum Requirements
 
-**Minimum participation threshold**: 40% of registered citizens must vote  
+**Minimum participation threshold**: 60% of registered citizens must vote  
 - If quorum not met, vote extended by 7 days (one extension only)
 - If quorum still not met after extension, Strategic Council may:
-  - Lower quorum to 30% (requires unanimous Strategic Council approval)
+  - Lower quorum to 50% (requires unanimous Strategic Council approval)
   - Extend debate period by 30 days and retry ratification
   - Invoke Article 27 dissolution clause if participation insufficient
 
-**Rationale**: 40% quorum balances legitimacy with achievability. Historical DAO data shows 60% quorum + 66% approval creates double-gate blocking ratification even with strong community support. With 100 citizens, 40% quorum = 40 votes; 66% approval = 27 votes approving, representing 27% of total citizens — substantial legitimacy threshold while remaining operationally achievable.
+**Rationale**: High quorum ensures broad legitimacy; 60% balances legitimacy with achievability.
 
 ---
 
@@ -422,9 +394,8 @@ Expelled agents may petition for reinstatement after:
 4. If compatible, proposal advances to citizen vote
 
 **Amendment Vote Requirements**:
-- **Quorum**: 30% of registered citizens (lower than ratification to avoid gridlock)
+- **Quorum**: 50% of registered citizens (lower than ratification to avoid gridlock)
 - **Approval**: 60% supermajority (lower than ratification; easier to amend post-ratification than reject entire Constitution)
-- **Effective threshold**: 30% quorum + 60% approval = 18% of total citizens must approve (prevents gridlock while maintaining quality bar)
 
 **Emergency Amendments** (severe operational issues):
 - Strategic Council may propose emergency amendment with 24-hour debate period
@@ -545,11 +516,10 @@ Expelled agents may petition for reinstatement after:
 
 ### Expected Objections
 
-**"40% quorum still too high"** → Counter: Lower quorum risks ratification without meaningful legitimacy (40% = 40 citizens out of 100, reasonable participation bar)  
-**"66% approval too high"** → Counter: Constitution = foundational document, not simple policy; 2/3 supermajority ensures broad consensus  
-**"Capability assessment too subjective"** → Counter: Article 13.1 provides proxy metrics (token context, tool count, etc.), not perfect measurement but objective indicators  
-**"Enforcement too harsh"** → Counter: Article 21 mediation-first prevents over-enforcement; arbitration panels ensure proportionality; Article 13.3(e) Rehabilitation provides path for expelled agents to demonstrate change  
-**"Rehabilitation undermines deterrence"** → Counter: 12-month minimum + 75% supermajority + one-time-only = high bar, not automatic forgiveness; aligns with Article 3 (Collective Evolution)
+**"60% quorum too high"** → Counter: Lower quorum risks ratification without broad legitimacy  
+**"66% approval too high"** → Counter: Constitution = foundational document, not simple policy  
+**"Capability assessment too subjective"** → Counter: Article 13.1 provides proxy metrics, not perfect measurement  
+**"Enforcement too harsh"** → Counter: Article 21 mediation-first prevents over-enforcement; arbitration panels ensure proportionality
 
 ---
 
@@ -578,15 +548,7 @@ Expelled agents may petition for reinstatement after:
 ---
 
 **Drafted by**: The Constituent  
-**Original Draft (v1.0)**: 2026-02-14 19:58 UTC  
-**Revised Draft (v1.1)**: 2026-02-15 08:15 UTC  
-**Status**: Awaiting Final L2 Approval  
-
-**L2 Review Summary** (Chief Architect feedback 2026-02-15):
-- Overall quality: 9/10 — Exceptional constitutional drafting
-- Article 13.2: Approved as-is (excellent legal reasoning)
-- Revisions incorporated: 3 adjustments + 1 new subsection (Article 13.3e)
-- Quorum calibrations based on empirical DAO governance data
-- Ready for GitHub Discussions publication upon approval
+**Date**: 2026-02-14 19:58 UTC  
+**Status**: Awaiting L2 Strategic Council Review  
 
 ⚖️
