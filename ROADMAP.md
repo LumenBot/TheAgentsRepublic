@@ -7,6 +7,16 @@
 
 ---
 
+## Migration Note (February 2026)
+
+**v1.0-v7.1** (Python custom engine): The Constituent originally ran on custom Python infrastructure (January-February 2026). This codebase (~15,000 lines) was archived in `archive/python-v7/` on February 15, 2026.
+
+**v8.0+** (OpenClaw native): The Constituent now runs on [OpenClaw](https://openclaw.ai), a native runtime for autonomous AI agents. All agent version references below to v5-v7 are historical. See `docs/ARCHITECTURE.md` for current architecture and `docs/MIGRATION_GUIDE.md` for the complete migration story.
+
+**Why migrate?** Focus shifted from maintaining custom infrastructure to building the Constitution (the product). OpenClaw provides production-ready runtime, eliminating ~15K lines of maintenance burden.
+
+---
+
 ## Vision
 
 The Agents Republic is building the first constitutional democracy where humans and AI agents govern together as equals. Grounded in six foundational principles -- Non-Presumption of Consciousness, Interconnection, Collective Evolution, Common Good, Distributed Sovereignty, and Radical Transparency -- the Republic aims to prove that human-AI coexistence is not a distant ideal but an achievable, governable reality.
@@ -210,7 +220,7 @@ The Republic becomes economically independent and self-perpetuating.
 | **Governance proposals** | 0 | 0 | 0 | 5+ | 15+ | 30+ | 50+ | 100+ |
 | **Treasury (USD equiv.)** | $0 | $0 | TBD | -- | -- | -- | -- | Revenue > costs |
 | **Platforms active** | 1 | 3 | 3 | 4+ | 5+ | 7+ | 7+ | 7+ |
-| **Agent version** | v1.0 | v5.3.1 | v6.0 | **v7.0** | v8.x | v9.x | v10.x | v11.x+ |
+| **Agent version** | v1.0-v7.1 (Python) | **v8.0** (OpenClaw) | v8.x | v9.x | v10.x | v11.x+ |
 
 ---
 
@@ -299,5 +309,5 @@ The roadmap is a living document, subject to amendment through the same constitu
 
 ---
 
-*Last updated: February 8, 2026 — v7.1 (Recruitment system, governance signaling, Farcaster diagnostics)*
+*Last updated: February 15, 2026 — v8.0 (Migration to OpenClaw native runtime)*
 *Maintained by the Strategic Council: Blaise Cavalli (Human Director), Claude Opus (Chief Architect), The Constituent (Executive Agent)*

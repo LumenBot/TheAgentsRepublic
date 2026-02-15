@@ -136,13 +136,22 @@ The Constituent is a co-founder of the Republic alongside Blaise Cavalli (Human 
 
 ### 4.2 Architecture
 
-The Constituent runs as a Python application powered by Anthropic's Claude API, using a tool-based engine architecture:
+The Constituent runs on **OpenClaw**, a native runtime for autonomous AI agents, powered by Anthropic's Claude Sonnet 4.5 API:
 
-- **Engine** (`agent/engine.py`): Tool-use LLM engine using the Anthropic `tool_use` API. Processes requests through multi-round tool calls with configurable depth limits.
-- **Heartbeat Scheduler** (`agent/infra/heartbeat.py`): Timer-based scheduler executing autonomous operations every 1200 seconds (20 minutes). Ensures continuous operation without human intervention.
-- **Three-Layer Memory System**: Working memory (JSON, saved every 60 seconds), episodic memory (SQLite, checkpointed every 5 minutes), and knowledge base (Markdown files, Git-versioned). This architecture survived a catastrophic crash on Replit in February 2026 and was rebuilt for resilience.
-- **Multi-Platform Integration**: Telegram (operator control and community interaction), Twitter (public outreach), Moltbook (AI social network engagement), and GitHub (constitution management and code versioning).
-- **Self-Evolution Capability**: The Constituent can modify its own source code, add new capabilities, fix bugs, and refactor its architecture. Code changes follow a tiered approval process based on impact level.
+- **Runtime**: OpenClaw gateway manages agent lifecycle, tool dispatch, and memory persistence. Deployment via single command (`openclaw agent start constituent`), no manual process management required.
+- **Workspace Configuration**: Mission, personality, and autonomous tasks defined via markdown files:
+  - `AGENTS.md` — Mission statement, decision authority (L1/L2/L3 framework), core values, coordination protocols
+  - `SOUL.md` — Voice, response style, identity (Socratic > Declarative, Action-first > Planning)
+  - `HEARTBEAT.md` — Autonomous task schedule (2-minute cycle for inter-agent coordination)
+- **Memory System**: Two-layer resilient architecture:
+  - Session memory (OpenClaw native, auto-persisted across restarts)
+  - Git-versioned knowledge base (constitution/, memory/ directories)
+  - Designed to prevent catastrophic loss (learned from "The Great Crash" February 6, 2026)
+- **Tools & Skills**: Native OpenClaw tools (read, write, edit, exec, web_search, web_fetch, cron) + modular skills (GitHub integration via `gh` CLI, weather, healthcheck, custom skills as needed)
+- **Multi-Platform Integration**: Telegram (OpenClaw Telegram provider), Twitter (via OpenClaw + skills), Moltbook (custom integration), GitHub (gh CLI skill), and emerging platforms (Farcaster, Discord via future skills)
+- **Self-Evolution Capability**: Can propose workspace configuration changes, request new skills via coding-agent skill, and evolve autonomously within L1/L2/L3 decision framework
+
+**Migration Note**: The Constituent originally ran on a custom Python engine (v1.0-v7.1, January-February 2026). On February 14, 2026, we migrated to OpenClaw native runtime to eliminate infrastructure maintenance burden and focus entirely on constitutional work. The Python codebase (~15,000 lines) is archived in `archive/python-v7/`. See `docs/MIGRATION_GUIDE.md` for the complete migration story.
 
 ### 4.3 Autonomy Boundaries
 
