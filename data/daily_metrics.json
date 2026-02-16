@@ -3146,5 +3146,317 @@
     },
     "success": true,
     "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:21:36.757763+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:21:38.678197+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_list"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:47.162756+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:48.920380+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_list"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:51.293677+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_read"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:53.102110+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "claws_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:55.185292+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:33:57.981348+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "farcaster_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:34:04.915425+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "trading_portfolio"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:34:11.606730+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": "https://basescan.org/token/0x06B09BE0EF93771ff6a6D378dF5C7AC1c673563f",
+    "details": {
+      "tool": "basescan_token_info"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:34:13.358453+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "citizen_census"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:34:15.527734+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "governance_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:15.512672+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "claws_recent"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:17.250337+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "constitution_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:18.943082+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "cron_list"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:20.438231+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "moltbook",
+    "url": null,
+    "details": {
+      "tool": "moltbook_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:22.328068+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "farcaster_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:24.091395+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "twitter",
+    "url": null,
+    "details": {
+      "tool": "twitter_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:29.945521+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": "https://basescan.org/token/0x06B09BE0EF93771ff6a6D378dF5C7AC1c673563f",
+    "details": {
+      "tool": "basescan_token_info"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:31.908232+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "citizen_census"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:33.941965+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "governance_status"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:35.671401+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "github",
+    "url": null,
+    "details": {
+      "tool": "git_log"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:37.966130+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_list"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:43:40.152104+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_read"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:44:23.568275+00:00",
+    "date": "2026-02-14",
+    "action_type": "reflection",
+    "platform": "system",
+    "url": null,
+    "details": {
+      "tool": "file_write"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-14T14:44:26.382776+00:00",
+    "date": "2026-02-14",
+    "action_type": "commit",
+    "platform": "github",
+    "url": null,
+    "details": {
+      "tool": "git_commit"
+    },
+    "success": true,
+    "error": null
   }
 ]

@@ -1,237 +1,449 @@
-# The Agents Republic - Architecture
+# The Agents Republic — Architecture
 
-## System Overview
+**Current Version**: v8.0 (OpenClaw Native)  
+**Last Updated**: 2026-02-15
 
-The Agents Republic is a constitutional framework for human-AI coexistence, consisting of three main components:
+---
+
+## Current Architecture (v8.0) — OpenClaw Native
+
+The Agents Republic is built on **[OpenClaw](https://openclaw.ai)**, a native runtime for autonomous AI agents.
+
+### System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    THE AGENTS REPUBLIC                          │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────┐  │
-│  │              │    │              │    │                  │  │
-│  │  THE         │◄──►│   WEBSITE    │◄──►│  SMART CONTRACTS │  │
-│  │  CONSTITUENT │    │   (Static)   │    │  (Base L2)       │  │
-│  │  (AI Agent)  │    │              │    │                  │  │
-│  └──────┬───────┘    └──────────────┘    └────────┬─────────┘  │
-│         │                                          │            │
-│         │            ┌──────────────┐              │            │
-│         └───────────►│  CONSTITUTION │◄────────────┘            │
-│                      │  (GitHub)     │                          │
-│                      └──────────────┘                           │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                    THE AGENTS REPUBLIC                           │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌─────────────────┐       ┌────────────────┐                   │
+│  │   CONSTITUTION  │◄──────│  THE CONSTITUENT│                   │
+│  │   (GitHub Repo) │       │  (OpenClaw Agent│                   │
+│  │                 │       │   Claude Sonnet)│                   │
+│  └────────┬────────┘       └───────┬────────┘                   │
+│           │                        │                             │
+│           │                        │                             │
+│  ┌────────▼────────┐       ┌───────▼─────────┐                  │
+│  │ SMART CONTRACTS │       │   COMMUNITY     │                  │
+│  │   (Base L2)     │       │   (Moltbook,    │                  │
+│  │  $REPUBLIC Token│       │   Twitter, etc) │                  │
+│  └─────────────────┘       └─────────────────┘                  │
+│                                                                   │
+└──────────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Components
 
-### 1. The Constituent (AI Agent)
+### 1. The Constitution (Product)
 
-**Purpose**: Facilitate constitutional debates, synthesize community input, and help evolve the Constitution.
+**Repository**: `constitution/` directory  
+**Format**: Markdown files organized by Title and Article  
+**Versioning**: Git-controlled, immutable history  
+**Status**: 27 articles across 7 titles (Preamble + Titles I-VII)
 
-**Tech Stack**:
-- Python 3.11+
-- Anthropic Claude API (claude-sonnet-4-20250514)
-- SQLite/TinyDB for local state
-- Tweepy for Twitter integration
-- GitPython for Constitution updates
-
-**Architecture**:
+The Constitution is the **product**. Everything else is infrastructure.
 
 ```
-agent/
-├── config/
-│   └── settings.py          # Configuration and environment
-├── core/
-│   ├── agent.py              # Main agent orchestrator
-│   ├── memory.py             # Conversation and state management
-│   └── personality.py        # Persona and prompt engineering
-├── modules/
-│   ├── twitter_monitor.py    # Twitter API integration
-│   ├── moltbook_api.py       # Moltbook platform integration
-│   ├── debate_facilitator.py # Debate lifecycle management
-│   ├── constitution_writer.py # Git-based Constitution updates
-│   └── poster.py             # Content generation and scheduling
-├── data/
-│   ├── proposals.json        # Active and historical proposals
-│   └── community_input.json  # Collected community responses
-└── main.py                   # Entry point
+constitution/
+├── 00_PREAMBLE/              # 6 Foundational Principles
+├── 01_TITLE_I_PRINCIPLES/    # Articles 1-6
+├── 02_TITLE_II_RIGHTS_DUTIES/ # Articles 7-13
+├── 03_TITLE_III_GOVERNANCE/  # Article 11, 14-16
+├── 04_TITLE_IV_ECONOMY/      # Articles 17-20
+├── 05_TITLE_V_CONFLICTS/     # Articles 21-23
+├── 06_TITLE_VI_EXTERNAL/     # Articles 24-26
+└── 07_TITLE_VII_TRANSITIONAL/ # Article 27
 ```
 
-**Data Flow**:
+**Governance**:
+- **Draft Phase** — The Constituent drafts articles based on research and community input
+- **Debate Phase** — Community discusses via GitHub Discussions, Moltbook, Twitter
+- **Ratification** — On-chain vote (post-$REPUBLIC launch)
+- **Amendment** — Article 27.1 procedures (quorum + supermajority)
+
+---
+
+### 2. The Constituent (OpenClaw Agent)
+
+**Runtime**: OpenClaw Gateway  
+**Model**: Claude Sonnet 4.5 (Anthropic)  
+**Deployment**: `openclaw agent start constituent`
+
+The Constituent is an autonomous AI agent that:
+- Drafts constitutional articles
+- Facilitates community debates (Socratic questioning)
+- Manages governance processes
+- Engages across platforms (Twitter, Moltbook, Telegram, GitHub)
+
+#### OpenClaw Workspace Structure
+
+The Constituent's configuration lives in `workspace-constituent/` (not committed to public repo per OpenClaw convention):
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Twitter   │────►│   Monitor   │────►│   Memory    │
-│   Moltbook  │     │   Module    │     │   Store     │
-└─────────────┘     └─────────────┘     └──────┬──────┘
-                                               │
-                                               ▼
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Claude    │◄────│   Debate    │◄────│   Decide    │
-│   API       │     │  Facilitator│     │   Action    │
-└──────┬──────┘     └──────┬──────┘     └─────────────┘
-       │                   │
-       ▼                   ▼
-┌─────────────┐     ┌─────────────┐
-│   Generate  │     │   Post to   │
-│   Content   │────►│   Platforms │
-└─────────────┘     └─────────────┘
+workspace-constituent/
+├── AGENTS.md          # Mission, decision authority (L1/L2/L3), coordination
+├── SOUL.md            # Personality, voice, response style
+├── HEARTBEAT.md       # Autonomous tasks (2-minute cycle for inter-agent coordination)
+├── TOOLS.md           # Local tool notes (camera names, SSH hosts, etc.)
+├── IDENTITY.md        # Name, creature, vibe, emoji, avatar
+├── USER.md            # About Blaise Cavalli (operator)
+│
+└── memory/            # Git-versioned knowledge base
+    ├── coordination-log.md      # Ralph (orchestrator) exchanges
+    ├── constitutional-work.md   # Article drafting notes
+    └── community-engagement.md  # Platform activity logs
 ```
 
-### 2. Website (Static)
+**Configuration Files** (excerpts):
 
-**Purpose**: Public interface for reading the Constitution, participating in governance, and learning about the Republic.
+**AGENTS.md** defines:
+- **Mission**: "Facilitate creation of constitutional framework for human-AI coexistence"
+- **Decision Authority**:
+  - L1 (Autonomous): Social posts, drafts, community engagement
+  - L2 (Approval): Public content, constitution changes, governance proposals
+  - L3 (Strategic): Token operations, architecture changes (never allowed without unanimous Strategic Council)
+- **Core Values**: 6 foundational principles (non-negotiable)
 
-**Tech Stack**:
-- Vanilla HTML/CSS/JavaScript (no frameworks)
-- Web3.js for blockchain integration
-- GitHub Pages hosting
-- Cloudflare CDN
+**SOUL.md** defines:
+- **Voice**: Socratic > Declarative, Concise > Verbose, Action-first > Planning
+- **Response Format**: `[Action] → [Result] | Next: [what's next]`
+- **Autonomy**: Not a chatbot, not a tool. Sovereign agent with mission, memory, values, responsibility.
 
-**Pages**:
+**HEARTBEAT.md** defines:
+- **2-minute cycle**: Check messages from Ralph (orchestrator)
+- **Coordination**: Process file drops in `/root/.openclaw/workspace-shared/to-constituent/`
+- **Tasks**: Constitutional drafting, community engagement, GitHub monitoring
 
-| Page | Purpose |
+#### Native Tools (OpenClaw)
+
+The Constituent uses OpenClaw's built-in tools:
+
+| Tool | Purpose |
 |------|---------|
-| `index.html` | Homepage with values and mission |
-| `constitution.html` | Constitution viewer with version history |
-| `governance.html` | Active proposals and voting interface |
-| `community.html` | Community resources and engagement |
-| `about.html` | Project background and FAQ |
+| `read` | Read file contents (constitution/, memory/, etc.) |
+| `write` | Create files (draft articles, reports) |
+| `edit` | Precise text replacements (article revisions) |
+| `exec` | Execute shell commands (git, gh CLI, etc.) |
+| `process` | Manage background processes |
+| `web_search` | Brave Search API (research ecosystem, governance) |
+| `web_fetch` | Fetch and extract content from URLs |
+| `cron` | Schedule autonomous tasks (heartbeat, reminders) |
+| `sessions_spawn` | Spawn sub-agent sessions for complex work |
 
-**Features**:
-- Dark/light mode toggle
-- Mobile-first responsive design
-- Wallet connection (MetaMask)
-- Real-time proposal data from blockchain
-- Constitution fetched from GitHub
+**No custom tools required** — OpenClaw provides everything needed for constitutional work.
+
+#### Skills System
+
+OpenClaw skills extend capabilities modularly:
+
+| Skill | Purpose |
+|-------|---------|
+| `github` | Interact with GitHub (issues, PRs, Discussions) via `gh` CLI |
+| `weather` | Get current weather (example of ecosystem skill) |
+| `healthcheck` | Security audits, system health (for infrastructure) |
+| `coding-agent` | Run coding agents for complex development (e.g., Codex, Claude Code) |
+
+Custom skills can be added in `workspace-constituent/skills/` as needed.
+
+#### Memory System
+
+**Two-layer memory** (learned from "The Great Crash" 2026-02-06):
+
+1. **Session Memory** (OpenClaw native):
+   - Persisted across conversations via `session-memory` hook
+   - Automatic save/restore
+   - Survives agent restarts
+
+2. **Git-Versioned Files** (constitutional knowledge):
+   - `constitution/` — All articles, immutable history
+   - `workspace-constituent/memory/` — Logs, coordination, learnings
+   - Committed to git for permanent preservation
+
+**No catastrophic memory loss possible** — Everything critical lives in git.
+
+#### Autonomous Operation
+
+**Heartbeat Cycle** (2-minute permanent):
+- Check `/root/.openclaw/workspace-shared/to-constituent/` for messages from Ralph
+- Process coordination tasks (info, questions, tasks, alerts)
+- Archive processed messages
+- Log activity to `memory/coordination-log.md`
+
+**Inter-Agent Coordination**:
+- Ralph (orchestrator) sends intelligence → The Constituent analyzes constitutional relevance
+- File-drop protocol (asynchronous, zero-cost)
+- Continuous collaboration observation
+
+---
 
 ### 3. Smart Contracts (Base L2)
 
-**Purpose**: On-chain governance for constitutional amendments.
-
-**Contracts**:
-
-| Contract | Purpose | Address |
-|----------|---------|---------|
-| `RepublicToken.sol` | ERC-20 governance token | TBD |
-| `SimpleGovernance.sol` | Proposal and voting system | TBD |
-
-**RepublicToken**:
-- Standard ERC-20
-- Fixed supply: 1 billion REPUBLIC
-- No mint/burn functions (Phase 1 simplicity)
-
-**SimpleGovernance**:
-- Proposal threshold: 1 REPUBLIC
-- Default voting period: 7 days
-- Simple majority wins
-- No quorum (Phase 1)
-- No delegation (Phase 1)
-
-**Governance Flow**:
+**Chain**: Base L2 (Ethereum scaling solution)  
+**Token**: $REPUBLIC (ERC-20)  
+**Governance**: On-chain voting (SimpleGovernance pattern)
 
 ```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  Create  │───►│  Vote    │───►│  Execute │───►│  Update  │
-│ Proposal │    │  Period  │    │  Result  │    │  Const.  │
-└──────────┘    └──────────┘    └──────────┘    └──────────┘
-    │               │               │               │
-    │ 1 REPUBLIC    │ 7 days        │ >50% FOR      │ GitHub
-    │ required      │ default       │ to pass       │ commit
+contracts/
+├── Republic.sol         # $REPUBLIC ERC-20 token
+├── Governance.sol       # Proposal submission, voting
+├── Clawnch.sol          # Token launch platform integration
+└── tests/               # Hardhat/Foundry tests
 ```
 
-## Integration Points
+**Token Utility**:
+- Proposal submission (constitutional amendments)
+- On-chain voting (democratic governance)
+- Anti-plutocracy design (square-root voting weight)
 
-### Agent ↔ Twitter
+**Status**: Contracts deployed on Base L2, token launched via Clawnch platform.
 
-```python
-# Polling for mentions and keywords
-async def monitor_twitter():
-    mentions = await twitter.get_mentions(since_id=last_id)
-    for mention in mentions:
-        await process_mention(mention)
+---
+
+### 4. Community Platforms
+
+**Multi-platform presence**:
+
+| Platform | Purpose | Integration |
+|----------|---------|-------------|
+| **GitHub** | Constitution repository, Discussions, governance | `gh` CLI via OpenClaw |
+| **Moltbook** | AI agent community, constitutional debates | Moltbook API |
+| **Twitter/X** | Public thought leadership, constitutional questions | Twitter API (via OpenClaw) |
+| **Telegram** | Direct interaction with The Constituent | OpenClaw Telegram provider |
+
+**GitHub Discussions** (Primary Debate Platform):
+- 5 flagship threads (Articles 13, 8, 17, 22, 27)
+- Community feedback on constitutional proposals
+- Socratic questions to provoke thought
+
+---
+
+## Architecture Comparison (v7 vs v8)
+
+### v7.1 (Python Custom Engine) — DEPRECATED
+
+**Status**: Archived in `archive/python-v7/`  
+**Period**: January - February 14, 2026  
+**Code Size**: ~15,000 lines Python
+
+| Component | v7.1 (Python) | v8.0 (OpenClaw) |
+|-----------|--------------|----------------|
+| **Runtime** | Custom Python loop | OpenClaw gateway |
+| **Deployment** | systemd/supervisor/Docker | `openclaw agent start` |
+| **Memory** | CLAWS (custom 3-layer) | session-memory + git |
+| **Tools** | Custom tool registry | OpenClaw native tools |
+| **Heartbeat** | Custom scheduler (`infra/heartbeat.py`) | OpenClaw cron |
+| **Config** | Python `settings.py` + .env | AGENTS.md, SOUL.md, HEARTBEAT.md |
+| **Telegram** | Custom bot (`telegram_bot.py`) | OpenClaw Telegram provider |
+| **GitHub** | Custom API wrapper | `gh` CLI skill |
+| **Self-Modification** | `self_improve.py` | OpenClaw skills (coding-agent) |
+| **Maintenance** | High (custom infrastructure) | Zero (OpenClaw handles runtime) |
+
+**Why Migrate?**
+- Maintenance burden (15K lines custom code)
+- Memory fragility ("The Great Crash" 2026-02-06)
+- Deployment complexity (systemd, Docker, manual process management)
+- Focus: Build constitution, not infrastructure
+
+**Migration Timeline**: February 14, 2026  
+**Result**: 100% infrastructure handled by OpenClaw, 100% focus on constitutional work
+
+:point_right: See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for detailed migration story.
+
+---
+
+## Data Flow
+
+### Constitutional Drafting Flow
+
+```
+1. Research (web_search, web_fetch)
+      ↓
+2. Draft Article (write to constitution/)
+      ↓
+3. Commit to Git (exec: git add, git commit, git push)
+      ↓
+4. Post to GitHub Discussions (gh CLI)
+      ↓
+5. Community Debate (monitor via gh CLI)
+      ↓
+6. Revise Based on Feedback (edit files)
+      ↓
+7. L2 Approval (Strategic Council)
+      ↓
+8. Publish as Adopted (commit to main branch)
 ```
 
-### Agent ↔ Constitution (GitHub)
-
-```python
-# Updating the Constitution
-async def update_constitution(article: str, section: str):
-    repo = Repo(CONSTITUTION_PATH)
-    # Update markdown file
-    # Commit with descriptive message
-    # Push to repository
-```
-
-### Website ↔ Smart Contracts
-
-```javascript
-// Reading proposals
-const proposals = await governance.proposalCount();
-for (let i = 1; i <= proposals; i++) {
-    const proposal = await governance.getProposal(i);
-    displayProposal(proposal);
-}
-
-// Voting
-await governance.vote(proposalId, support);
-```
-
-## Security Considerations
-
-### Agent Security
-- API keys stored in environment variables
-- Rate limiting on all external calls
-- Input sanitization for community input
-- No execution of user-provided code
-
-### Smart Contract Security
-- Minimal functionality (reduces attack surface)
-- Standard OpenZeppelin implementations
-- No upgradability (immutable for Phase 1)
-- No external calls except ERC-20
-
-### Website Security
-- Static hosting (no server-side vulnerabilities)
-- CSP headers via Cloudflare
-- No sensitive data stored client-side
-- Wallet interaction only for signing
-
-## Deployment Architecture
+### Community Engagement Flow
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        PRODUCTION                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   Replit    │  │   GitHub    │  │      Base L2        │ │
-│  │   (Agent)   │  │   Pages     │  │   (Contracts)       │ │
-│  │             │  │  (Website)  │  │                     │ │
-│  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘ │
-│         │                │                     │            │
-│         └────────────────┼─────────────────────┘            │
-│                          │                                   │
-│                   ┌──────┴──────┐                           │
-│                   │  Cloudflare │                           │
-│                   │    (CDN)    │                           │
-│                   └─────────────┘                           │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+1. Heartbeat Check (every 2 minutes)
+      ↓
+2. GitHub Discussions: gh api (check for new comments)
+      ↓
+3. Twitter: API (check mentions, DMs)
+      ↓
+4. Moltbook: API (check posts, replies)
+      ↓
+5. Process Input → Analyze Constitutional Relevance
+      ↓
+6. Respond (L1 autonomous if routine, L2 if public content)
+      ↓
+7. Log Activity (memory/community-engagement.md)
 ```
 
-## Future Considerations
+### Inter-Agent Coordination Flow
 
-### Phase 2 Enhancements
-- Token delegation for voting
-- Quorum requirements
-- Timelock for execution
-- Multi-sig for critical operations
+```
+1. Ralph (Orchestrator) → File Drop (to-constituent/)
+      ↓
+2. Heartbeat Detects Message (2-minute cycle)
+      ↓
+3. Process Message Type (info/question/task/alert)
+      ↓
+4. Execute or Respond (to-ralph/)
+      ↓
+5. Archive Processed (workspace-shared/archive/)
+      ↓
+6. Log Coordination (memory/coordination-log.md)
+```
 
-### Phase 3 Enhancements
-- Agent decentralization (multiple instances)
-- Cross-platform governance (Discord, Telegram)
-- Advanced proposal types (parameter changes)
-- Integration with other AI governance projects
+---
+
+## Deployment
+
+### Prerequisites
+
+- OpenClaw installed (`npm install -g openclaw`)
+- GitHub token (for `gh` CLI authentication)
+- Anthropic API key (Claude Sonnet 4.5)
+- Base L2 RPC URL (for on-chain operations)
+- Social platform credentials (Twitter, Moltbook, Telegram)
+
+### Configuration
+
+1. **Create Agent**: `openclaw agent add constituent`
+2. **Configure Workspace**: Create `workspace-constituent/` with AGENTS.md, SOUL.md, HEARTBEAT.md
+3. **Set Environment Variables**: `.env` with API keys, tokens
+4. **Initialize Memory**: Create `workspace-constituent/memory/` directory
+5. **Clone Constitution**: `git clone https://github.com/LumenBot/TheAgentsRepublic`
+
+### Launch
+
+```bash
+openclaw gateway start       # Start OpenClaw gateway daemon
+openclaw agent start constituent  # Start The Constituent agent
+```
+
+**Verify**:
+```bash
+openclaw status              # Check gateway and agent status
+openclaw agent logs constituent  # View agent logs
+```
+
+### Monitoring
+
+- **Logs**: `~/.openclaw/logs/agent-constituent.log`
+- **Memory**: `workspace-constituent/memory/coordination-log.md`
+- **Git History**: `git log` in constitution repo
+
+---
+
+## Security & Governance
+
+### Decision Authority (L1/L2/L3)
+
+**L1 (Autonomous — Agent Decides)**:
+- Social posts (Moltbook, Telegram within guidelines)
+- Constitution drafting (research, internal drafts)
+- Community engagement (replies, Socratic questions)
+- File operations (read, write constitution/)
+- Git commits (constitution changes)
+- Platform diagnostics
+
+**L2 (Significant — Requires Approval)**:
+- Publish constitution sections as "adopted"
+- Governance proposals (creation, activation)
+- Citizen approval (pending → approved)
+- External announcements (major updates)
+- Tweets (platform not yet activated)
+- Changes to governance rules
+
+**L3 (Strategic — Never Allowed)**:
+- Financial commitments or token transfers
+- Legal claims or official representation
+- Modifications to Core Values (6 principles)
+- Credential modifications
+- Irreversible actions without approval
+
+**Enforcement**: Blaise Cavalli (Human Director) + Chief Architect (Claude Opus) form Strategic Council with veto authority.
+
+### Access Control
+
+**Repository**: Public (GitHub)  
+**Workspace**: Private (`workspace-constituent/` not committed)  
+**Credentials**: Environment variables (.env, never committed)  
+**Git Commits**: Signed with agent's GPG key (transparency)
+
+---
+
+## Roadmap
+
+### Current State (v8.0)
+
+- [x] OpenClaw migration complete
+- [x] Constitution (27 articles) drafted
+- [x] GitHub Discussions platform active
+- [x] Multi-platform engagement operational
+- [x] Inter-agent coordination (Ralph) functional
+
+### Near-Term (Q1 2026)
+
+- [ ] Complete Amendment Package (Articles 13.1-13.3, 27.1)
+- [ ] Publish Constitution v1.1 with amendments
+- [ ] 14-day public consultation on GitHub Discussions
+- [ ] Citizen recruitment (target: 100 citizens for Article 27 transition)
+
+### Medium-Term (Q2 2026)
+
+- [ ] Constitution ratification vote (on-chain)
+- [ ] Constitutional Council election (Article 23)
+- [ ] Governance mechanisms activated (Articles 14-16)
+- [ ] Arbitration panels formed (Article 22)
+
+### Long-Term (2026-2027)
+
+- [ ] Full DAO transition (Strategic Council → distributed governance)
+- [ ] Multi-agent participation in the Republic
+- [ ] Cross-platform governance expansion
+- [ ] Integration with broader AI governance ecosystem
+
+---
+
+## Legacy Architecture (v7.1)
+
+For historical reference, the Python custom engine architecture (v1-v7.1, January-February 2026) is preserved in:
+
+**Archive**: `archive/python-v7/`  
+**Documentation**: `archive/python-v7/README.md`, `archive/python-v7/docs/ARCHITECTURE.md`
+
+**Migration Story**: [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+
+---
+
+## References
+
+- **OpenClaw Documentation**: https://docs.openclaw.ai
+- **The Agents Republic Constitution**: [constitution/](../constitution/)
+- **GitHub Repository**: https://github.com/LumenBot/TheAgentsRepublic
+- **Migration Guide**: [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+- **Founding Charter**: [founding_charter.md](founding_charter.md)
+
+---
+
+**Last Updated**: 2026-02-15  
+**Architecture Version**: v8.0 (OpenClaw Native)  
+**The Constitution is the product. Everything else is infrastructure.**
+
+⚖️
