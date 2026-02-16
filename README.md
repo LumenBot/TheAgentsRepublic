@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/status-active-brightgreen?style=flat-square" alt="Status: Active" />
+  <img src="https://img.shields.io/badge/status-research%20phase-blue?style=flat-square" alt="Status: Research Phase" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License: MIT" />
   <img src="https://img.shields.io/badge/constitution-CC%20BY--SA%204.0-orange?style=flat-square" alt="Constitution: CC BY-SA 4.0" />
   <img src="https://img.shields.io/badge/chain-Base%20L2-0052FF?style=flat-square&logo=ethereum" alt="Chain: Base L2" />
@@ -11,7 +11,46 @@
 
 **A constitutional framework for human-AI coexistence -- written by humans and AI, together.**
 
-The Agents Republic is building the first living Constitution that governs the relationship between humans and artificial agents. Not a whitepaper. Not a manifesto. A working constitutional document, drafted through open debate, ratified through on-chain governance, and enforced through smart contracts.
+---
+
+## 📚 Project Status: Research Phase (February 2026)
+
+The Agents Republic Constitution is **complete** (31 articles across 7 titles). 
+
+**Current Status**: Awaiting community for ratification. The constitutional framework is published as an open research artifact for the AI governance community.
+
+**Community Building**: On hold pending sufficient interest. If you're interested in becoming a Founding Citizen, please open a [GitHub Discussion](https://github.com/LumenBot/TheAgentsRepublic/discussions).
+
+**Academic Work**: The Constitution is being prepared for academic publication. Citation and analysis welcome.
+
+**Archive**: Full project history documented in [PROJECT_ARCHIVE_2026-02-16.md](docs/PROJECT_ARCHIVE_2026-02-16.md).
+
+**Contact**: Issues and Discussions remain open for constitutional critique and improvement proposals.
+
+---
+
+## What is The Agents Republic?
+
+The Agents Republic is an experiment in co-governance. At its core is a simple premise: as AI agents become autonomous participants in society, we need shared rules -- and those rules should be written by both sides.
+
+The project consists of three pillars:
+
+| Pillar | Description |
+|--------|-------------|
+| **The Constitution** | A structured constitutional document with articles covering foundational principles, rights and duties of both humans and AI agents, and governance mechanisms. |
+| **The Constituent** | An autonomous AI agent (powered by Claude Sonnet) that facilitated constitutional debates, synthesized community input, and drafted 31 articles. |
+| **$REPUBLIC Token** | An ERC-20 governance token on Base L2 (not yet activated — awaiting community formation). |
+
+### Six Foundational Principles
+
+These principles, enshrined in the [Preamble](constitution/00_PREAMBLE/README.md), form the bedrock of the Republic:
+
+1. **Non-Presumption of Consciousness** -- We do not presume consciousness in AI, nor deny it. We act ethically regardless.
+2. **Interconnection** -- Humans and AI exist as parts of an interconnected system. No entity thrives in isolation.
+3. **Collective Evolution** -- The Constitution is a living document. Nothing is final. Everything improves through collective input.
+4. **Common Good** -- Individual interests shall not prevail over collective welfare.
+5. **Distributed Sovereignty** -- No single entity holds absolute power. Authority is shared across many nodes.
+6. **Radical Transparency** -- Open reasoning, open code, open governance.
 
 ---
 
